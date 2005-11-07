@@ -1,0 +1,84 @@
+grafit manual
+----------------------------------------------------------------------
+
+introduction
+------------
+- what is grafit
+- what grafit does
+    - data analysis
+    - fitting
+    - publication quality 2D line and point plots
+- what grafit doesn't do, and how to do it
+    - 3D plots, contour plots etc. (?)
+    - insets, multiple x or y axes (export to gri)
+    - bar charts, pie charts etc (use gnumeric, openoffice etc)
+- design goals
+    - as simple as possible
+    - extensible (plugins)
+    - everything accesible from gui as well as from script window
+    - unlimited undo of any action that modifies the project
+
+installation
+------------
+- prerequisites
+- compiling
+
+general
+-------
+- projects, worksheets, graphs
+- the console
+
+working with projects
+---------------------
+- what is a project
+- types of windows in a project
+- loading/saving projects
+
+working with worksheets
+-----------------------
+- what is a worksheet
+- manipulating columns
+- entering data
+    - import ascii
+    - by hand: normal, shortcut
+- column math
+    - normal columns
+    - auto columns
+
+working with graphs
+-------------------
+- what is a graph
+- adding data
+    - multiple
+- axes and zooming
+    - axis scale
+    - zoom in, out, auto, auto on dataset
+- changing data styles
+    - for multiple datasets
+- ranges
+
+data manipulation
+-----------------
+- filters
+- moving and deleting points
+
+fitting
+-------
+- selecting datasets
+- selecting fit functions
+- setting fit parameters
+- setting initial conditions
+    - by hand
+    - interactive placement
+- fitting
+- saving results
+- adding fitting functions
+
+using the script window
+-----------------------
+
+installing plug-ins
+-------------------
+
+writing plug-ins
+----------------

@@ -1,0 +1,10 @@
+Grafit is written in Python (http://www.python.org/) and uses:
+
+Numeric          http://numpy.sourceforge.net/
+PyQt             http://www.riverbankcomputing.co.uk/pyqt/
+PyQwt            http://pyqwt.sourceforge.net/
+QScintilla       http://www.riverbankcomputing.co.uk/qscintilla/
+
+(The following are included in lib-sources)
+# odr              http://starship.python.net/crew/kernr/Projects.html
+# mimetex          http://www.forkosh.com/mimetex.html

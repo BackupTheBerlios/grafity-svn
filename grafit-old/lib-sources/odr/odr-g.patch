@@ -1,0 +1,94 @@
+diff -cr odr-0.6/lib/d_odr.f odr-0.6g/lib/d_odr.f
+*** odr-0.6/lib/d_odr.f	Fri Jun 28 00:49:21 2002
+--- odr-0.6g/lib/d_odr.f	Sun Jan 25 21:19:24 2004
+***************
+*** 5343,5349 ****
+  C...EXTERNAL SUBROUTINES
+        EXTERNAL
+       +   DACCES,DCOPY,DEVJAC,DFLAGS,
+!      +   DODLM,DODPCR,DODVCV,DUNPAC,DWGHT,DXMY,DXPY
+  
+  C...INTRINSIC FUNCTIONS
+        INTRINSIC
+--- 5343,5350 ----
+  C...EXTERNAL SUBROUTINES
+        EXTERNAL
+       +   DACCES,DCOPY,DEVJAC,DFLAGS,
+!      +   DODLM,DODPCR,DODVCV,DUNPAC,DWGHT,DXMY,DXPY,
+!      +   PRINTFCN
+  
+  C...INTRINSIC FUNCTIONS
+        INTRINSIC
+***************
+*** 5907,5913 ****
+                 END IF
+                 LUNR = LUNRPT
+                 DO 140 I=1,NPR
+!                   CALL DODPCR(IPR,LUNR,
+       +                        HEAD,PRTPEN,FSTITR,DIDVCV,IFLAG,
+       +                        N,M,NP,NQ,NPP,NNZW,
+       +                        MSGB,MSGD, BETA,Y,LDY,X,LDX,DELTA,
+--- 5908,5917 ----
+                 END IF
+                 LUNR = LUNRPT
+                 DO 140 I=1,NPR
+!                   IF (IPR2.GE.7) THEN
+!                     CALL PRINTFCN(NITER, ACTRED, BETA, WSS)
+!                   ELSE
+!                     CALL DODPCR(IPR,LUNR,
+       +                        HEAD,PRTPEN,FSTITR,DIDVCV,IFLAG,
+       +                        N,M,NP,NQ,NPP,NNZW,
+       +                        MSGB,MSGD, BETA,Y,LDY,X,LDX,DELTA,
+***************
+*** 5918,5923 ****
+--- 5922,5928 ----
+       +                        WSS,RVAR,IDF,WORK(SD),
+       +                        NITER,NFEV,NJEV,ACTRED,PRERED,
+       +                        TAU,PNORM,ALPHA,F,RCOND,IRANK,INFO,ISTOP)
++                   END IF
+                    IF (IPR2.GE.5) THEN
+                       IPR = 2
+                    ELSE
+diff -cr odr-0.6/odrpack.py odr-0.6g/odrpack.py
+*** odr-0.6/odrpack.py	Tue Nov 19 04:55:54 2002
+--- odr-0.6g/odrpack.py	Sun Jan 25 21:19:11 2004
+***************
+*** 988,994 ****
+                    [1, 1], # short, short
+                    [2, 1], # long,  short
+                    [1, 2], # short, long
+!                   [2, 2]] # long,  long
+  
+          if self.rptfile is None and \
+             (so_init is not None or
+--- 988,995 ----
+                    [1, 1], # short, short
+                    [2, 1], # long,  short
+                    [1, 2], # short, long
+!                   [2, 2], # long,  long
+!                   [3, 0]] # function, none
+  
+          if self.rptfile is None and \
+             (so_init is not None or
+diff -cr odr-0.6/src/__odrpack.c odr-0.6g/src/__odrpack.c
+*** odr-0.6/src/__odrpack.c	Sun Nov 10 03:09:04 2002
+--- odr-0.6g/src/__odrpack.c	Sun Jan 25 21:07:18 2004
+***************
+*** 1356,1361 ****
+--- 1356,1371 ----
+    {NULL, NULL},
+  };
+  
++ /* CALL PRINTFCN(NITER, ACTRED, BETA, WSS) */
++ 
++ void printfcn_ (int *niter, double *actred, double *beta, double *wss)
++ {
++     PyObject *arg01;
++     arg01 = Py_BuildValue("(idd)", *niter, *actred, *wss);
++ 
++     PyEval_CallObject (odr_global.fcn, arg01);
++ }
++ 
+  void init__odrpack()
+  {
+    PyObject *m, *d;

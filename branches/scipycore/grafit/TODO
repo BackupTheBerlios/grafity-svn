@@ -1,0 +1,10 @@
+bugs
+----
+* save data range
+* fix issue with double-click in explorer list
+* ask whether to save changes on exit
+* open recent files
+* update total function curve when term is moved
+* show/hide xorobjects correctly
+* vertical text does not align correctly
+* minor tics for logarithmic axes
