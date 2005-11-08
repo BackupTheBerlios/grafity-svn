@@ -1,0 +1,24 @@
+/*
+ * content.css (c) 2003-2005 by Benjamin Schweizer <gopher at h07 dot org>
+ *                              http://www.redsheep.de/
+ *
+ *********************************************************************/
+
+/*
+ * The default stylesheet for agjf.de
+ */
+
+#content table th {
+	background: #eee;
+}
+pre.code {
+	border-left: #eee 7pt solid;
+	padding: 0 0 0 7pt;
+}
+#content fieldset {
+	width: 70%;
+}
+
+/*
+ * eof
+ */

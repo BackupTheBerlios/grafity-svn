@@ -1,0 +1,153 @@
+/*
+ * screen.css (c) 2003-2005 by Benjamin Schweizer <gopher at h07 dot org>
+ *                             http://www.redsheep.de/
+ *
+ *********************************************************************/
+
+/*
+ * The default stylesheet for agjf.de
+ */
+
+img {
+	margin: 0;
+	border: 0;
+}
+
+html,body {
+	width: 100%;
+	height: 100%;
+	margin: 0px;
+	padding: 0px; 
+}
+body,input,pre {
+	color: #222;
+        font-family: 'Trebuchet MS', Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11pt;
+	line-height: 15pt;
+}
+
+a {
+	text-decoration: none;
+	color: #486;
+}
+a:hover {
+	text-decoration: underline;
+}
+
+/**********************************************************************/
+
+#title {
+	margin: 0;
+	padding: 7pt 7pt 7pt 7pt;
+	color: #fff;
+	background: #486;
+	border-bottom: #222 1px solid;
+}
+#subtitle {
+	margin: 0 0 14pt 0;
+	padding: 4pt 7pt 4pt 7pt;
+	background: #eee;
+}
+#search {
+	float: right;
+}
+#search input {
+	display: none;
+}
+#search .edit {
+	display: inline;
+	padding: 0;
+	margin: 0;
+	border: #486 1px solid;
+}
+
+#toolbar {
+	float: left;
+}
+#toolbar div {
+	width: 144pt;
+	margin: 0 0 14pt 0;
+	padding: 7pt 0 7pt 0;
+	-moz-border-radius-topright: 7pt;
+	-moz-border-radius-bottomright: 7pt;
+	background: #eee;
+}
+#toolbar div a {
+	display: block;
+	width: 130pt;
+	padding: 0 7pt 0 7pt;
+}
+#toolbar div a:hover {
+	color: #fff;
+	background: #486;
+	text-decoration: none;
+}
+#toolbar div .button {
+	margin: 0;
+//	padding: 0 0 0 7pt;
+//	width: 100%;
+	width: 144pt;
+	text-align: left;
+	border: 0;
+	color: #48b;
+	background: transparent;
+}
+#toolbar div .button:hover {
+	background: #48b;
+	color: #fff;
+}
+#toolbar #logo {
+	background: transparent;
+	text-align: center;
+}
+#toolbar #logo a:hover {
+	background: transparent;
+}
+
+#toolbar #global {
+	color: #fff;
+	background: transparent;
+//	font-size: 9pt;
+}
+
+div#content {
+//	float: right;
+	padding: 0 7pt 14pt 158pt;
+//	padding: 0 7pt 14pt 7pt;
+	width: auto;
+}
+.secedit {
+	display: none;
+}
+input.edit {
+	border: 1px #222 solid;
+}
+input.button {
+	border: 1px #486 solid;
+	background: #eee;
+}
+#content {
+	width: 100%;
+}
+#foo {
+	float: right;
+}
+#foo input {
+	color: #486;
+	background: transparent;
+	border: 0;
+	width: auto;
+	margin: 4pt 0 0 0;
+	padding: 0;
+}
+
+#content .toc {
+	display: none;
+}
+#content textarea#wikitext {
+	width: 100%;
+}
+
+/*
+ * eof
+ */

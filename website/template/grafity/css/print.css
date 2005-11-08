@@ -1,0 +1,17 @@
+/*
+ * screen.css (c) 2003-2005 by Benjamin Schweizer <gopher at h07 dot org>
+ *                             http://www.redsheep.de/
+ *
+ *********************************************************************/
+
+/*
+ * The default stylesheet for agjf.de
+ */
+
+#title,#subtitle,#toolbar,#local,#content #foo,#content .toc,#content .secedit {
+	display: none;
+}
+
+/*
+ * eof
+ */
