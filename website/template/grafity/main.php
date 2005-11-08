@@ -24,7 +24,9 @@
 
   <body>
     <!-- h1 id="title"><?php tpl_link(wl($ID,'do=backlink'),$ID)?></h1 -->
-    <h1 id="title"> grafity.<?php echo $ID?></h1>
+    <h1 id="title">
+    <img src="<?php echo DOKU_TPL; ?>/img/logo-small.png"/>
+grafity.<?php echo $ID?></h1>
     <!-- div id="subtitle"><?php tpl_breadcrumbs()?></div -->
     <div id="subtitle"><div id="search"><?php tpl_searchform()?></div>
     <?php tpl_youarehere()?>
