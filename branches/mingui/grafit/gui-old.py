@@ -17,8 +17,8 @@ from wx.lib.scrolledpanel import ScrolledPanel
 from wx.lib.fancytext import StaticFancyText
 from wx.html import HtmlWindow
 
-from grafit.signals import HasSignals
-from grafit.settings import DATADIR
+from grafity.signals import HasSignals
+from grafity.settings import DATADIR
 
 
 ###############################################################################
@@ -30,7 +30,7 @@ class _xSplashScreen(wx.SplashScreen):
     Create a splash screen widget.
     """
     def __init__(self):
-        aBitmap = wx.Image(name = os.path.join(DATADIR, "data/images/logos/grafit.png")).ConvertToBitmap()
+        aBitmap = wx.Image(name = os.path.join(DATADIR, "data/images/logos/grafity.png")).ConvertToBitmap()
         splashStyle = wx.SPLASH_CENTRE_ON_SCREEN | wx.SPLASH_TIMEOUT | wx.NO_BORDER
 #        splashDuration = 1000 # milliseconds
 #        splashCallback = None
@@ -1482,8 +1482,8 @@ class Window(Widget):
         self.title = title
         self._widget.Bind(wx.EVT_CLOSE, self.on_close)
         icon = wx.EmptyIcon()
-#        icon.LoadFile(DATADIR+'install/grafit.ico', wx.BITMAP_TYPE_ICO)
-        icon.CopyFromBitmap(wx.Image(DATADIR+'install/grafit16.png').ConvertToBitmap())
+#        icon.LoadFile(DATADIR+'install/grafity.ico', wx.BITMAP_TYPE_ICO)
+        icon.CopyFromBitmap(wx.Image(DATADIR+'install/grafity16.png').ConvertToBitmap())
         self._widget.SetIcon(icon)
 
     title = property(lambda self: self._widget.GetTitle(), lambda self, t: self._widget.SetTitle(t))

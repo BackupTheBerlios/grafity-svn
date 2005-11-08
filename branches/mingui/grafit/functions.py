@@ -2,12 +2,12 @@ import sys
 import os
 import mingui as gui
 
-from grafit.thirdparty import odr
+from grafity.thirdparty import odr
 
-from grafit.signals import HasSignals
-from grafit.arrays import zeros, nan
-from grafit.actions import action_from_methods, StopAction, action_from_methods2
-from grafit.settings import DATADIR, USERDATADIR
+from grafity.signals import HasSignals
+from grafity.arrays import zeros, nan
+from grafity.actions import action_from_methods, StopAction, action_from_methods2
+from grafity.settings import DATADIR, USERDATADIR
 
 def gen_flatten(s):
     try:
@@ -285,7 +285,7 @@ class FunctionSum(HasSignals):
 ]
 """
 
-from grafit.project import create_id
+from grafity.project import create_id
 
 class MFunctionSum(FunctionSum):
     def __init__(self, data):

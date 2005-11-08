@@ -3,18 +3,18 @@ import tempfile
 import subprocess
 import sys
 
-from grafit import Graph, Worksheet, Folder, Project
-from grafit.ui_worksheet_view import WorksheetView
-from grafit.ui_graph_view import GraphView
-from grafit.import_ascii import import_ascii
-from grafit.arrays import nan
-from grafit.signals import HasSignals, global_connect
-from grafit.actions import action_list, undo, redo
-from grafit.settings import settings, DATADIR
+from grafity import Graph, Worksheet, Folder, Project
+from grafity.ui_worksheet_view import WorksheetView
+from grafity.ui_graph_view import GraphView
+from grafity.import_ascii import import_ascii
+from grafity.arrays import nan
+from grafity.signals import HasSignals, global_connect
+from grafity.actions import action_list, undo, redo
+from grafity.settings import settings, DATADIR
 from mingui import Window, Button, Box, Application, Shell, List, \
                        Splitter, Label, Tree, TreeNode, Notebook, MainPanel, \
                        OpenGLWidget, Table, Command, Menu, Menubar, Toolbar, Html
-import grafit.signals
+import grafity.signals
 
 import wx
 import wx.xrc
@@ -23,12 +23,12 @@ class ItemDragData(object):
     def __init__(self, items):
         self.items = items
         if Folder in [type(item) for item in items]:
-            self.supported_formats = ['grafit-object']
+            self.supported_formats = ['grafity-object']
         else:
-            self.supported_formats = ['grafit-object', 'filename']
+            self.supported_formats = ['grafity-object', 'filename']
 
     def get_data(self, format):
-        if format == 'grafit-object':
+        if format == 'grafity-object':
             return '\n'.join(i.id for i in self.items)
         elif format == 'filename':
             r = []
@@ -56,8 +56,8 @@ class ScriptWindow(Shell):#, Pyro.core.ObjBase):
         self.locals = {}
         Shell.__init__(self, parent, locals=self.locals, **kwds)
 
-        self.run('from grafit.arrays import *')
-        self.run('from grafit import *')
+        self.run('from grafity.arrays import *')
+        self.run('from grafity import *')
 
         self.clear()
         self.run('print "# Welcome to Grafit"')
@@ -102,7 +102,7 @@ class FolderTreeNode(HasSignals):
 
     def get_pixmap(self): 
 #        if self.folder == self.folder.project.top:
-#            return 'grafit16.png'
+#            return 'grafity16.png'
 #        else:
             return '16/folder.png'
 
@@ -131,7 +131,7 @@ class ProjectExplorer(Box):
         self.splitter = Splitter(self, 'horizontal')
 
         self.tree = Tree(self.splitter)
-        self.tree.enable_drop(['grafit-object'])
+        self.tree.enable_drop(['grafity-object'])
 
         self.tree.connect('drop-hover', self.on_drop_hover)
         self.tree.connect('drop-ask', self.on_tree_drop_ask)
@@ -140,7 +140,7 @@ class ProjectExplorer(Box):
         self.tree.connect('selected', self.on_tree_selected)
 
         self.list = List(self.splitter, editable=True)
-        self.list.enable_drop(['grafit-object', 'filename'])
+        self.list.enable_drop(['grafity-object', 'filename'])
 
         self.list.connect('drop-hover', self.on_drop_hover)
         self.list.connect('dropped', self.on_dropped)
@@ -182,8 +182,8 @@ class ProjectExplorer(Box):
         subprocess.Popen(['evince', d+'/preview.eps'])
 
     def on_tree_dropped(self, item, data):
-        if 'grafit-object' in data.formats:
-            for d in data.get('grafit-object').split('\n'):
+        if 'grafity-object' in data.formats:
+            for d in data.get('grafity-object').split('\n'):
                 self.project.items[d].parent = item.folder
             return True
         else:
@@ -201,9 +201,9 @@ class ProjectExplorer(Box):
 #            return False
 
     def on_dropped(self, item, data):
-        if 'grafit-object' in data.formats:
+        if 'grafity-object' in data.formats:
             parent = self.list.model[item]
-            for d in data.get('grafit-object').split('\n'):
+            for d in data.get('grafity-object').split('\n'):
                 self.project.items[d].parent = parent
             return True
         elif 'filename' in data.formats and item == -1:
@@ -365,7 +365,7 @@ class MainWindow(Window):
                                 self.on_project_save, 'save.png', 'Ctrl+S'),
             'file-saveas': Command('Save As...', 'Save the project with a new name', 
                                   self.on_project_saveas, 'saveas.png'),
-            'file-quit': Command('Quit', 'Quit grafit', self.on_quit, 'stock_exit.png', 'Ctrl+Q'),
+            'file-quit': Command('Quit', 'Quit grafity', self.on_quit, 'stock_exit.png', 'Ctrl+Q'),
 
             'edit-undo': Command('Undo', 'Undo the last action', undo, 'stock_undo.png', 'Ctrl+Z'),
             'edit-redo': Command('Redo', 'Redo the last action', redo, 'stock_redo.png', 'Shift+Ctrl+Z'),

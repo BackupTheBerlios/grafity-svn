@@ -1,8 +1,8 @@
-from grafit.arrays import *
-from grafit.signals import HasSignals
-from grafit.actions import action_from_methods2, action_from_methods
-from grafit.functions import MFunctionSum
-from grafit.project import wrap_attribute
+from grafity.arrays import *
+from grafity.signals import HasSignals
+from grafity.actions import action_from_methods2, action_from_methods
+from grafity.functions import MFunctionSum
+from grafity.project import wrap_attribute
 from numarray.ieeespecial import isfinite
 
 import time
@@ -10,7 +10,7 @@ import time
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
-from grafit.graph_render import *
+from grafity.graph_render import *
 
 class Style(HasSignals):
     def __init__(self, color=(0,0,0), symbol='square-f', symbol_size=8,line_type='none', line_style='solid', line_width=0):

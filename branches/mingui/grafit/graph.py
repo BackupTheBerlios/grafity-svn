@@ -3,19 +3,19 @@ import time
 import string
 import tempfile
 
-from grafit.arrays import *
+from grafity.arrays import *
 from OpenGL.GL import *
 
-from grafit.signals import HasSignals
-from grafit.project import Item, wrap_attribute, register_class, create_id
-from grafit.actions import action_from_methods, action_from_methods2, StopAction
-from grafit.graph_axis import Axis, Grid
-from grafit.graph_objects import Rubberband, Cross, Line, Text, Move, DrawFunction, Rangehandle
-from grafit.graph_dataset import Dataset, Function
-from grafit.graph_text import FONTFILE, TextPainter, encodeTTFasPS
-from grafit.graph_render import *
-from grafit.settings import DATADIR
-from grafit.thirdparty.ft2font import FT2Font
+from grafity.signals import HasSignals
+from grafity.project import Item, wrap_attribute, register_class, create_id
+from grafity.actions import action_from_methods, action_from_methods2, StopAction
+from grafity.graph_axis import Axis, Grid
+from grafity.graph_objects import Rubberband, Cross, Line, Text, Move, DrawFunction, Rangehandle
+from grafity.graph_dataset import Dataset, Function
+from grafity.graph_text import FONTFILE, TextPainter, encodeTTFasPS
+from grafity.graph_render import *
+from grafity.settings import DATADIR
+from grafity.thirdparty.ft2font import FT2Font
 
 import wx
 

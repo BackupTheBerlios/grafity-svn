@@ -1,8 +1,8 @@
-from grafit.signals import HasSignals
-from grafit.settings import DATADIR
-from grafit.project import wrap_attribute
-from grafit.actions import action_from_methods2, StopAction
-from grafit.graph_dataset import Function
+from grafity.signals import HasSignals
+from grafity.settings import DATADIR
+from grafity.project import wrap_attribute
+from grafity.actions import action_from_methods2, StopAction
+from grafity.graph_dataset import Function
 
 from OpenGL.GL import *
 from OpenGL.GLU import *

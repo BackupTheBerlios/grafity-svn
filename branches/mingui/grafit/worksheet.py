@@ -1,13 +1,13 @@
 import sys
 #print >>sys.stderr, "import worksheet"
 
-from grafit.signals import HasSignals
-from grafit.actions import action_from_methods, action_from_methods2, StopAction
-from grafit.project import Item, wrap_attribute, register_class, create_id
+from grafity.signals import HasSignals
+from grafity.actions import action_from_methods, action_from_methods2, StopAction
+from grafity.project import Item, wrap_attribute, register_class, create_id
 
-from grafit.arrays import MkArray, transpose, array, asarray
+from grafity.arrays import MkArray, transpose, array, asarray
 
-import grafit.arrays as arrays
+import grafity.arrays as arrays
 
 class Column(MkArray, HasSignals):
     def __init__(self, worksheet, ind):

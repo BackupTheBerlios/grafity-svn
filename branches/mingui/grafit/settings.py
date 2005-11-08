@@ -12,9 +12,9 @@ if platform.system() == 'Windows':
     # 2. does this work?  os.environ['APPDATA']
 #    appdata = shell.SHGetPathFromIDList(shell.SHGetSpecialFolderLocation(0, shellcon.CSIDL_APPDATA))
     appdata = os.environ['APPDATA']
-    USERDATADIR = os.path.join(appdata, 'grafit')
+    USERDATADIR = os.path.join(appdata, 'grafity')
 if platform.system() == 'Linux':
-    USERDATADIR = os.path.expanduser('~/.grafit')
+    USERDATADIR = os.path.expanduser('~/.grafity')
 
 
 if not os.path.exists(USERDATADIR):
@@ -53,4 +53,4 @@ class Settings(object):
         log.info('Getting option %s/%s', section, key)
         return self.config.get(section, key)
 
-settings = Settings(os.path.join(USERDATADIR,'grafit.cfg'))
+settings = Settings(os.path.join(USERDATADIR,'grafity.cfg'))

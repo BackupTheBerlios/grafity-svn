@@ -1,8 +1,8 @@
 import sys
 
-from grafit.signals import HasSignals
-from grafit.arrays import nan, array
-from grafit.worksheet import Worksheet
+from grafity.signals import HasSignals
+from grafity.arrays import nan, array
+from grafity.worksheet import Worksheet
 
 import mingui as gui
 

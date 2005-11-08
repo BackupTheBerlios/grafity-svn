@@ -4,11 +4,11 @@ import mingui as gui
 
 sys.path.append("..")
 
-from grafit.signals import HasSignals
-from grafit import Project, Folder, Worksheet, Graph
-from grafit.settings import settings, DATADIR
-from grafit.arrays import nan
-from grafit.actions import action_list, undo, redo
+from grafity.signals import HasSignals
+from grafity import Project, Folder, Worksheet, Graph
+from grafity.settings import settings, DATADIR
+from grafity.arrays import nan
+from grafity.actions import action_list, undo, redo
 
 from ui_worksheet_view import WorksheetView
 from ui_graph_view import GraphView, GraphDataPanel, GraphStylePanel
@@ -26,8 +26,8 @@ class ProjectShell(gui.PythonShell):
     """
 
     def setup(self):
-        self.run('from grafit.arrays import *')
-        self.run('from grafit import *')
+        self.run('from grafity.arrays import *')
+        self.run('from grafity import *')
         self.clear()
         self.run('print "# Welcome to Grafit"')
         self.prompt()
@@ -276,7 +276,7 @@ class MainWindow(gui.Window):
 
 
 def main():
-    gui.xml.merge('grafit.ui')
+    gui.xml.merge('grafity.ui')
     gui.run(gui.xml.build('mainwin', src=globals()))
 
 if __name__ == '__main__':

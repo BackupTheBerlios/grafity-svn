@@ -7,7 +7,7 @@ import pickle
 
 import cElementTree as xml
 
-from grafit import Worksheet, Graph
+from grafity import Worksheet, Graph
 
 def pyget (elem, name):
     return eval (elem.get (name), {"__builtins__": { 'True': True, 'False':False, 'None':None, 'nan':0.0 }})

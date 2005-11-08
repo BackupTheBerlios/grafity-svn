@@ -18,7 +18,7 @@ class ElementTreeNode(HasSignals):
     def get_pixmap(self): return '16/folder.png'
 
 def main():
-    gui.xml.merge('grafit.mgx')
+    gui.xml.merge('grafity.mgx')
     win = gui.xml.build('mainwin')
 
     tree = win.find('tree')

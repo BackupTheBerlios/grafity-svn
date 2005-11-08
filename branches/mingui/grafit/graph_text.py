@@ -7,9 +7,9 @@ import ImageFont
 import ImageDraw
 from thirdparty.ft2font import FT2Font
 
-import grafit.thirdparty.mathtextg as mathtext
-from grafit.settings import DATADIR
-from grafit.arrays import *
+import grafity.thirdparty.mathtextg as mathtext
+from grafity.settings import DATADIR
+from grafity.arrays import *
 from OpenGL.GL import *
 import time
 

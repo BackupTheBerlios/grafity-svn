@@ -32,7 +32,7 @@ import os
 import settings
 
 sys.path.append(settings.DATADIR)
-sys.path.append(os.path.join(settings.DATADIR, 'grafit', 'thirdparty'))
+sys.path.append(os.path.join(settings.DATADIR, 'grafity', 'thirdparty'))
 
 from thirdparty.ultraTB import VerboseTB
 
@@ -89,8 +89,8 @@ def excepthook(type, value, traceback):
 
 def main():
     sys.excepthook = excepthook
-    import mgrafit
-    mgrafit.main()
+    import mgrafity
+    mgrafity.main()
 #    app = gui.Application()
 #    app.splash()
 #    from ui_main import MainWindow

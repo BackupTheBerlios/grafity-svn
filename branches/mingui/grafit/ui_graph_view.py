@@ -1,15 +1,15 @@
 import sys
 import sets
 
-from grafit import Worksheet, Folder
+from grafity import Worksheet, Folder
 
-from grafit.graph_dataset import Style
-from grafit.signals import HasSignals
+from grafity.graph_dataset import Style
+from grafity.signals import HasSignals
 
-from grafit.arrays import nan, isfinite, asarray
-from grafit.util import flatten
+from grafity.arrays import nan, isfinite, asarray
+from grafity.util import flatten
 
-from grafit.settings import DATADIR
+from grafity.settings import DATADIR
 
 import wx
 import mingui as gui

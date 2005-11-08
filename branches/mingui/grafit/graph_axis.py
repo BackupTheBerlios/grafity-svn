@@ -1,8 +1,8 @@
 import re
-from grafit.arrays import *
+from grafity.arrays import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
-from grafit.graph_render import *
+from grafity.graph_render import *
 
 from __builtin__ import round
 

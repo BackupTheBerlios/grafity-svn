@@ -2,7 +2,7 @@ import sys
 try:
     import metakit
 except ImportError:
-    import grafit.thirdparty.metakit as metakit
+    import grafity.thirdparty.metakit as metakit
 
 import cPickle as pickle
 

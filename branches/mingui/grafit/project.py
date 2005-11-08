@@ -5,10 +5,10 @@ import time, random, socket, md5
 try:
     import metakit
 except ImportError:
-    import grafit.thirdparty.metakit as metakit
+    import grafity.thirdparty.metakit as metakit
 
-from grafit.actions import action_from_methods, action_list, action_from_methods2, StopAction
-from grafit.signals import HasSignals
+from grafity.actions import action_from_methods, action_list, action_from_methods2, StopAction
+from grafity.signals import HasSignals
 
 # by (Carl Free Jr. http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/213761)
 def create_id(*args):
@@ -278,7 +278,7 @@ class Project(HasSignals):
             self.db = metakit.storage(self.filename, 1)
             self.cleanup()
 
-#        self.aside = metakit.storage('grafit-storage.mka', 1)
+#        self.aside = metakit.storage('grafity-storage.mka', 1)
 #        self.db.aside(self.aside)
 #        print >>sys.stderr, "project created"
 
@@ -306,7 +306,7 @@ class Project(HasSignals):
         self.this = None
 
         # create objects
-        for cls, desc in [(i, storage_desc[i]) for i in (Folder, grafit.worksheet.Worksheet, grafit.graph.Graph)]:
+        for cls, desc in [(i, storage_desc[i]) for i in (Folder, grafity.worksheet.Worksheet, grafity.graph.Graph)]:
             view = self.db.getas(desc)
             for i, row in enumerate(view):
                 if row.id != self.top.id:
@@ -508,5 +508,5 @@ class Project(HasSignals):
     modified = property(get_modified, set_modified)
 
 # import only in order to register object types
-import grafit.worksheet
-import grafit.graph
+import grafity.worksheet
+import grafity.graph
