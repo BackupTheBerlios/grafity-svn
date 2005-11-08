@@ -139,14 +139,14 @@ from pyparsing import Literal, Word, OneOrMore, ZeroOrMore, \
 
 #from matplotlib.afm import AFM
 #from matplotlib.cbook import enumerate, iterable, Bunch
-from grafit.thirdparty.ft2font import FT2Font
+from grafity.thirdparty.ft2font import FT2Font
 #from matplotlib.font_manager import fontManager
 from _mathtext_data import latex_to_bakoma, cmkern
 #from matplotlib.numerix import absolute
 #from matplotlib import get_data_path
 # start XXX
 
-from grafit.settings import DATADIR
+from grafity.settings import DATADIR
 
 def get_data_path():
     return os.path.join(DATADIR, 'data', 'fonts', 'bakoma-cm')
