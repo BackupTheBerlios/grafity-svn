@@ -33,9 +33,9 @@ class Box(Widget, Container, wx.Panel):
         else:
             expand = 0
         if prepend:
-            self.layout.Prepend(widget, stretch, expand | wx.ADJUST_MINSIZE)
+            self.layout.Prepend(widget, stretch*255, expand | wx.ADJUST_MINSIZE)
         else:
-            self.layout.Add(widget, stretch, expand | wx.ADJUST_MINSIZE)
+            self.layout.Add(widget, stretch*255, expand | wx.ADJUST_MINSIZE)
         self.layout.Layout()
         self.layout.Fit(self)
         

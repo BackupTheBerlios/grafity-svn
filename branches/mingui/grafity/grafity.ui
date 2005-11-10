@@ -112,8 +112,8 @@
             <Grid _expand="True" _stretch="1.">
               <Checkbox _position="(0,0)"/>
               <Label text="'Symbol'" _position="(0,1)"/>
-              <ImageChoice _position="(0,2)"/>
-
+              <ImageChoice name="'ic'" _position="(0,2)"/>
+<!--
               <Checkbox _position="(1,0)"/>
               <Label text="'Color'" _position="(1,1)"/>
               <ImageChoice _position="(1,2)"/>
@@ -121,6 +121,7 @@
               <Checkbox _position="(2,0)"/>
               <Label text="'Size'" _position="(2,1)"/>
               <Spin _position="(2,2)"/>
+-->
             </Grid>
           </Frame>
 

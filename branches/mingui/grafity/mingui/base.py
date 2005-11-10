@@ -216,7 +216,7 @@ class Button(Widget, wx.Button, wx.ToggleButton):
         def fget(self): return self.GetValue()
         def fset(self, state): self.SetValue(state)
         return locals()
-    toggled = property(**toggled())
+    on = property(**toggled())
 
     def text():
         doc = "Text to display inside the button"
