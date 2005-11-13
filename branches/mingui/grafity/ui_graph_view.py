@@ -51,6 +51,8 @@ class GraphView(gui.Box):
         self.graph.connect('redraw', self.glwidget.redraw)
         self.graph.connect('object-doubleclicked', self.on_object_doubleclicked)
         self.graph.connect('right-clicked', self.on_right_clicked)
+        self.graph.connect('request-cursor', self.on_request_cursor)
+        self.graph.connect('rename', self.on_rename)
 
         self.glwidget.connect('initialize-gl', self.graph.init)
         self.glwidget.connect('resize-gl', self.graph.reshape)
@@ -64,81 +66,31 @@ class GraphView(gui.Box):
         self.legend = self.find('legend')
         self.legend.data = LegendModel(self.graph)
         self.legend.connect('selection-changed', self.on_legend_select)
+        self.legend.connect('right-click', self.on_legend_right_click)
 
         self.style = self.find('style-panel')
 
-
-    def __binit__(self, parent, graph, **place):
-        gui.Box.__init__(self, parent, 'horizontal', **place)
-        self.graph = graph
-
-        tbbox = gui.Box(self, 'horizontal', stretch=0)
+        import wx
+        cursor = {'arrow': wx.CURSOR_ARROW,
+                  'hand': wx.CURSOR_HAND,
+                  'zoom': wx.CURSOR_MAGNIFIER,
+                  'range': wx.CURSOR_SIZEWE,
+                  'd-reader': wx.CURSOR_CROSS,
+                  's-reader': wx.CURSOR_CROSS,
+                  'draw-text': wx.CURSOR_IBEAM,
+                  'draw-line': wx.CURSOR_PENCIL,
+                  'none': wx.CURSOR_NONE }
 
         def set_graph_mode(mode):
-            def _set(): 
+            def set(): 
                 self.graph.prev_mode = self.graph.mode
                 self.graph.mode = mode
-
-                import wx
-                cur = {'arrow': wx.CURSOR_ARROW,
-                       'hand': wx.CURSOR_HAND,
-                       'zoom': wx.CURSOR_MAGNIFIER,
-                       'range': wx.CURSOR_SIZEWE,
-                       'd-reader': wx.CURSOR_CROSS,
-                       's-reader': wx.CURSOR_CROSS,
-                       'draw-text': wx.CURSOR_IBEAM,
-                       'draw-line': wx.CURSOR_PENCIL,
-                       'none': wx.CURSOR_NONE }[mode]
-                self.glwidget.SetCursor(wx.StockCursor(cur))
+                self.glwidget.SetCursor(wx.StockCursor(cursor[mode]))
                 self.graph.emit('redraw')
-            return _set
+            return set
 
-        graph.show()
-
-        self.toolbar = gui.Toolbar(tbbox, orientation='vertical', stretch=1)
-        self.toolbar.append(gui.Command('Arrow', '', set_graph_mode('arrow'), 'arrow.png', type='radio'))
-        self.toolbar.append(gui.Command('Hand', '', set_graph_mode('hand'), 'hand.png', type='radio'))
-        self.toolbar.append(gui.Command('Zoom', '', set_graph_mode('zoom'), 'zoom.png', type='radio'))
-        self.toolbar.append(gui.Command('Range', '', set_graph_mode('range'), 'range.png', type='radio'))
-        self.toolbar.append(gui.Command('Data reader', '', set_graph_mode('d-reader'), 'dreader.png', type='radio'))
-        self.toolbar.append(gui.Command('Screen reader', '', set_graph_mode('s-reader'), 'sreader.png', type='radio'))
-        self.toolbar.append(None)
-        self.toolbar.append(gui.Command('Line', '', set_graph_mode('draw-line'), 'stock_draw-line.png'))
-        self.toolbar.append(gui.Command('Text', '', set_graph_mode('draw-text'), 'stock_draw-text.png'))
-        self.toolbar.append(None)
-        self.toolbar.append(gui.Command('Select all datasets', '', self.on_selectall, 'stock_select-all.png'))
-
-
-        self.toolbar.Realize()
-
-#        self.closebar = gui.Toolbar(tbbox, stretch=0)
-#        self.closebar.append(gui.Command('Close', 'Close this worksheet', 
-#                                        self.on_close, 'close.png'))
-#        self.closebar.Realize()
-
-        self.panel = gui.MainPanel(self)
-        self.box = gui.Splitter(self.panel, 'vertical', proportion=0.8)
-        self.scrolled = gui.Scrolled(self.box)
-        self.glwidget = gui.OpenGLWidget(self.scrolled)
-        self.glwidget.min_size = (400, 200)
-
-
-        self.graphdata = GraphDataPanel(self.graph, self, self.panel.right_panel, 
-                                        page_label='Data', page_pixmap='worksheet.png')
-        self.style = GraphStylePanel(self.graph, self, self.panel.right_panel, 
-                                     page_label='Style', page_pixmap='style.png')
-        self.axes = GraphAxesPanel(self.graph, self, self.panel.right_panel, 
-                                   page_label='Axes', page_pixmap='axes.png')
-        self.fit = GraphFunctionsPanel(self.graph.functions[0].func, self.graph, 
-                                       self.panel.right_panel,
-                                       page_label='Fit', page_pixmap='function.png')
-        self.panel.right_panel.toolbar.Realize()
-
-        self.graph.connect('request-cursor', self.on_request_cursor)
-
-        self.object = self.graph
-        self.graph.connect('rename', self.on_rename)
-        self.legend.connect('right-click', self.on_legend_right_click)
+        for mode in set(cursor.keys()) - set(['none']):
+            self.commands['mode:'+mode].connect('activated', set_graph_mode(mode), True)
 
     def on_legend_right_click(self, item):
         if item == -1:

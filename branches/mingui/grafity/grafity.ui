@@ -16,7 +16,6 @@
   </Images>
 
 
-
   <MainWindow name="'mainwin'" title="'Grafity'" size="(640, 480)" statusbar="True">
 
     <!-- Menus and toolbars -->
@@ -93,8 +92,27 @@
     <Commands>
       <Command id="'add-dataset'" label="'Add'" image="'add'"/>
       <Command id="'remove-dataset'" label="'Add'" image="'remove'"/>
+
+      <Command id="'mode:arrow'" label="'Arrow'" image="'arrow'" type="'radio'"/>
+      <Command id="'mode:hand'" label="'Hand'" image="'hand'" type="'radio'"/>
+      <Command id="'mode:zoom'" label="'Zoom'" image="'zoom'" type="'radio'"/>
+      <Command id="'mode:range'" label="'Range'" image="'range'" type="'radio'"/>
+      <Command id="'mode:d-reader'" label="'Data reader'" image="'dreader'" type="'radio'"/>
+      <Command id="'mode:s-reader'" label="'Screen reader'" image="'sreader'" type="'radio'"/>
+
+      <Command id="'mode:draw-line'" label="'Line'" image="'draw-line'"/>
+      <Command id="'mode:draw-text'" label="'Text'" image="'draw-text'"/>
     </Commands>
     <Toolbar _stretch="0" orientation="'vertical'">
+      <CommandRef object="'^graph-view'" id="'mode:arrow'"/>
+      <CommandRef object="'^graph-view'" id="'mode:hand'"/>
+      <CommandRef object="'^graph-view'" id="'mode:zoom'"/>
+      <CommandRef object="'^graph-view'" id="'mode:range'"/>
+      <CommandRef object="'^graph-view'" id="'mode:d-reader'"/>
+      <CommandRef object="'^graph-view'" id="'mode:s-reader'"/>
+      <Separator/>
+      <CommandRef object="'^graph-view'" id="'mode:draw-line'"/>
+      <CommandRef object="'^graph-view'" id="'mode:draw-text'"/>
     </Toolbar>
     <Splitter orientation="'horizontal'">
       <Scrolled _stretch="1.">
