@@ -1,4 +1,6 @@
 import StringIO
+import sys
+
 import mingui as gui
 import Image
 from cElementTree import parse
@@ -52,6 +54,7 @@ def _from_element(elem, parent=None, place=None, src={}, extra={}):
     args = dict((k, eval(v, {})) for k, v in elem.items() if not k.startswith('_'))
 
     args.update(extra)
+#    print >>sys.stderr, cls, plac, args
 
     if elem.tag == 'Command':
         cmd = cls(**args)

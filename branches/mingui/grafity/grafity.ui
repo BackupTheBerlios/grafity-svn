@@ -14,8 +14,13 @@
     <DirImageProvider path="'../data/images/16'"/>
     <DirImageProvider path="'../data/images/24'"/>
   </Images>
+
+
+
   <MainWindow name="'mainwin'" title="'Grafity'" size="(640, 480)" statusbar="True">
-<!-- Menus and toolbars -->
+
+    <!-- Menus and toolbars -->
+
     <Menubar>
       <Menu label="'&amp;File'">
         <CommandRef id="'file-new'"/>
@@ -44,7 +49,9 @@
       <Separator/>
       <CommandRef id="'exit'"/>
     </Toolbar>
-<!-- Widgets -->
+
+    <!-- Widgets -->
+
     <Splitter orientation="'horizontal'">
       <Panel position="'left'" _width="150">
         <Splitter name="'projectpane'" _label="'project'" _image="'open'" orientation="'vertical'">
@@ -60,6 +67,8 @@
       </Splitter>
     </Splitter>
   </MainWindow>
+
+
   <WorksheetView name="'worksheet-view'" orientation="'horizontal'">
     <Commands>
       <Command id="'mode-arrow'" label="'New'" image="'new'" desc="'Create a new file'" accel="'Ctrl+N'"/>
@@ -77,6 +86,9 @@
     </Toolbar>
     <Table name="'table'"/>
   </WorksheetView>
+
+
+
   <GraphView name="'graph-view'" orientation="'horizontal'">
     <Commands>
       <Command id="'add-dataset'" label="'Add'" image="'new'"/>
@@ -97,35 +109,72 @@
             <CommandRef object="'^graph-view'" id="'add-dataset'"/>
             <CommandRef object="'^graph-view'" id="'remove-dataset'"/>
           </Toolbar>
-          <Label text="'Worksheet'" _stretch="0"/>
-          <List/>
-          <Label text="'X column'" _stretch="0"/>
-          <List/>
-          <Label text="'Y column'" _stretch="0"/>
-          <List/>
+          <Label text="'Worksheet'" _stretch="0"/> <List/>
+          <Label text="'X column'" _stretch="0"/> <List/>
+          <Label text="'Y column'" _stretch="0"/> <List/>
         </GraphDataPanel>
 
         <!-- Style panel -->
 
         <GraphStylePanel _label="'style'" _image="'new'" orientation="'vertical'">
-          <Frame orientation="'vertical'" title="'Symbol'" _stretch="1.">
-            <Grid _expand="True" _stretch="1.">
-              <Checkbox _position="(0,0)"/>
-              <Label text="'Symbol'" _position="(0,1)"/>
-              <ImageChoice name="'ic'" _position="(0,2)"/>
-<!--
-              <Checkbox _position="(1,0)"/>
-              <Label text="'Color'" _position="(1,1)"/>
-              <ImageChoice _position="(1,2)"/>
 
-              <Checkbox _position="(2,0)"/>
-              <Label text="'Size'" _position="(2,1)"/>
-              <Spin _position="(2,2)"/>
--->
+          <Frame orientation="'vertical'" title="'Symbol'" _stretch="1">
+            <Grid name="'grid1'" _expand="True" _stretch="1.">
+              <Checkbox name="'check:symbol'" _position="(0,0)"/> 
+              <Label name="'label:symbol'" text="'Symbol'" _position="(0,1)"/> 
+              <ImageChoice name="'symbol'" _position="(0,2)"/>
+              <Checkbox name="'check:color'" _position="(1,0)"/> 
+              <Label name="'label:color'" text="'Color'" _position="(1,1)"/> 
+              <ImageChoice name="'color'" _position="(1,2)"/>
+              <Checkbox name="'check:size'" _position="(2,0)"/> 
+              <Label name="'label:size'" text="'Size'" _position="(2,1)"/> 
+              <Spin name="'size'" _position="(2,2)"/>
             </Grid>
           </Frame>
 
+          <Frame orientation="'vertical'" title="'Line'" _stretch="1">
+            <Grid name="'grid2'" _expand="True" _stretch="1">
+              <Checkbox name="'check:line_type'" _position="(0,0)"/> 
+              <Label name="'label:line_type'" text="'Type'" _position="(0,1)"/> 
+              <Choice name="'line_type'" _position="(0,2)"/>
+              <Checkbox name="'check:line_style'" _position="(1,0)"/> 
+              <Label name="'label:line_style'" text="'Style'" _position="(1,1)"/> 
+              <Choice name="'line_style'" _position="(1,2)"/>
+              <Checkbox name="'check:line_width'" _position="(2,0)"/> 
+              <Label name="'label:line_width'" text="'Width'" _position="(2,1)"/> 
+              <Spin name="'line_width'" _position="(2,2)"/>
+            </Grid>
+          </Frame>
+
+          <Box orientation="'horizontal'" _stretch="1">
+            <Label text="'Group'" _stretch="0" _expand="False"/>
+            <Choice name="'multi'" items="['identical', 'series']" _stretch="1" _expand="False"/>
+          </Box>
+
         </GraphStylePanel>
+
+        <!-- Axes panel -->
+
+        <GraphAxesPanel _label="'Axes'" _image="'new'" orientation="'vertical'">
+          <Frame orientation="'vertical'" title="'X axis'" _stretch="1">
+            <Grid name="'agrid'" _expand="False">
+              <Label text="'Title'" _position="(0,0)"/> <Text _position="(0,1)"/>
+              <Label text="'From'" _position="(1,0)"/> <Text _position="(1,1)"/>
+              <Label text="'To'" _position="(2,0)"/> <Text _position="(2,1)"/>
+              <Label text="'Type'" _position="(3,0)"/> <Choice _position="(3,1)"/>
+            </Grid>
+          </Frame>
+
+          <Frame orientation="'vertical'" title="'Y axis'" _stretch="1">
+            <Grid name="'agrid'" _expand="False">
+              <Label text="'Title'" _position="(0,0)"/> <Text _position="(0,1)"/>
+              <Label text="'From'" _position="(1,0)"/> <Text _position="(1,1)"/>
+              <Label text="'To'" _position="(2,0)"/> <Text _position="(2,1)"/>
+              <Label text="'Type'" _position="(3,0)"/> <Choice _position="(3,1)"/>
+            </Grid>
+          </Frame>
+ 
+        </GraphAxesPanel>
 
       </Panel>
     </Splitter>

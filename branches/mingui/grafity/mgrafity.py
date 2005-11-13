@@ -11,7 +11,7 @@ from grafity.arrays import nan
 from grafity.actions import action_list, undo, redo
 
 from ui_worksheet_view import WorksheetView
-from ui_graph_view import GraphView, GraphDataPanel, GraphStylePanel
+from ui_graph_view import GraphView, GraphDataPanel, GraphStylePanel, GraphAxesPanel
 
 class ProjectShell(gui.PythonShell):
     """

@@ -7,6 +7,8 @@ import wx
 import PIL.Image
 from signals import HasSignals
 
+DATADIR='/home/daniel/grafity/'
+
 class Container(HasSignals):
     def __init__(self):
         self.children = []
@@ -100,6 +102,17 @@ class Widget(Placeable, HasSignals):
             return next
         else:
             return next.ref(rest)
+
+    def findall(self, pattern):
+        from fnmatch import fnmatch
+        if self.name is not None and fnmatch(self.name, pattern):
+            yield self
+            raise StopIteration
+        if hasattr(self, 'children'):
+            for c in self.children:
+                if hasattr(c, 'findall'):
+                    for f in c.findall(pattern):
+                        yield f 
 
     def find(self, name):
         if self.name == name:
@@ -268,6 +281,7 @@ class Spin(Widget, wx.SpinCtrl):
         Widget.__init__(self, place, **args) 
 
         self.Bind(wx.EVT_SPINCTRL, self.on_spin)
+        self.min_size = (10, -1)
 
     def get_value(self): return self.GetValue()
     def set_value(self, val): self.SetValue(val)
@@ -281,6 +295,7 @@ class Choice(Widget, wx.Choice):
         wx.Choice.__init__(self, place[0], -1)
         Widget.__init__(self, place, **args)
         self.Bind(wx.EVT_CHOICE, self.on_choice)
+        self.min_size = (10, -1)
 
     def append(self, s):
         self.Append(s)
@@ -291,6 +306,17 @@ class Choice(Widget, wx.Choice):
 
     def on_choice(self, event):
         self.emit('select', self.value)
+
+    def clear(self):
+        self.Clear()
+
+    def set_items(self, items):
+        self.clear()
+        for i in items:
+            self.append(i)
+    def get_items(self):
+        return [self.GetString(i) for i in xrange(self.GetCount())]
+    items = property(get_items, set_items)
 
 
 
@@ -308,6 +334,7 @@ class ImageChoice(Widget, wx.BitmapButton):
         self.items = []
 
         self.down = False
+        self.min_size = (10, -1)
 
     def create_colored_bitmap(self, size, rgb):
         dc = wx.MemoryDC()
@@ -354,13 +381,13 @@ class ImageChoice(Widget, wx.BitmapButton):
         self._selection = i
         self.emit('select', i)
 
-    def set_selection(self, idx):
+    def set_value(self, idx):
         bitmap = self.images[self.items[idx]]
         self._selection = idx
         self.SetBitmapLabel(bitmap)
-    def get_selection(self):
+    def get_value(self):
         return self._selection
-    value = property(get_selection, set_selection)
+    value = property(get_value, set_value)
 
     def on_kill_focus(self, event):
         try:
@@ -374,6 +401,7 @@ class ImageChoice(Widget, wx.BitmapButton):
             bitmap = wx.Image(DATADIR+'data/images/'+bitmap).ConvertToBitmap()
         id = self.imagelist.Add(bitmap)
         self.items.append(id)
+        self.images[id] = bitmap
 
 class ColorSelect(Widget, ColourSelect):
     def __init__(self, place, **args):

@@ -43,6 +43,13 @@ class GraphView(gui.Box):
     def setup(self):
         self.glwidget = self.find('gl-widget')
 
+        #FIXME
+        for grid in self.findall('grid*'):
+            grid.layout.AddGrowableCol(2)
+        for grid in self.findall('agrid*'):
+            print grid
+            grid.layout.AddGrowableCol(1)
+
         self.graph.connect('redraw', self.glwidget.redraw)
         self.graph.connect('object-doubleclicked', self.on_object_doubleclicked)
         self.graph.connect('right-clicked', self.on_right_clicked)
@@ -77,7 +84,7 @@ class GraphView(gui.Box):
                        'draw-text': wx.CURSOR_IBEAM,
                        'draw-line': wx.CURSOR_PENCIL,
                        'none': wx.CURSOR_NONE }[mode]
-                self.glwidget._widget.SetCursor(wx.StockCursor(cur))
+                self.glwidget.SetCursor(wx.StockCursor(cur))
                 self.graph.emit('redraw')
             return _set
 
@@ -97,31 +104,18 @@ class GraphView(gui.Box):
         self.toolbar.append(gui.Command('Select all datasets', '', self.on_selectall, 'stock_select-all.png'))
 
 
-        self.toolbar._widget.Realize()
+        self.toolbar.Realize()
 
 #        self.closebar = gui.Toolbar(tbbox, stretch=0)
 #        self.closebar.append(gui.Command('Close', 'Close this worksheet', 
 #                                        self.on_close, 'close.png'))
-#        self.closebar._widget.Realize()
+#        self.closebar.Realize()
 
         self.panel = gui.MainPanel(self)
         self.box = gui.Splitter(self.panel, 'vertical', proportion=0.8)
         self.scrolled = gui.Scrolled(self.box)
         self.glwidget = gui.OpenGLWidget(self.scrolled)
         self.glwidget.min_size = (400, 200)
-
-        self.glwidget.connect('initialize-gl', self.graph.init)
-        self.glwidget.connect('resize-gl', self.graph.reshape)
-        self.glwidget.connect('paint-gl', self.graph.display)
-        self.glwidget.connect('button-pressed', self.graph.button_press)
-        self.glwidget.connect('button-released', self.graph.button_release)
-        self.glwidget.connect('button-doubleclicked', self.graph.button_doubleclick)
-        self.glwidget.connect('mouse-moved', self.graph.button_motion)
-        self.glwidget.connect('key-down', self.graph.key_down)
-
-        self.graph.connect('redraw', self.glwidget.redraw)
-        self.graph.connect('object-doubleclicked', self.on_object_doubleclicked)
-        self.graph.connect('right-clicked', self.on_right_clicked)
 
         self.legend = gui.List(self.box, model=LegendModel(self.graph))#, stretch=0)
         self.legend.connect('selection-changed', self.on_legend_select)
@@ -135,7 +129,7 @@ class GraphView(gui.Box):
         self.fit = GraphFunctionsPanel(self.graph.functions[0].func, self.graph, 
                                        self.panel.right_panel,
                                        page_label='Fit', page_pixmap='function.png')
-        self.panel.right_panel._widget.toolbar.Realize()
+        self.panel.right_panel.toolbar.Realize()
 
         self.graph.connect('request-cursor', self.on_request_cursor)
 
@@ -155,10 +149,10 @@ class GraphView(gui.Box):
         menu.append(gui.Command('Remove', '', object))
         menu.append(None)
         menu.append(gui.Command('Select All', '', object))
-        self.legend._widget.PopupMenu(menu._menu)
+        self.legend.PopupMenu(menu._menu)
 
     def on_rename(self, name, item=None):
-        self.parent._widget.SetPageText(self.parent.pages.index(self), name)
+        self.parent.SetPageText(self.parent.pages.index(self), name)
 
     def on_selectall(self):
         self.legend.setsel(xrange(len(self.graph.datasets)))
@@ -166,13 +160,13 @@ class GraphView(gui.Box):
     def on_object_doubleclicked(self, obj):
         from prop import Editor
         e = Editor(self, DATADIR+'/data/resources.xrc', obj)
-        e._widget.Show()
+        e.Show()
 
     def on_right_clicked(self, obj):
         print >>sys.stderr, obj
         menu = gui.Menu()
         menu.append(gui.Command('Delete', 'delete', object, 'open.png'))
-        self.glwidget.parent.parent._widget.PopupMenu(menu._menu)
+        self.glwidget.parent.parent.PopupMenu(menu._menu)
 
     def on_request_cursor(self, cursor):
         cur = {'arrow': wx.CURSOR_ARROW,
@@ -182,7 +176,7 @@ class GraphView(gui.Box):
                'd-reader': wx.CURSOR_CROSS,
                's-reader': wx.CURSOR_CROSS,
                'none': wx.CURSOR_NONE }[cursor]
-        self.glwidget._widget.SetCursor(wx.StockCursor(cur))
+        self.glwidget.SetCursor(wx.StockCursor(cur))
 
     def on_legend_select(self):
         self.style.on_legend_selection()
@@ -205,7 +199,7 @@ class GraphView(gui.Box):
 
 
 class GraphAxesPanel(gui.Box):
-    def __init__(self, graph, view, parent, **place):
+    def __cinit__(self, graph, view, parent, **place):
         gui.Box.__init__(self, parent, "vertical", **place)
         self.graph, self.view = graph, view
 
@@ -263,111 +257,67 @@ class GraphAxesPanel(gui.Box):
         self.y_type.value = ['linear', 'log'].index(self.graph.xtype)
 
 ###############################################################################
-# style panel                                                                  #
+# style panel                                                                 #
 ###############################################################################
 
 class GraphStylePanel(gui.Box):
     def setup(self):
-        pass
-    def __qinit__(self, graph, view, parent, **place):
-        gui.Box.__init__(self, parent, 'vertical', **place)
-
-        self.graph = graph
-        self.view = view
-
-        # Symbol
-        self.symbol = gui.Frame(self, 'vertical', title='Symbol', stretch=0.)
-        grid = self.symbol_grid = gui.Grid(self.symbol, 3, 3, expand=False)#, expand=True, stretch=1.)
-        grid.layout.AddGrowableCol(2)
-
-        # symbol type
-        self.symbol = gui.PixmapChoice(grid, pos=(0,2))
-        self.symbol.label = gui.Label(grid,  'Symbol', pos=(0,1))
-        self.symbol.check = gui.Checkbox(grid, pos=(0,0))
-
-        self.symbol.min_size = (10, self.symbol.min_size[1])
+        self.symbol = self.find('symbol')
         for symbol in Style.symbols:
             self.symbol.append(symbol+'.png')
         self.symbol.value = 0
         self.symbol.connect('select', lambda value: self.on_select_property('symbol', value), True)
 
-        # symbol color
-        self.color = gui.PixmapChoice(grid, pos=(1,2))
-        self.color.label = gui.Label(grid,  'Color', pos=(1,1))
-        self.color.check = gui.Checkbox(grid, pos=(1,0))
-        self.color.min_size = (10, self.color.min_size[1])
+        self.color = self.find('color')
         for color in Style.colors:
             self.color.append(self.color.create_colored_bitmap((20, 10), color))
         self.color.value = 0
         self.color.connect('select', lambda value: self.on_select_property('color', value), True)
 
-        # symbol size
-        self.symbol_size = gui.Spin(grid, pos=(2,2))
-        self.symbol_size.label = gui.Label(grid, 'Size', pos=(2,1))
-        self.symbol_size.check = gui.Checkbox(grid, pos=(2,0))
-        self.symbol_size.min_size = (10, self.symbol_size.min_size[1])
+        self.symbol_size = self.find('size')
         self.symbol_size.value = 5
         self.symbol_size.connect('modified', lambda value: self.on_select_property('symbol_size', value), True)
 
-        # Line
-        self.line = gui.Frame(self, 'vertical', title='Line', stretch=0.)
-        grid = self.line_grid = gui.Grid(self.line, 3, 3)#, expand=True, stretch=1.)
-        grid.layout.AddGrowableCol(2)
-
-        # Line type
-        self.line_type = gui.Choice(grid, pos=(0,2))
-        self.line_type.label = gui.Label(grid, 'Type', pos=(0,1))
-        self.line_type.check = gui.Checkbox(grid, pos=(0,0))
-        self.line_type.min_size = (10, self.line_type.min_size[1])
+        self.line_type = self.find('line_type')
         for t in Style.line_types:
             self.line_type.append(t)
         self.line_type.value = 0
         self.line_type.connect('select', lambda value: self.on_select_property('line_type', value), True)
 
-        # Line style
-        self.line_style = gui.Choice(grid, pos=(1,2))
-        self.line_style.label = gui.Label(grid,  'Style', pos=(1,1))
-        self.line_style.check = gui.Checkbox(grid, pos=(1,0))
-        self.line_style.min_size = (10, self.line_style.min_size[1])
+        self.line_style = self.find('line_style')
         for p in Style.line_styles:
             self.line_style.append(p)
         self.line_style.value = 0
         self.line_style.connect('select', lambda value: self.on_select_property('line_style', value), True)
 
-        # Line width
-        self.line_width = gui.Spin(grid, pos=(2,2))
-        self.line_width.label = gui.Label(grid, 'Width', pos=(2,1))
-        self.line_width.check = gui.Checkbox(grid, pos=(2,0))
-        self.line_width.min_size = (10, self.line_width.min_size[1])
+        self.line_width = self.find('line_width')
         self.line_width.value = 1
         self.line_width.connect('modified', lambda value: self.on_select_property('line_width', value), True)
 
-        self.settings_widgets = [self.symbol, self.color, self.symbol_size, 
+
+        self.settings = [self.symbol, self.color, self.symbol_size, 
                                  self.line_type, self.line_style, self.line_width]
 
-        self.show_checks(False)
+        for widget in self.settings:
+            widget.check = self.find('check:'+widget.name)
+            widget.label = self.find('label:'+widget.name)
 
-        self.symbol.prop = 'symbol'
-        self.symbol_size.prop = 'symbol_size'
-        self.color.prop = 'color'
-        self.line_width.prop = 'line_width'
-        self.line_type.prop = 'line_type'
-        self.line_style.prop = 'line_style'
+        maxminw = max([w.label.GetBestSize()[0] for w in self.settings])
 
-        b = gui.Box(self, 'horizontal', expand=True, stretch=0)
-        gui.Label(b, 'Group', stretch=0)
-        self.multi = gui.Choice(b, stretch=1)
-        self.multi.append('identical')
-        self.multi.append('series')
+        for widget in self.settings:
+            widget.check.connect('modified', lambda state, widget=widget: self.on_check(widget, state), True)
+            widget.label.min_size = (maxminw, widget.label.min_size[1])
+
+        self.multi = self.find('multi')
         self.multi.value = 0
         self.multi.connect('select', self.on_select_multi)
 
 
-        maxminw = max([w.label._widget.GetBestSize()[0] for w in self.settings_widgets])
-        for widget in self.settings_widgets:
-            widget.check.connect('modified', lambda state, widget=widget: self.on_check(widget, state), True)
-            widget.label.min_size = (maxminw, widget.label.min_size[1])
+    def __qinit__(self, graph, view, parent, **place):
+        gui.Box.__init__(self, parent, 'vertical', **place)
 
+        self.graph = graph
+        self.view = view
 
     def on_legend_selection(self):
         datasets = [self.view.legend.model[i] for i in self.view.legend.selection]
@@ -387,17 +337,17 @@ class GraphStylePanel(gui.Box):
         if len(datasets) > 1:
             if self.multi.value == 0: # identical
                 self.show_checks(True)
-                for control in self.settings_widgets:
-                    control.check.state = len(set(getattr(d.style, control.prop) 
+                for control in self.settings:
+                    control.check.state = len(set(getattr(d.style, control.name) 
                                               for d in datasets)) == 1
                     control.active = control.label.active = control.check.state
 
             elif self.multi.value == 1: # series
                 self.show_checks(False)
-                self.symbol_grid.layout.Show(self.color.check._widget)
+                self.symbol_grid.layout.Show(self.color.check)
                 self.symbol_grid.layout.Layout()
 
-                for control in self.settings_widgets:
+                for control in self.settings:
                     control.active = control.label.active = control.check.state = False
 
                 colors = [Style.colors.index(d.style.color) for d in datasets]
@@ -405,7 +355,7 @@ class GraphStylePanel(gui.Box):
                 self.color.check.state = colors == [c % len(Style.colors) for c in range(c0, c0+len(colors))]
                 self.color.active = self.color.label.active = self.color.check.state
         else:
-            for control in self.settings_widgets:
+            for control in self.settings:
                 control.active = control.label.active = True
             self.show_checks(False)
 
@@ -415,13 +365,13 @@ class GraphStylePanel(gui.Box):
     def on_check(self, widget, state):
         widget.active = state
         widget.label.active = state
-        self.on_select_property(widget.prop, widget.value)
+        self.on_select_property(widget.name, widget.value)
 
     def show_checks(self, visible):
         for w in [self.symbol,self.color,self.symbol_size]:
-            self.symbol_grid.layout.Show(w.check._widget, visible)
+            self.symbol_grid.layout.Show(w.check, visible)
         for w in [self.line_type, self.line_style, self.line_width]:
-            self.line_grid.layout.Show(w.check._widget, visible)
+            self.line_grid.layout.Show(w.check, visible)
         self.symbol_grid.layout.Layout()
         self.line_grid.layout.Layout()
 
@@ -503,7 +453,7 @@ class GraphDataPanel(gui.Box):
                                        self.on_add, 'add.png'))
         self.toolbar.append(gui.Command('Remove', 'Remove datasets from the graph', 
                                        self.on_remove, 'remove.png'))
-        self.toolbar._widget.Realize()
+        self.toolbar.Realize()
         
         self.worksheet_list = gui.List(self, editable=False, 
                                        model=WorksheetListModel(self.project.top))
@@ -568,7 +518,7 @@ class GraphFunctionsPanel(gui.Box):
         self.toolbar.append(gui.Command('Fit', '', self.do_fit, 'manibela.png'))
         self.toolbar.append(gui.Command('Save parameters', '', 
                             self.do_fit, 'pencil.png'))
-        self.toolbar._widget.Realize()
+        self.toolbar.Realize()
 
         self.set_function(func)
 
@@ -580,7 +530,7 @@ class GraphFunctionsPanel(gui.Box):
         from prop import Editor
         e = Editor(self, DATADIR+'/data/resources.xrc', b)
         b.emit('modified')
-        e._widget.ShowModal()
+        e.ShowModal()
         print b.__dict__
 
 
@@ -632,7 +582,7 @@ class GraphFunctionsPanel(gui.Box):
         term._act = gui.Command('x', '', lambda checked: self.on_use(term, checked), '16/down.png', type='check')
         t.append(term._act)
         t.append(gui.Command('x', '', lambda: self.on_close(term), 'close.png'))
-        t._widget.Realize()
+        t.Realize()
         term._box = box
         term._tx = None
 
@@ -648,8 +598,8 @@ class GraphFunctionsPanel(gui.Box):
         if term._tx is None:
             term._tx = gui.Text(term._butt.parent.parent, align='center')
 
-            term._tx._widget.SetPosition(term._butt._widget.GetPosition())
-            term._tx._widget.SetSize(term._butt._widget.GetSize())
+            term._tx.SetPosition(term._butt.GetPosition())
+            term._tx.SetSize(term._butt.GetSize())
 
             term._tx.connect('enter', lambda: self.on_done(term), True)
             term._tx.connect('kill-focus', lambda: self.on_done(term), True)
@@ -657,7 +607,7 @@ class GraphFunctionsPanel(gui.Box):
 
         term._tx.show()
         term._tx.text = term.name
-        term._tx._widget.SetFocus()
+        term._tx.SetFocus()
 
     def on_done(self, term):
         if term._tx is None:
@@ -666,7 +616,7 @@ class GraphFunctionsPanel(gui.Box):
         term._tx = None
 
         term.name = t.text
-        t._widget.Destroy()
+        t.Destroy()
         term._butt.text = term.name
 
     def on_toggled(self, term, on):
@@ -695,7 +645,7 @@ class GraphFunctionsPanel(gui.Box):
             term._lock.append(lock)
         term._parambox = parambox
 
-        self.update_widget()
+        self.updat()
 
     def on_activate(self, term, n, char=13):
         if char != 13:
@@ -705,15 +655,15 @@ class GraphFunctionsPanel(gui.Box):
         self.function.emit('modified')
 
     def delete_parambox(self, term):
-        term._parambox._widget.Close()
-        term._parambox._widget.Destroy()
+        term._parambox.Close()
+        term._parambox.Destroy()
         term._parambox = None
-        self.update_widget()
+        self.updat()
  
     def on_remove_term(self, term):
-        term._box._widget.Close()
-        term._box._widget.Destroy()
-        self.update_widget()
+        term._box.Close()
+        term._box.Destroy()
+        self.updat()
         
     def on_function_activated(self, f):
         n = 0
@@ -734,10 +684,10 @@ class GraphFunctionsPanel(gui.Box):
         else:
             self.delete_parambox(f)
         f.enabled = isit
-        self.update_widget()
+        self.updat()
         self.function.emit('modified')
 
-    def update_widget(self):
-        s = self.parent._widget.GetSize()
+    def updat(self):
+        s = self.parent.GetSize()
         self.parent._widget.SetSize((s[0]+1, s[1]))
         self.parent._widget.SetSize(s)
