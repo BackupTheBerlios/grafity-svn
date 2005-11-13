@@ -91,15 +91,18 @@
 
   <GraphView name="'graph-view'" orientation="'horizontal'">
     <Commands>
-      <Command id="'add-dataset'" label="'Add'" image="'new'"/>
-      <Command id="'remove-dataset'" label="'Add'" image="'open'"/>
+      <Command id="'add-dataset'" label="'Add'" image="'add'"/>
+      <Command id="'remove-dataset'" label="'Add'" image="'remove'"/>
     </Commands>
     <Toolbar _stretch="0" orientation="'vertical'">
-        </Toolbar>
+    </Toolbar>
     <Splitter orientation="'horizontal'">
       <Scrolled _stretch="1.">
         <OpenGLWidget name="'gl-widget'" min_size="(400, 200)"/>
       </Scrolled>
+
+      <List name="'legend'"/>
+
       <Panel position="'right'" _width="150">
 
         <!-- Data panel -->
@@ -109,14 +112,14 @@
             <CommandRef object="'^graph-view'" id="'add-dataset'"/>
             <CommandRef object="'^graph-view'" id="'remove-dataset'"/>
           </Toolbar>
-          <Label text="'Worksheet'" _stretch="0"/> <List/>
-          <Label text="'X column'" _stretch="0"/> <List/>
-          <Label text="'Y column'" _stretch="0"/> <List/>
+          <Label text="'Worksheet'" _stretch="0"/> <List name="'worksheet-list'"/>
+          <Label text="'X column'" _stretch="0"/> <List name="'x-list'"/>
+          <Label text="'Y column'" _stretch="0"/> <List name="'y-list'"/>
         </GraphDataPanel>
 
         <!-- Style panel -->
 
-        <GraphStylePanel _label="'style'" _image="'new'" orientation="'vertical'">
+        <GraphStylePanel name="'style-panel'" _label="'style'" _image="'new'" orientation="'vertical'">
 
           <Frame orientation="'vertical'" title="'Symbol'" _stretch="1">
             <Grid name="'grid1'" _expand="True" _stretch="1.">

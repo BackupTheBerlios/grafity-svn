@@ -11,7 +11,6 @@ from grafity.util import flatten
 
 from grafity.settings import DATADIR
 
-import wx
 import mingui as gui
 
 class LegendModel(HasSignals):
@@ -30,7 +29,7 @@ class LegendModel(HasSignals):
         if hasattr(self[row], "_legend_wxbitmap"):
             return self[row]._legend_wxbitmap
         else:
-            return '16/folder.png'
+            return 'folder'
     def __len__(self): return len(self.graph.datasets)
     def __getitem__(self, row): return self.graph.datasets[row]
 
@@ -47,7 +46,6 @@ class GraphView(gui.Box):
         for grid in self.findall('grid*'):
             grid.layout.AddGrowableCol(2)
         for grid in self.findall('agrid*'):
-            print grid
             grid.layout.AddGrowableCol(1)
 
         self.graph.connect('redraw', self.glwidget.redraw)
@@ -63,6 +61,12 @@ class GraphView(gui.Box):
         self.glwidget.connect('mouse-moved', self.graph.button_motion)
         self.glwidget.connect('key-down', self.graph.key_down)
 
+        self.legend = self.find('legend')
+        self.legend.data = LegendModel(self.graph)
+        self.legend.connect('selection-changed', self.on_legend_select)
+
+        self.style = self.find('style-panel')
+
 
     def __binit__(self, parent, graph, **place):
         gui.Box.__init__(self, parent, 'horizontal', **place)
@@ -75,6 +79,7 @@ class GraphView(gui.Box):
                 self.graph.prev_mode = self.graph.mode
                 self.graph.mode = mode
 
+                import wx
                 cur = {'arrow': wx.CURSOR_ARROW,
                        'hand': wx.CURSOR_HAND,
                        'zoom': wx.CURSOR_MAGNIFIER,
@@ -117,8 +122,6 @@ class GraphView(gui.Box):
         self.glwidget = gui.OpenGLWidget(self.scrolled)
         self.glwidget.min_size = (400, 200)
 
-        self.legend = gui.List(self.box, model=LegendModel(self.graph))#, stretch=0)
-        self.legend.connect('selection-changed', self.on_legend_select)
 
         self.graphdata = GraphDataPanel(self.graph, self, self.panel.right_panel, 
                                         page_label='Data', page_pixmap='worksheet.png')
@@ -140,7 +143,7 @@ class GraphView(gui.Box):
     def on_legend_right_click(self, item):
         if item == -1:
             return
-        item = self.legend.model[item]
+        item = self.legend.data[item]
         menu = gui.Menu()
         menu.append(gui.Command('Hide', '', object))
         menu.append(gui.Command('Show', '', object))
@@ -169,6 +172,7 @@ class GraphView(gui.Box):
         self.glwidget.parent.parent.PopupMenu(menu._menu)
 
     def on_request_cursor(self, cursor):
+        import wx
         cur = {'arrow': wx.CURSOR_ARROW,
                'hand': wx.CURSOR_HAND,
                'zoom': wx.CURSOR_MAGNIFIER,
@@ -294,7 +298,6 @@ class GraphStylePanel(gui.Box):
         self.line_width.value = 1
         self.line_width.connect('modified', lambda value: self.on_select_property('line_width', value), True)
 
-
         self.settings = [self.symbol, self.color, self.symbol_size, 
                                  self.line_type, self.line_style, self.line_width]
 
@@ -302,25 +305,22 @@ class GraphStylePanel(gui.Box):
             widget.check = self.find('check:'+widget.name)
             widget.label = self.find('label:'+widget.name)
 
-        maxminw = max([w.label.GetBestSize()[0] for w in self.settings])
-
-        for widget in self.settings:
-            widget.check.connect('modified', lambda state, widget=widget: self.on_check(widget, state), True)
-            widget.label.min_size = (maxminw, widget.label.min_size[1])
-
+#        maxminw = max([w.label.GetBestSize()[0] for w in self.settings])
+#
+#        for widget in self.settings:
+#            widget.check.connect('modified', lambda state, widget=widget: self.on_check(widget, state), True)
+#            widget.label.min_size = (maxminw, widget.label.min_size[1])
+#
         self.multi = self.find('multi')
         self.multi.value = 0
         self.multi.connect('select', self.on_select_multi)
 
+        self.view = self.rfind('graph-view')
+        self.graph = self.view.graph
 
-    def __qinit__(self, graph, view, parent, **place):
-        gui.Box.__init__(self, parent, 'vertical', **place)
-
-        self.graph = graph
-        self.view = view
 
     def on_legend_selection(self):
-        datasets = [self.view.legend.model[i] for i in self.view.legend.selection]
+        datasets = [self.view.legend.data[i] for i in self.view.legend.selection]
         self.graph.selected_datasets = datasets
 
         if len(datasets) == 0:
@@ -369,11 +369,11 @@ class GraphStylePanel(gui.Box):
 
     def show_checks(self, visible):
         for w in [self.symbol,self.color,self.symbol_size]:
-            self.symbol_grid.layout.Show(w.check, visible)
+            self.find('grid1').layout.Show(w.check, visible)
         for w in [self.line_type, self.line_style, self.line_width]:
-            self.line_grid.layout.Show(w.check, visible)
-        self.symbol_grid.layout.Layout()
-        self.line_grid.layout.Layout()
+            self.find('grid2').layout.Show(w.check, visible)
+        self.find('grid1').layout.Layout()
+        self.find('grid2').layout.Layout()
 
     def on_select_property(self, prop, value):
         datasets = [self.graph.datasets[s] for s in self.view.legend.selection]
@@ -410,11 +410,13 @@ class WorksheetListModel(HasSignals):
     def get_image(self, row): 
         obj = self.contents[row]
         if isinstance(obj, Worksheet):
-            return 'worksheet.png'
+            return 'worksheet'
         elif isinstance(obj, Folder):
-            return ['16/folder.png', '16/up.png'][obj == self.folder.parent]
+            return ['folder', 'up'][obj == self.folder.parent]
     def __len__(self): return len(self.contents)
-    def __getitem__(self, row): return self.contents[row]
+    def __getitem__(self, row):
+        print row
+        return self.contents[row]
 
 class ColumnListModel(HasSignals):
     def __init__(self):
@@ -424,6 +426,7 @@ class ColumnListModel(HasSignals):
         if Folder in (type(w) for w in worksheets) or len(worksheets) == 0:
             self.colnames = []
         else:
+            print worksheets
             self.colnames = list(reduce(set.intersection, (set(w.column_names) for w in worksheets)))
         if len(self.colnames) > 0:
             self.colnames.sort(lambda a, b: cmp(worksheets[0].column_names.index(a), worksheets[0].column_names.index(b)))
@@ -436,62 +439,50 @@ class ColumnListModel(HasSignals):
 
 class GraphDataPanel(gui.Box):
     def setup(self):
-        pass
-        
-    def __binit__(self, graph, view, parent, **place):
-        gui.Box.__init__(self, parent, 'vertical', **place)
-
-        self.graph = graph
-        self.view = view
-
-        self.project = graph.project
+        self.view = self.rfind('graph-view')
+        self.graph = self.view.graph
+        self.project = self.graph.project
         self.folder = None
 
-        self.toolbar = gui.Toolbar(self, stretch=0)
-        gui.Label(self, 'Worksheet', stretch=0)
-        self.toolbar.append(gui.Command('Add', 'Add datasets to the graph', 
-                                       self.on_add, 'add.png'))
-        self.toolbar.append(gui.Command('Remove', 'Remove datasets from the graph', 
-                                       self.on_remove, 'remove.png'))
-        self.toolbar.Realize()
-        
-        self.worksheet_list = gui.List(self, editable=False, 
-                                       model=WorksheetListModel(self.project.top))
-#        self.worksheet_list.connect('item-activated', self.on_wslist_activated)
+        self.worksheet_list = self.find('worksheet-list')
+        self.worksheet_list.data = WorksheetListModel(self.project.top)
         self.worksheet_list.connect('selection-changed', self.on_wslist_select)
         self.worksheet_list.connect('item-activated', self.on_item_activated)
 
-        gui.Label(self, 'X column', stretch=0)
-        self.x_list = gui.List(self, model=ColumnListModel())
+        self.x_list = self.find('x-list')
+        self.x_list.data = ColumnListModel()
+        self.y_list = self.find('y-list')
+        self.y_list.data = ColumnListModel()
 
-        gui.Label(self, 'Y column', stretch=0)
-        self.y_list = gui.List(self, model=ColumnListModel())
+        self.view.commands['add-dataset'].connect('activated', self.on_add)
+        self.view.commands['remove-dataset'].connect('activated', self.on_remove)
 
-
-#    def on_wslist_activated(self, ind):
-#        print 'activated:', self.worksheet_list.model[ind]
-
-    def on_item_activated(self, ind):
-        obj = self.worksheet_list.model[ind]
+        
+#        self.toolbar.append(gui.Command('Add', 'Add datasets to the graph', 
+#                                       self.on_add, 'add.png'))
+#        self.toolbar.append(gui.Command('Remove', 'Remove datasets from the graph', 
+#                                       self.on_remove, 'remove.png'))
+        
+    def on_item_activated(self, obj):
         if isinstance(obj, Folder):
-            self.worksheet_list.model = WorksheetListModel(obj)
+            self.worksheet_list.data = WorksheetListModel(obj)
 
     def on_wslist_select(self):
-        selection = [self.worksheet_list.model[ind] for ind in self.worksheet_list.selection]
-        self.x_list.model.set_worksheets(selection)
-        self.y_list.model.set_worksheets(selection)
+        selection = [self.worksheet_list.data[ind] for ind in self.worksheet_list.selection]
+        self.x_list.data.set_worksheets(selection)
+        self.y_list.data.set_worksheets(selection)
 
     def set_current_folder(self, folder):
         self.folder = folder
-        self.worksheet_list.model = WorksheetListModel(folder)
+        self.worksheet_list.data = WorksheetListModel(folder)
 
     def on_add(self):
         for ws in self.worksheet_list.selection:
-            worksheet = self.worksheet_list.model[ws]
+            worksheet = self.worksheet_list.data[ws]
             for x in self.x_list.selection:
                 for y in self.y_list.selection:
-                    self.graph.add(worksheet[self.x_list.model[x]], 
-                                   worksheet[self.y_list.model[y]])
+                    self.graph.add(worksheet[self.x_list.data[x]], 
+                                   worksheet[self.y_list.data[y]])
 
     def on_remove(self):
         for d in [self.graph.datasets[s] for s in self.view.legend.selection]:
@@ -579,7 +570,7 @@ class GraphFunctionsPanel(gui.Box):
         term._butt.connect('toggled', lambda on: self.on_toggled(term, on), True)
         term._butt.connect('double-clicked', lambda: self.on_btn_doubleclicked(term), True)
         t = gui.Toolbar(bpx, expand=False, stretch=0)
-        term._act = gui.Command('x', '', lambda checked: self.on_use(term, checked), '16/down.png', type='check')
+        term._act = gui.Command('x', '', lambda checked: self.on_use(term, checked), 'down.png', type='check')
         t.append(term._act)
         t.append(gui.Command('x', '', lambda: self.on_close(term), 'close.png'))
         t.Realize()

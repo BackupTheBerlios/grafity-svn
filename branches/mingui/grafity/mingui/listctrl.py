@@ -1,6 +1,7 @@
 import wx
 from wx.lib.mixins.listctrl import ListCtrlAutoWidthMixin, ListCtrlSelectionManagerMix
 from images import images
+import Image
 
 from signals import HasSignals
 
@@ -60,8 +61,16 @@ class _xListCtrl(wx.ListCtrl, ListCtrlAutoWidthMixin, ListCtrlSelectionManagerMi
     def getpixmap(self, image):
         if image is None:
             return None
+
         if image not in self.pixmaps:
-            self.pixmaps[image] = self.imagelist.Add(_pil_to_wxbitmap(images[image][16,16]))
+            if isinstance(image, Image.Image):
+                img = _pil_to_wxbitmap(image)
+            elif isinstance(image, wx.Bitmap):
+                img = image
+            else:
+                img = _pil_to_wxbitmap(images[image][16,16])
+            self.pixmaps[image] = self.imagelist.Add(img)
+
         return self.pixmaps[image]
 
     def OnGetItemText(self, item, col):
