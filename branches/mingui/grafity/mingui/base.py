@@ -75,6 +75,14 @@ class Widget(Placeable, HasSignals):
         for signal, slot in connect.iteritems():
             self.connect(signal, slot)
 
+        class _finder(object):
+            def __init__(self, widget):
+                self.widget = widget
+            def __getattr__(self, attr):
+                return self.widget.find(attr)
+        self._ = _finder(self)
+
+
     def ref(self, path):
         cmd, path = path[0], path[1:]
         if '^' not in path and '/' not in path:
@@ -113,6 +121,7 @@ class Widget(Placeable, HasSignals):
                 if hasattr(c, 'findall'):
                     for f in c.findall(pattern):
                         yield f 
+
 
     def find(self, name):
         if self.name == name:
