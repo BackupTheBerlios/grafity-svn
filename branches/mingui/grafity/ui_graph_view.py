@@ -13,6 +13,19 @@ from grafity.settings import DATADIR
 
 import mingui as gui
 
+dlg = """
+<Resource>
+    <Dialog name="'fooo'">
+        <Frame orientation="'vertical'" title="'test'">
+            <Grid _expand="True" _stretch="1.">
+                <Label text="'foo'" _position="(0,0)"/>
+                <Text _position="(0,1)"/>
+            </Grid>
+        </Frame>
+    </Dialog>
+</Resource>
+"""
+
 class LegendModel(HasSignals):
     def __init__(self, graph):
         self.graph = graph

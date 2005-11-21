@@ -3,7 +3,8 @@ import sys
 
 import mingui as gui
 import Image
-from cElementTree import parse
+import os.path
+from cElementTree import parse, fromstring
 from weakref import WeakValueDictionary
 from commands import commands
 from images import images
@@ -14,7 +15,10 @@ def _attr(attr):
     return eval(attr, {})
 
 def merge(filename):
-    root = parse(filename).getroot()
+    if os.path.exists(filename):
+        root = parse(filename).getroot()
+    else:
+        root = fromstring(filename)
     for elem in root:
         if elem.tag == 'Commands':
             for e in elem:
