@@ -1,0 +1,7 @@
+#!/usr/bin/env python
+import os, sys
+DATADIR = os.path.normpath(os.path.abspath(os.path.dirname(sys.argv[0]))+'/../') + '/'
+sys.path.append(DATADIR)
+sys.path.append(DATADIR+'/grafity/thirdparty/')
+import mgrafity
+mgrafity.main()
