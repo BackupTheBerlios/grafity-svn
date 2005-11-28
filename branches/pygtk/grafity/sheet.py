@@ -1,6 +1,7 @@
 import pygtk
 pygtk.require('2.0')
 import gtk
+import pango
 
 import sys
 sys.path.append('..')
@@ -18,7 +19,11 @@ class Sheet(object):
         self.hadjust = gtk.Adjustment(3, 1, 10, 1, 2, 2)
         self.hadjust.connect('value_changed', self.adj_changed)
         self.hscroll = gtk.HScrollbar(self.hadjust)
-        self.vscroll = gtk.VScrollbar()
+
+        self.vadjust = gtk.Adjustment(3, 1, 10, 1, 2, 2)
+        self.vadjust.connect('value_changed', self.adj_changed)
+        self.vscroll = gtk.VScrollbar(self.vadjust)
+
         self.hscroll.show()
         self.vscroll.show()
         self.hadjust.set_value(6)
@@ -33,7 +38,7 @@ class Sheet(object):
         self.mainwidget = self.table
 
         self.worksheet = worksheet
-        self.firstrow = 0
+        self.firstrow = 3
         self.firstcol = 0
 
         self.CELL_HEIGHT = 20
@@ -58,8 +63,11 @@ class Sheet(object):
         self.editor.set_size_request(self.CELL_WIDTH, self.CELL_HEIGHT)
         self.widget.put(self.editor, 70, 80)
 
-    def adj_changed(self, adjustment):
-        print adjustment.value
+    def adj_changed(self, adjust):
+        if adjust == self.hadjust:
+            print 'h', adjust.value
+        elif adjust == self.vadjust:
+            print 'v', adjust.value
 
     def coord_to_cell(self, x, y):
         return (int(x - self.LHEADER)/self.CELL_WIDTH, 
@@ -78,22 +86,32 @@ class Sheet(object):
 
     def configure_event(self, widget, event):
         x, y, width, height = widget.get_allocation()
-        print width, height
         return True
 
     def expose_event(self, widget, event):
         x, y, width, height = event.area
         _, _, totalw, totalh = widget.get_allocation()
 
+        self.lastrow = int(totalh-self.CELL_HEIGHT)/self.CELL_HEIGHT + self.firstrow
+        self.lastcol = min(int(totalw-self.CELL_WIDTH)/self.CELL_WIDTH+1 + self.firstcol, len(self.worksheet.columns))
+
+        self.hadjust.lower = 0
+#        self.hadjust.upper = (self.lastcol - self.firstcol)/float(len(self.worksheet.columns))
+        self.hadjust.upper = 30
+        self.hadjust.value = 21
+        self.hadjust.emit('changed')
+
         gc = widget.get_style().fg_gc[gtk.STATE_NORMAL]
 
         gc.foreground = self.white
         widget.window.draw_rectangle(gc, True, x, y, width, height)
         pangolayout = widget.create_pango_layout("")
-        nlines = 10
-
+        pangolayout.set_alignment(pango.ALIGN_RIGHT)
+        gc.foreground = self.lineh
+        widget.window.draw_rectangle(gc, True, 0, 0,
+                                     self.CELL_WIDTH, self.CELL_HEIGHT)
         # left header
-        for i in range(1, nlines+1):
+        for i in range(1, self.lastrow):
             gc.foreground = self.wheat
             gc.line_width = 1
             widget.window.draw_rectangle(gc, True, 0, i*self.CELL_HEIGHT, 
@@ -104,11 +122,13 @@ class Sheet(object):
                                          self.CELL_WIDTH, self.CELL_HEIGHT)
 
             gc.foreground = self.black
-            pangolayout.set_text(str(i-1))
-            widget.window.draw_layout(gc, 0, i*self.CELL_HEIGHT, pangolayout)
+            pangolayout.set_text(str(i-1+self.firstrow))
+            _, _, w, h  = pangolayout.get_pixel_extents()[1]
+            widget.window.draw_layout(gc, (self.CELL_WIDTH-w)/2, 
+                                          i*self.CELL_HEIGHT + (self.CELL_HEIGHT-h)/2, pangolayout)
 
         # top header
-        for i in range(0, len(self.worksheet.columns)):
+        for i in range(0, self.lastcol):
             gc.foreground = self.wheat
             gc.line_width = 1
             widget.window.draw_rectangle(gc, True, (i+1)*self.CELL_WIDTH, 0, 
@@ -119,21 +139,24 @@ class Sheet(object):
                                          self.CELL_WIDTH, self.CELL_HEIGHT)
 
             gc.foreground = self.black
-            pangolayout.set_text(self.worksheet.column_names[i])
-            widget.window.draw_layout(gc, (i+1)*self.CELL_WIDTH, 0, pangolayout)
+            pangolayout.set_text(self.worksheet.column_names[i+self.firstcol])
+            _, _, w, h  = pangolayout.get_pixel_extents()[1]
+            widget.window.draw_layout(gc, (i+1)*self.CELL_WIDTH+(self.CELL_WIDTH-w)/2, 
+                                          (self.CELL_HEIGHT-h)/2, pangolayout)
 
         # cells
-        for col in range(0, len(self.worksheet.columns)):
-            for line in range(0, nlines):
+        for col in range(0, self.lastcol):
+            for line in range(0, self.lastrow):
                 gc.foreground = self.linec
                 gc.line_width = 1
                 widget.window.draw_rectangle(gc, False, (col+1)*self.CELL_WIDTH, 
                                              (line+1)*self.CELL_HEIGHT, 
                                              self.CELL_WIDTH, self.CELL_HEIGHT)
                 gc.foreground = self.black
-                pangolayout.set_text(str(self.worksheet[col][line]).replace('nan', ''))
-                widget.window.draw_layout(gc, (col+1)*self.CELL_WIDTH, 
-                                          (line+1)*self.CELL_HEIGHT, pangolayout)
+                pangolayout.set_text(str(self.worksheet[col+self.firstcol][line+self.firstrow]).replace('nan', ''))
+                _, _, w, h  = pangolayout.get_pixel_extents()[1]
+                widget.window.draw_layout(gc, (col+1)*self.CELL_WIDTH + (self.CELL_WIDTH-w-5), 
+                                          (line+1)*self.CELL_HEIGHT + (self.CELL_HEIGHT-h)/2, pangolayout)
 
         gc.foreground = self.black
         gc.line_width = 1
@@ -152,8 +175,8 @@ def main():
     p = grafity.Project()
     w = p.new(grafity.Worksheet, 'test')
     w.a = [1,2,3]*1000
-    w.b = [2,4,5]
-    w.c = [3,2,1]
+    w.b = [2,4,5, 5.5]
+    w.c = [3,2,1,3.3]
 
     sheet = Sheet(w)
     vbox.pack_start(sheet.mainwidget, True, True, 0)
