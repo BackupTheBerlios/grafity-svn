@@ -38,8 +38,11 @@ class Sheet(object):
         self.mainwidget = self.table
 
         self.worksheet = worksheet
-        self.firstrow = 3
+        self.firstrow = 0
         self.firstcol = 0
+
+        self.originx = 25
+        self.originy = 47
 
         self.CELL_HEIGHT = 20
         self.CELL_WIDTH = 70
@@ -92,13 +95,15 @@ class Sheet(object):
         x, y, width, height = event.area
         _, _, totalw, totalh = widget.get_allocation()
 
-        self.lastrow = int(totalh-self.CELL_HEIGHT)/self.CELL_HEIGHT + self.firstrow
+        self.firstrow = int(self.originy)/self.CELL_HEIGHT
+        self.lastrow = int(totalh+self.originy-self.CELL_HEIGHT)/self.CELL_HEIGHT + self.firstrow
         self.lastcol = min(int(totalw-self.CELL_WIDTH)/self.CELL_WIDTH+1 + self.firstcol, len(self.worksheet.columns))
 
         self.hadjust.lower = 0
-#        self.hadjust.upper = (self.lastcol - self.firstcol)/float(len(self.worksheet.columns))
-        self.hadjust.upper = 30
-        self.hadjust.value = 21
+        self.hadjust.upper = len(self.worksheet.columns)
+        self.hadjust.value = self.firstcol
+        self.hadjust.page_size = self.lastcol-self.firstcol
+
         self.hadjust.emit('changed')
 
         gc = widget.get_style().fg_gc[gtk.STATE_NORMAL]
@@ -107,56 +112,63 @@ class Sheet(object):
         widget.window.draw_rectangle(gc, True, x, y, width, height)
         pangolayout = widget.create_pango_layout("")
         pangolayout.set_alignment(pango.ALIGN_RIGHT)
-        gc.foreground = self.lineh
-        widget.window.draw_rectangle(gc, True, 0, 0,
-                                     self.CELL_WIDTH, self.CELL_HEIGHT)
-        # left header
-        for i in range(1, self.lastrow):
-            gc.foreground = self.wheat
-            gc.line_width = 1
-            widget.window.draw_rectangle(gc, True, 0, i*self.CELL_HEIGHT, 
-                                         self.CELL_WIDTH, self.CELL_HEIGHT)
-            gc.foreground = self.lineh
-            gc.line_width = 2
-            widget.window.draw_rectangle(gc, False, 0, i*self.CELL_HEIGHT, 
-                                         self.CELL_WIDTH, self.CELL_HEIGHT)
-
-            gc.foreground = self.black
-            pangolayout.set_text(str(i-1+self.firstrow))
-            _, _, w, h  = pangolayout.get_pixel_extents()[1]
-            widget.window.draw_layout(gc, (self.CELL_WIDTH-w)/2, 
-                                          i*self.CELL_HEIGHT + (self.CELL_HEIGHT-h)/2, pangolayout)
-
-        # top header
-        for i in range(0, self.lastcol):
-            gc.foreground = self.wheat
-            gc.line_width = 1
-            widget.window.draw_rectangle(gc, True, (i+1)*self.CELL_WIDTH, 0, 
-                                         self.CELL_WIDTH, self.CELL_HEIGHT)
-            gc.foreground = self.lineh
-            gc.line_width = 2
-            widget.window.draw_rectangle(gc, False, (i+1)*self.CELL_WIDTH, 0, 
-                                         self.CELL_WIDTH, self.CELL_HEIGHT)
-
-            gc.foreground = self.black
-            pangolayout.set_text(self.worksheet.column_names[i+self.firstcol])
-            _, _, w, h  = pangolayout.get_pixel_extents()[1]
-            widget.window.draw_layout(gc, (i+1)*self.CELL_WIDTH+(self.CELL_WIDTH-w)/2, 
-                                          (self.CELL_HEIGHT-h)/2, pangolayout)
 
         # cells
         for col in range(0, self.lastcol):
-            for line in range(0, self.lastrow):
+            for line in range(self.firstrow, self.lastrow):
                 gc.foreground = self.linec
                 gc.line_width = 1
-                widget.window.draw_rectangle(gc, False, (col+1)*self.CELL_WIDTH, 
-                                             (line+1)*self.CELL_HEIGHT, 
+                widget.window.draw_rectangle(gc, False, 
+                                             (col+1) * self.CELL_WIDTH - self.originx, 
+                                             (line+1) * self.CELL_HEIGHT - self.originy, 
                                              self.CELL_WIDTH, self.CELL_HEIGHT)
                 gc.foreground = self.black
-                pangolayout.set_text(str(self.worksheet[col+self.firstcol][line+self.firstrow]).replace('nan', ''))
+                pangolayout.set_text(str(self.worksheet[col][line]).replace('nan', ''))
                 _, _, w, h  = pangolayout.get_pixel_extents()[1]
-                widget.window.draw_layout(gc, (col+1)*self.CELL_WIDTH + (self.CELL_WIDTH-w-5), 
-                                          (line+1)*self.CELL_HEIGHT + (self.CELL_HEIGHT-h)/2, pangolayout)
+                widget.window.draw_layout(gc, 
+                                          (col+1)*self.CELL_WIDTH + (self.CELL_WIDTH-w-5) - self.originx,
+                                          (line+1)*self.CELL_HEIGHT - self.originy + (self.CELL_HEIGHT-h)/2, 
+                                          pangolayout)
+
+
+        # left header
+        for row in range(self.firstrow, self.lastrow):
+            gc.foreground = self.wheat
+            gc.line_width = 1
+            widget.window.draw_rectangle(gc, True, 0, (row+1) * self.CELL_HEIGHT - self.originy, 
+                                         self.CELL_WIDTH, self.CELL_HEIGHT)
+            gc.foreground = self.lineh
+            gc.line_width = 2
+            widget.window.draw_rectangle(gc, False, 0, (row+1) * self.CELL_HEIGHT - self.originy, 
+                                         self.CELL_WIDTH, self.CELL_HEIGHT)
+
+            gc.foreground = self.black
+            pangolayout.set_text(str(row))
+            _, _, w, h  = pangolayout.get_pixel_extents()[1]
+            widget.window.draw_layout(gc, (self.CELL_WIDTH-w)/2,
+                                      (row+1)*self.CELL_HEIGHT - self.originy + (self.CELL_HEIGHT-h)/2, pangolayout)
+
+        # top header
+        for col in range(self.firstcol, self.lastcol):
+            gc.foreground = self.wheat
+            gc.line_width = 1
+            widget.window.draw_rectangle(gc, True, (col+1)*self.CELL_WIDTH-self.originx, 0,
+                                         self.CELL_WIDTH, self.CELL_HEIGHT)
+            gc.foreground = self.lineh
+            gc.line_width = 2
+            widget.window.draw_rectangle(gc, False, (col+1)*self.CELL_WIDTH-self.originx, 0, 
+                                         self.CELL_WIDTH, self.CELL_HEIGHT)
+
+            gc.foreground = self.black
+            pangolayout.set_text(self.worksheet.column_names[col])
+            _, _, w, h  = pangolayout.get_pixel_extents()[1]
+            widget.window.draw_layout(gc, (col+1)*self.CELL_WIDTH+(self.CELL_WIDTH-w)/2-self.originx, 
+                                          (self.CELL_HEIGHT-h)/2, pangolayout)
+
+        gc.foreground = self.lineh
+        widget.window.draw_rectangle(gc, True, 0, 0,
+                                     self.CELL_WIDTH, self.CELL_HEIGHT)
+
 
         gc.foreground = self.black
         gc.line_width = 1
@@ -174,7 +186,7 @@ def main():
 
     p = grafity.Project()
     w = p.new(grafity.Worksheet, 'test')
-    w.a = [1,2,3]*1000
+    w.a = range(100)
     w.b = [2,4,5, 5.5]
     w.c = [3,2,1,3.3]
 
