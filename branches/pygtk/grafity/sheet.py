@@ -65,11 +65,13 @@ class Sheet(object):
 
     def adj_changed(self, adjust):
         if adjust == self.hadjust:
-            if self.originx != adjust.value:
-                self.originx = adjust.value
+            if self.originx != int(adjust.value):
+                self.originx = int(adjust.value)
                 self.widget.queue_draw()
         elif adjust == self.vadjust:
-            print 'v', adjust.value
+            if self.originy != int(adjust.value):
+                self.originy = int(adjust.value)
+                self.widget.queue_draw()
 
     def coord_to_cell(self, x, y):
         return (int(x - self.LHEADER)/self.CELL_WIDTH, 
@@ -97,15 +99,20 @@ class Sheet(object):
         _, _, totalw, totalh = widget.get_allocation()
 
         self.firstrow = int(self.originy)/self.CELL_HEIGHT
-        self.lastrow = int(totalh+self.originy-self.CELL_HEIGHT)/self.CELL_HEIGHT + self.firstrow
+        self.lastrow = int(totalh+self.originy-self.CELL_HEIGHT)/self.CELL_HEIGHT + self.firstrow+1
         self.firstcol = int(self.originx)/self.CELL_WIDTH
-        self.lastcol = min(int(totalw-self.CELL_WIDTH)/self.CELL_WIDTH+1 + self.firstcol, len(self.worksheet.columns))
-        print self.firstcol, self.lastcol
+        self.lastcol = min(int(totalw+self.originx-self.CELL_WIDTH)/self.CELL_WIDTH + self.firstcol+1, 
+                           self.worksheet.ncolumns)
 
         self.hadjust.lower = 0
-        self.hadjust.upper = len(self.worksheet.columns)*self.CELL_WIDTH
+        self.hadjust.upper = self.worksheet.ncolumns*self.CELL_WIDTH
         self.hadjust.value = self.originx
-#        self.hadjust.page_size = self.lastcol-self.firstcol
+        self.hadjust.page_size = min(totalw - self.CELL_WIDTH, self.worksheet.ncolumns*self.CELL_WIDTH)
+
+        self.vadjust.lower = 0
+        self.vadjust.upper = self.worksheet.nrows*self.CELL_HEIGHT
+        self.vadjust.value = self.originy
+        self.vadjust.page_size = min(totalh - self.CELL_HEIGHT, self.worksheet.nrows*self.CELL_HEIGHT)
 
         gc = widget.get_style().fg_gc[gtk.STATE_NORMAL]
 
