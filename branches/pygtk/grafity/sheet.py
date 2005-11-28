@@ -26,9 +26,6 @@ class Sheet(object):
 
         self.hscroll.show()
         self.vscroll.show()
-        self.hadjust.set_value(6)
-
-        print self.hadjust.lower, self.hadjust.upper
 
         self.table.attach(self.evtbox, 0, 1, 0, 1)
         self.table.attach(self.hscroll, 0, 1, 1, 2, gtk.FILL|gtk.EXPAND, 0)
@@ -41,8 +38,8 @@ class Sheet(object):
         self.firstrow = 0
         self.firstcol = 0
 
-        self.originx = 25
-        self.originy = 47
+        self.originx = 0
+        self.originy = 0
 
         self.CELL_HEIGHT = 20
         self.CELL_WIDTH = 70
@@ -68,7 +65,9 @@ class Sheet(object):
 
     def adj_changed(self, adjust):
         if adjust == self.hadjust:
-            print 'h', adjust.value
+            if self.originx != adjust.value:
+                self.originx = adjust.value
+                self.widget.queue_draw()
         elif adjust == self.vadjust:
             print 'v', adjust.value
 
@@ -86,9 +85,11 @@ class Sheet(object):
         self.editor.show()
         self.editor.grab_focus()
 
-
     def configure_event(self, widget, event):
         x, y, width, height = widget.get_allocation()
+
+        self.hadjust.emit('changed')
+
         return True
 
     def expose_event(self, widget, event):
@@ -97,14 +98,14 @@ class Sheet(object):
 
         self.firstrow = int(self.originy)/self.CELL_HEIGHT
         self.lastrow = int(totalh+self.originy-self.CELL_HEIGHT)/self.CELL_HEIGHT + self.firstrow
+        self.firstcol = int(self.originx)/self.CELL_WIDTH
         self.lastcol = min(int(totalw-self.CELL_WIDTH)/self.CELL_WIDTH+1 + self.firstcol, len(self.worksheet.columns))
+        print self.firstcol, self.lastcol
 
         self.hadjust.lower = 0
-        self.hadjust.upper = len(self.worksheet.columns)
-        self.hadjust.value = self.firstcol
-        self.hadjust.page_size = self.lastcol-self.firstcol
-
-        self.hadjust.emit('changed')
+        self.hadjust.upper = len(self.worksheet.columns)*self.CELL_WIDTH
+        self.hadjust.value = self.originx
+#        self.hadjust.page_size = self.lastcol-self.firstcol
 
         gc = widget.get_style().fg_gc[gtk.STATE_NORMAL]
 
