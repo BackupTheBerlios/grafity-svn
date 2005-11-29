@@ -90,7 +90,6 @@ class Sheet(object):
     def configure_event(self, widget, event):
         x, y, width, height = widget.get_allocation()
 
-        self.hadjust.emit('changed')
 
         return True
 
@@ -114,6 +113,8 @@ class Sheet(object):
         self.vadjust.value = self.originy
         self.vadjust.page_size = min(totalh - self.CELL_HEIGHT, self.worksheet.nrows*self.CELL_HEIGHT)
 
+        self.hadjust.emit('changed')
+        self.vadjust.emit('changed')
         gc = widget.get_style().fg_gc[gtk.STATE_NORMAL]
 
         gc.foreground = self.white
