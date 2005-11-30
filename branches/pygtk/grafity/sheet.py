@@ -97,6 +97,9 @@ class Sheet(object):
         x, y, width, height = event.area
         _, _, totalw, totalh = widget.get_allocation()
 
+        if totalw-self.CELL_WIDTH > self.worksheet.ncolumns * self.CELL_WIDTH - self.originx and self.originx>0:
+            self.originx = max(self.CELL_WIDTH + self.worksheet.ncolumns * self.CELL_WIDTH - totalw, 0)
+
         self.firstrow = int(self.originy)/self.CELL_HEIGHT
         self.lastrow = int(totalh+self.originy-self.CELL_HEIGHT)/self.CELL_HEIGHT + self.firstrow+1
         self.firstcol = int(self.originx)/self.CELL_WIDTH
@@ -198,6 +201,8 @@ def main():
     w.a = range(100)
     w.b = [2,4,5, 5.5]
     w.c = [3,2,1,3.3]
+    w.d = 2*w.a
+    w.e = w.b * w.c
 
     sheet = Sheet(w)
     vbox.pack_start(sheet.mainwidget, True, True, 0)
