@@ -11,6 +11,8 @@ import numarray
 
 class Sheet(object):
     def __init__(self, worksheet):
+        self.worksheet = worksheet
+
         self.table = gtk.Table(2, 2, False)
         self.evtbox = gtk.EventBox()
         self.widget = gtk.Fixed()
@@ -21,11 +23,9 @@ class Sheet(object):
         self.hadjust = gtk.Adjustment(3, 1, 10, 1, 70, 350)
         self.hadjust.connect('value_changed', self.on_adjustment_changed)
         self.hscroll = gtk.HScrollbar(self.hadjust)
-
         self.vadjust = gtk.Adjustment(3, 1, 10, 1, 20, 200)
         self.vadjust.connect('value_changed', self.on_adjustment_changed)
         self.vscroll = gtk.VScrollbar(self.vadjust)
-
         self.hscroll.show()
         self.vscroll.show()
 
@@ -36,30 +36,35 @@ class Sheet(object):
 
         self.mainwidget = self.table
 
-        self.worksheet = worksheet
-        self.firstrow = 0
-        self.firstcol = 0
+        self.editor = gtk.Entry()
+        self.widget.put(self.editor, 0, 0)
 
-        self.originx = 0
-        self.originy = 0
+        
+        # colors
+        alloc_color = self.widget.get_colormap().alloc_color
+        self.header_fg = alloc_color("#d4cfca")
+        self.linec = alloc_color("#c7c7c7")
+        self.header_line = alloc_color("#c0b5a9")
+        self.black = alloc_color("black")
+        self.white = alloc_color("white")
+        self.sel_bg = alloc_color("#e6e6fa")
+        self.sel_header = alloc_color("#b9b38f")
 
-        self.header_fg = self.widget.get_colormap().alloc_color("#d4cfca")
-        self.linec = self.widget.get_colormap().alloc_color("#c7c7c7")
-        self.header_line = self.widget.get_colormap().alloc_color("#c0b5a9")
-        self.black = self.widget.get_colormap().alloc_color("black")
-        self.white = self.widget.get_colormap().alloc_color("white")
-
+        # connect events
         self.widget.set_events(gtk.gdk.EXPOSURE_MASK)
         self.widget.connect("configure_event", self.configure_event)
         self.widget.connect("expose_event", self.expose_event)
         self.widget.connect("size_allocate", self.on_resize)
 
-        self.evtbox.set_events(gtk.gdk.BUTTON_PRESS_MASK|gtk.gdk.POINTER_MOTION_MASK)
+        self.evtbox.set_events(gtk.gdk.BUTTON_PRESS_MASK |
+                               gtk.gdk.BUTTON_RELEASE_MASK | 
+                               gtk.gdk.POINTER_MOTION_MASK |
+                               gtk.gdk.KEY_PRESS_MASK)
         self.evtbox.connect("button_press_event", self.on_button_press_event)
-
-        self.editor = gtk.Entry()
-#        self.editor.set_size_request(self.CELL_WIDTH, self.CELL_HEIGHT)
-        self.widget.put(self.editor, 70, 80)
+        self.evtbox.connect("button_release_event", self.on_button_release_event)
+        self.evtbox.connect("motion_notify_event", self.on_motion_notify_event)
+        self.evtbox.connect_after("key_press_event", self.on_key_press_event)
+        self.evtbox.set_flags(gtk.CAN_FOCUS)
 
         self.column_widths = {}
         self.row_height = 20
@@ -68,6 +73,74 @@ class Sheet(object):
 
         for i, c in enumerate(self.worksheet.columns):
             self.column_widths[c] = 40 + i*20
+
+        self.update_widths()
+
+        self.firstrow = 0
+        self.firstcol = 0
+
+        self.originx = 0
+        self.originy = 0
+
+        self.resizing_column = None
+        self.dragging_selection = False
+        self.active_cell = (0, 0)
+        self.selection = (0, 0, 1, 1)
+
+    def on_key_press_event(self, widget, event):
+        keyname = gtk.gdk.keyval_name(event.keyval)
+        print "Key %s (%d) was pressed" % (keyname, event.keyval)
+
+    def on_button_press_event(self, widget, event):
+        if event.type == gtk.gdk._2BUTTON_PRESS:
+            col, row = self.coord_to_cell(event.x, event.y)
+            x, y = self.cell_origin(col, row)
+            self.widget.move(self.editor, x, y)
+            self.editor.set_size_request(self.left_header + self.sumwidths[col]-x, self.row_height)
+            self.editor.set_text(str(self.worksheet[col][row]).replace('nan', ''))
+            self.editor.show()
+            self.editor.grab_focus()
+        else:
+            self.editor.hide()
+            self.evtbox.grab_focus()
+            for i, w, c in zip(range(self.worksheet.ncolumns), self.sumwidths, self.worksheet.columns):
+                if w-3 < event.x-self.left_header < w+3 and event.y < self.top_header:
+                    self.resizing_column = i
+                    break
+            else:
+                self.resizing_column = None
+                cell = self.coord_to_cell(event.x, event.y)
+                self.selection = (cell[0], cell[1], cell[0]+1, cell[1]+1)
+                self.widget.queue_draw()
+                self.dragging_selection = True
+
+    def on_button_release_event(self, widget, event):
+        self.resizing_column = None
+        self.dragging_selection = False
+
+    def on_motion_notify_event(self, widget, event):
+        if self.dragging_selection:
+            cell = self.coord_to_cell(event.x, event.y)
+            selection = (self.selection[0], self.selection[1], cell[0]+1, cell[1]+1)
+            if self.selection != selection:
+                self.selection = selection
+                self.widget.queue_draw()
+            
+        elif self.resizing_column is None:
+            for i, w, c in zip(range(self.worksheet.ncolumns), self.sumwidths, self.worksheet.columns):
+                if w-2 < event.x-self.left_header < w+2 and event.y < self.top_header:
+                    watch = gtk.gdk.Cursor(gtk.gdk.SB_H_DOUBLE_ARROW)
+                    self.widget.window.set_cursor(watch)
+                    break
+            else:
+                watch = gtk.gdk.Cursor(gtk.gdk.ARROW)
+                self.widget.window.set_cursor(watch)
+        else:
+            start = ([0] + list(self.sumwidths[:-1]))[self.resizing_column]
+            width = max(event.x - start - self.left_header, 50)
+            self.column_widths[self.worksheet.columns[self.resizing_column]] = width
+            self.widget.queue_draw_area(*self.widget.get_allocation())
+           
 
     def update_widths(self):
         self.widths = list(self.column_widths[c] for c in self.worksheet.columns)
@@ -99,17 +172,11 @@ class Sheet(object):
 
     def cell_origin(self, col, row):
         """The coordinates of the top left corner of the cell (col,row)""" 
-        return (self.left_header + self.sumwidths[col],
-               self.top_header + row*self.row_height)
-
-    def on_button_press_event(self, widget, event):
-        self.widget.move(self.editor, 
-                         *self.cell_origin(*self.coord_to_cell(event.x, event.y)))
-        self.editor.show()
-        self.editor.grab_focus()
+        col_start = [0] + list(self.sumwidths)
+        return (self.left_header + col_start[col] - self.originx,
+                self.top_header + row*self.row_height - self.originy)
 
     def configure_event(self, widget, event):
-        x, y, width, height = widget.get_allocation()
         return True
 
     def expose_event(self, widget, event):
@@ -148,30 +215,48 @@ class Sheet(object):
         pangolayout = widget.create_pango_layout("")
         pangolayout.set_alignment(pango.ALIGN_RIGHT)
 
-        col_start = [0] + list(self.sumwidths[:-1])
-        col_end = self.sumwidths
+        col_start = [0] + list(self.sumwidths)
+
+        # selection
+        gc.line_width = 1
+        cfrom, rfrom, cto, rto = self.selection
+        xs = int(col_start[cfrom] + self.left_header - self.originx)
+        xe = int(col_start[cto] + self.left_header - self.originx)
+        ys = int(self.top_header + rfrom * self.row_height - self.originy)
+        ye = int(self.top_header + rto * self.row_height - self.originy)
+
+        gc.foreground = self.sel_bg
+        widget.window.draw_rectangle(gc, True, xs, ys, xe-xs, ye-ys)
+
+        gc.foreground = self.black
+        widget.window.draw_rectangle(gc, False, xs-1, ys-1, xe-xs+2, ye-ys+2)
+#        widget.window.draw_rectangle(gc, False, xs+1, ys+1, xe-xs-2, ye-ys-2)
+#        gc.foreground = self.white
+        widget.window.draw_rectangle(gc, False, xs, ys, xe-xs, ye-ys)
+
 
         # cells
         for col in range(self.firstcol, self.lastcol):
             for line in range(self.firstrow, self.lastrow):
                 gc.foreground = self.linec
                 gc.line_width = 1
-                widget.window.draw_rectangle(gc, False, 
-                                             col_start[col] + self.left_header - self.originx, 
-                                             self.top_header + line * self.row_height - self.originy, 
-                                             self.widths[col], self.row_height)
+                x = int(col_start[col] + self.left_header - self.originx)
+                y = int(self.top_header + line * self.row_height - self.originy)
+                widget.window.draw_rectangle(gc, False, x, y, int(self.widths[col]), self.row_height)
+
                 gc.foreground = self.black
                 pangolayout.set_text(str(self.worksheet[col][line]).replace('nan', ''))
                 _, _, w, h  = pangolayout.get_pixel_extents()[1]
-                widget.window.draw_layout(gc, 
-                                          self.left_header + col_start[col] + (self.widths[col]-w-5) - self.originx,
-                                          self.top_header + line * self.row_height - self.originy + (self.row_height-h)/2,
-                                          pangolayout)
-
+                widget.window.draw_layout(gc, x + self.widths[col]-w-5, y + (self.row_height-h)/2, pangolayout)
 
         # left header
         for row in range(self.firstrow, self.lastrow):
-            gc.foreground = self.header_fg
+            if row in range(self.selection[1], self.selection[3]):
+                gc.foreground = self.sel_header
+                fmt = "<b>%s</b>"
+            else:
+                gc.foreground = self.header_fg
+                fmt = "%s"
             gc.line_width = 1
             widget.window.draw_rectangle(gc, True, 
                                          0, self.top_header + row * self.row_height - self.originy, 
@@ -184,32 +269,37 @@ class Sheet(object):
                                          self.left_header, self.row_height)
 
             gc.foreground = self.black
-            pangolayout.set_text(str(row))
+            pangolayout.set_markup(fmt % str(row))
             _, _, w, h  = pangolayout.get_pixel_extents()[1]
             widget.window.draw_layout(gc, 
-                                      (self.left_header-w)/2,
-                                      self.top_header + row*self.row_height - self.originy + (self.row_height-h)/2, 
+                                      int((self.left_header-w)/2),
+                                      int(self.top_header + row*self.row_height - self.originy + (self.row_height-h)/2), 
                                       pangolayout)
 
         # top header
         for col in range(self.firstcol, self.lastcol):
-            gc.foreground = self.header_fg
+            if col in range(self.selection[0], self.selection[2]):
+                gc.foreground = self.sel_header
+                fmt = "<b>%s</b>"
+            else:
+                gc.foreground = self.header_fg
+                fmt = "%s"
             gc.line_width = 1
             widget.window.draw_rectangle(gc, True, 
-                                         self.left_header + col_start[col]-self.originx, 0,
-                                         self.widths[col], self.top_header)
+                                         int(self.left_header + col_start[col]-self.originx), 0,
+                                         int(self.widths[col]), self.top_header)
 
             gc.foreground = self.header_line
             gc.line_width = 2
             widget.window.draw_rectangle(gc, False,
-                                         self.left_header + col_start[col]-self.originx, 0,
-                                         self.widths[col], self.top_header)
+                                         int(self.left_header + col_start[col]-self.originx), 0,
+                                         int(self.widths[col]), self.top_header)
 
             gc.foreground = self.black
-            pangolayout.set_text(self.worksheet.column_names[col])
+            pangolayout.set_markup(fmt % self.worksheet.column_names[col])
             _, _, w, h  = pangolayout.get_pixel_extents()[1]
-            widget.window.draw_layout(gc, self.left_header + col_start[col] - self.originx + (self.widths[col]-w)/2, 
-                                          (self.row_height-h)/2, pangolayout)
+            widget.window.draw_layout(gc, int(self.left_header + col_start[col] - self.originx + (self.widths[col]-w)/2),
+                                          int((self.row_height-h)/2), pangolayout)
 
         gc.foreground = self.header_line
         widget.window.draw_rectangle(gc, True, 0, 0,
@@ -241,10 +331,10 @@ def main():
     sheet = Sheet(w)
     vbox.pack_start(sheet.mainwidget, True, True, 0)
 
-    button = gtk.Button("Quit")
-    vbox.pack_start(button, False, False, 0)
-    button.connect_object("clicked", lambda w: w.destroy(), window)
-    button.show()
+#    button = gtk.Button("Quit")
+#    vbox.pack_start(button, False, False, 0)
+#    button.connect_object("clicked", lambda w: w.destroy(), window)
+#    button.show()
 
     window.show()
 
