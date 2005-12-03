@@ -37,6 +37,7 @@ class Sheet(object):
         self.mainwidget = self.table
 
         self.editor = gtk.Entry()
+        self.editor.connect('activate', self.on_entry_activate)
         self.widget.put(self.editor, 0, 0)
 
         
@@ -86,6 +87,14 @@ class Sheet(object):
         self.dragging_selection = False
         self.active_cell = (0, 0)
         self.selection = (0, 0, 1, 1)
+        self.edit_cell = None
+
+    def on_entry_activate(self, entry):
+        col, row = self.edit_cell
+        self.worksheet[col][row] = float(entry.get_text())
+        entry.hide()
+        self.evtbox.grab_focus()
+        self.edit_cell = None
 
     def on_key_press_event(self, widget, event):
         keyname = gtk.gdk.keyval_name(event.keyval)
@@ -100,9 +109,11 @@ class Sheet(object):
             self.editor.set_text(str(self.worksheet[col][row]).replace('nan', ''))
             self.editor.show()
             self.editor.grab_focus()
+            self.edit_cell = (col, row)
         else:
             self.editor.hide()
             self.evtbox.grab_focus()
+            self.edit_cell = None
             for i, w, c in zip(range(self.worksheet.ncolumns), self.sumwidths, self.worksheet.columns):
                 if w-3 < event.x-self.left_header < w+3 and event.y < self.top_header:
                     self.resizing_column = i
