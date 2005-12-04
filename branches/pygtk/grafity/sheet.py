@@ -1,19 +1,20 @@
-import pygtk
-pygtk.require('2.0')
+import sys
+
 import gtk
 import pango
+import numarray
 
-import sys
 sys.path.append('..')
 import grafity
 
-import numarray
 
-class Sheet(object):
+class Sheet(gtk.Table):
     def __init__(self, worksheet):
         self.worksheet = worksheet
 
-        self.table = gtk.Table(2, 2, False)
+        gtk.Table.__init__(self, 2, 2, False)
+
+        self.table = self
         self.evtbox = gtk.EventBox()
         self.widget = gtk.Fixed()
         self.evtbox.add(self.widget)
@@ -33,8 +34,6 @@ class Sheet(object):
         self.table.attach(self.hscroll, 0, 1, 1, 2, gtk.FILL|gtk.EXPAND, 0)
         self.table.attach(self.vscroll, 1, 2, 0, 1, 0, gtk.FILL|gtk.EXPAND)
         self.table.show()
-
-        self.mainwidget = self.table
 
         self.editor = gtk.Entry()
         self.editor.connect('activate', self.on_entry_activate)
@@ -240,8 +239,8 @@ class Sheet(object):
         widget.window.draw_rectangle(gc, True, xs, ys, xe-xs, ye-ys)
 
         gc.foreground = self.black
-        widget.window.draw_rectangle(gc, False, xs-1, ys-1, xe-xs+2, ye-ys+2)
-#        widget.window.draw_rectangle(gc, False, xs+1, ys+1, xe-xs-2, ye-ys-2)
+#        widget.window.draw_rectangle(gc, False, xs-1, ys-1, xe-xs+2, ye-ys+2)
+        widget.window.draw_rectangle(gc, False, xs+1, ys+1, xe-xs-2, ye-ys-2)
 #        gc.foreground = self.white
         widget.window.draw_rectangle(gc, False, xs, ys, xe-xs, ye-ys)
 
@@ -258,7 +257,7 @@ class Sheet(object):
                 gc.foreground = self.black
                 pangolayout.set_text(str(self.worksheet[col][line]).replace('nan', ''))
                 _, _, w, h  = pangolayout.get_pixel_extents()[1]
-                widget.window.draw_layout(gc, x + self.widths[col]-w-5, y + (self.row_height-h)/2, pangolayout)
+                widget.window.draw_layout(gc, int(x + self.widths[col]-w-5), y + (self.row_height-h)/2, pangolayout)
 
         # left header
         for row in range(self.firstrow, self.lastrow):
@@ -333,14 +332,14 @@ def main():
 
     p = grafity.Project()
     w = p.new(grafity.Worksheet, 'test')
-    w.a = range(100)
+    w.a = numarray.arange(1000)
     w.b = [2,4,5, 5.5]
     w.c = [3,2,1,3.3]
     w.d = 2*w.a
     w.e = w.b * w.c
 
     sheet = Sheet(w)
-    vbox.pack_start(sheet.mainwidget, True, True, 0)
+    vbox.pack_start(sheet, True, True, 0)
 
 #    button = gtk.Button("Quit")
 #    vbox.pack_start(button, False, False, 0)

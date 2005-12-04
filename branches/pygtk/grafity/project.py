@@ -241,6 +241,9 @@ class Folder(Item, HasSignals):
         cn = [i.name for i in self.contents()]
         ci = [i.id for i in self.contents()]
 
+        if isinstance(key, int):
+            return self.project.items[ci[key]]
+
         if key in cn:
             return self.project.items[ci[cn.index(key)]]
         else:
