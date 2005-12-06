@@ -192,10 +192,15 @@ class Widgets(object):
         self.console_box.add(console)
 
         self.left_panel.connect("switch_page", self.on_switch_page, self.left_paned)
+        self.right_panel.set_position(300)
+
 
     def on_switch_page(self, widget, _, pagenum, paned):
         if pagenum == 0:
-            paned.set_position(40)
+            pos = self.left_panel.get_allocation()[2]-self.vseparator1.get_allocation()[2]
+            print tuple(self.left_panel.get_allocation()), tuple(self.vseparator1.get_allocation())
+            print pos
+            paned.set_position(pos)
         else:
             paned.set_position(200)
         print widget, pagenum, paned
