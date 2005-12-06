@@ -192,17 +192,27 @@ class Widgets(object):
         self.console_box.add(console)
 
         self.left_panel.connect("switch_page", self.on_switch_page, self.left_paned)
-        self.right_panel.set_position(300)
+        self.right_panel.connect("switch_page", self.on_switch_page, self.right_paned)
+        self.bottom_panel.connect("switch_page", self.on_switch_page, self.bottom_paned)
+        self.right_paned.set_position(300)
 
 
     def on_switch_page(self, widget, _, pagenum, paned):
         if pagenum == 0:
-            pos = self.left_panel.get_allocation()[2]-self.vseparator1.get_allocation()[2]
-            print tuple(self.left_panel.get_allocation()), tuple(self.vseparator1.get_allocation())
-            print pos
-            paned.set_position(pos)
+            if widget in [self.left_panel, self.right_panel]:
+                coord = 2
+            elif widget == self.bottom_panel:
+                coord = 3
+            pos = widget.get_allocation()[coord]-widget.get_nth_page(0).get_allocation()[coord]
+            if widget in [self.right_panel, self.bottom_panel]:
+                paned.set_position(paned.get_property("max-position")-pos)
+            elif widget == self.left_panel:
+                paned.set_position(pos)
         else:
-            paned.set_position(200)
+            if widget in [self.right_panel, self.bottom_panel]:
+                paned.set_position(paned.get_property("max-position")-200)
+            elif widget == self.left_panel:
+                paned.set_position(200)
         print widget, pagenum, paned
 
     def __getattr__(self, attr):
