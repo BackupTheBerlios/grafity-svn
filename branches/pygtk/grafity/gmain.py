@@ -165,8 +165,8 @@ class Scene(GLScene):
 
 class GraphView(object):
     def __init__(self):
-        self.widgets = gtk.glade.XML("grafity.glade", 'graph_view')
-        self.label = gtk.glade.XML("grafity.glade", 'graph_view_label').get_widget('graph_view_label')
+        self.widgets = gtk.glade.XML("pixmaps/grafity.glade", 'graph_view')
+        self.label = gtk.glade.XML("pixmaps/grafity.glade", 'graph_view_label').get_widget('graph_view_label')
 
         p = grafity.Project()
         g = p.new(grafity.Graph, 'arse')
@@ -188,7 +188,7 @@ class GraphView(object):
 
 class Widgets(object):
     def __init__(self):
-        self.widgets = gtk.glade.XML("grafity.glade", 'mainwin')
+        self.widgets = gtk.glade.XML("pixmaps/grafity.glade", 'mainwin')
         signals = { "on_quit1_activate" : self.on_quit1_activate}
         self.widgets.signal_autoconnect(signals)
 
