@@ -565,6 +565,8 @@ class Graph(Item, HasSignals):
             glDisable(GL_COLOR_LOGIC_OP)
 
     def reshape(self, width=-1, height=-1):
+        if width < 10 and height < 10:
+            width, height = 200, 200
         if not hasattr(self, 'listno'):
             return
         t = time.time()

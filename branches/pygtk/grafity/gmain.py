@@ -130,23 +130,65 @@ class MyTreeModel(gtk.GenericTreeModel):
             return node[:-1]
 
 
+def make_panel(notebook, paned_widget, side):
+    def on_switch_page(widget, _, pagenum, paned):
+        if pagenum == 0:
+            if side in ['left', 'right']:
+                coord = 2
+            elif side in ['top', 'bottom']:
+                coord = 3
+            pos = widget.get_allocation()[coord]-widget.get_nth_page(0).get_allocation()[coord]
+            if pos == 0:
+                pos = 34
+            if side in ['right', 'bottom']:
+                paned.set_position(paned.get_property("max-position")-pos)
+            elif side in ['top', 'left']:
+                paned.set_position(pos)
+        else:
+            if side in ['right', 'bottom']:
+                paned.set_position(paned.get_property("max-position")-200)
+            elif side in ['top', 'left']:
+                paned.set_position(200)
+
+    notebook.connect("switch_page", on_switch_page, paned_widget)
+    on_switch_page(notebook, None, 0, paned_widget)
+
+
 class Scene(GLScene):
     def __init__(self, graph):
         self.graph = graph
-        GLScene.__init__(self,
-                         gtk.gdkgl.MODE_RGB   |
-                         gtk.gdkgl.MODE_DEPTH |
-                         gtk.gdkgl.MODE_DOUBLE)
-    def init(self):
-        return self.graph.init()
-    def reshape(self, w, h):
-        return self.graph.reshape(w, h)
-    def display(self, w, h):
-        return self.graph.display(w, h)
+        GLScene.__init__(self, gtk.gdkgl.MODE_RGB|gtk.gdkgl.MODE_DEPTH|gtk.gdkgl.MODE_DOUBLE)
+    def init(self): return self.graph.init()
+    def reshape(self, w, h): return self.graph.reshape(w, h)
+    def display(self, w, h): return self.graph.display(w, h)
+
+
+class GraphView(object):
+    def __init__(self):
+        self.widgets = gtk.glade.XML("grafity.glade", 'graph_view')
+        self.label = gtk.glade.XML("grafity.glade", 'graph_view_label').get_widget('graph_view_label')
+
+        p = grafity.Project()
+        g = p.new(grafity.Graph, 'arse')
+        graph = Scene(g)
+        area = GLArea(graph)
+        area.set_size_request(300, 300)
+        area.show()
+        self.box.pack_start(area, True, True, 0)
+
+    def init_ui(self):
+        make_panel(self.right_panel, self.graph_view, 'right')
+
+    def __getattr__(self, attr):
+        if attr in self.__dict__:
+            return self.__dict__[attr]
+        else:
+            return self.widgets.get_widget(attr)
+        
 
 class Widgets(object):
     def __init__(self):
-        self.widgets = gtk.glade.XML("grafity.glade")
+        self.widgets = gtk.glade.XML("grafity.glade", 'mainwin')
         signals = { "on_quit1_activate" : self.on_quit1_activate}
         self.widgets.signal_autoconnect(signals)
 
@@ -175,45 +217,24 @@ class Widgets(object):
         w.d = 2*w.a
         w.e = w.b * w.c
 
-        g = p.new(grafity.Graph, 'arse')
 
         sheet = Sheet(w)
 #        self.box.pack_start(sheet, True, True, 0)
-        graph = Scene(g)
-        area = GLArea(graph)
-        area.set_size_request(300, 300)
-        area.show()
-        self.box.pack_start(area, True, True, 0)
-
         console = Console(banner="Hello there!",
                           use_rlcompleter=True,
                           start_script="import grafity\n")
         console.show()
         self.console_box.add(console)
 
-        self.left_panel.connect("switch_page", self.on_switch_page, self.left_paned)
-        self.right_panel.connect("switch_page", self.on_switch_page, self.right_paned)
-        self.bottom_panel.connect("switch_page", self.on_switch_page, self.bottom_paned)
-        self.right_paned.set_position(300)
+        make_panel(self.left_panel, self.left_paned, 'left')
+        make_panel(self.bottom_panel, self.bottom_paned, 'bottom')
 
-
-    def on_switch_page(self, widget, _, pagenum, paned):
-        if pagenum == 0:
-            if widget in [self.left_panel, self.right_panel]:
-                coord = 2
-            elif widget == self.bottom_panel:
-                coord = 3
-            pos = widget.get_allocation()[coord]-widget.get_nth_page(0).get_allocation()[coord]
-            if widget in [self.right_panel, self.bottom_panel]:
-                paned.set_position(paned.get_property("max-position")-pos)
-            elif widget == self.left_panel:
-                paned.set_position(pos)
-        else:
-            if widget in [self.right_panel, self.bottom_panel]:
-                paned.set_position(paned.get_property("max-position")-200)
-            elif widget == self.left_panel:
-                paned.set_position(200)
-        print widget, pagenum, paned
+        g = GraphView()
+        self.notebook.append_page(g.graph_view, g.label)
+        g.init_ui()
+        g = GraphView()
+        self.notebook.append_page(g.graph_view, g.label)
+        g.init_ui()
 
     def __getattr__(self, attr):
         if attr in self.__dict__:
