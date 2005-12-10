@@ -23,7 +23,13 @@ if options.log is not None:
     for l in options.log.split(','):
         logging.getLogger(l).setLevel(logging.DEBUG)
 
-
+class Widgets(object):
+    def __getattr__(self, attr):
+        if attr in self.__dict__:
+            return self.__dict__[attr]
+        else:
+            return self.widgets.get_widget(attr)
+ 
 def make_panel(notebook, paned_widget, side):
     def on_switch_page(widget, _, pagenum, paned):
         if pagenum == 0:
@@ -57,33 +63,37 @@ class Scene(GLScene):
     def display(self, w, h): return self.graph.display(w, h)
 
 
-class GraphView(object):
+class GraphView(Widgets):
     def __init__(self, graph):
         self.graph = graph
         self.widgets = gtk.glade.XML("pixmaps/grafity.glade", 'graph_view')
         self.label = gtk.glade.XML("pixmaps/grafity.glade", 'graph_view_label').get_widget('graph_view_label')
+        self.page = self.graph_view
 
         scene = Scene(self.graph)
         area = GLArea(scene)
         area.set_size_request(300, 300)
         area.show()
-        self.box.pack_start(area, True, True, 0)
-
-    def init_ui(self):
+        self.box.pack_start(area)
         make_panel(self.right_panel, self.graph_view, 'right')
 
-    def __getattr__(self, attr):
-        if attr in self.__dict__:
-            return self.__dict__[attr]
-        else:
-            return self.widgets.get_widget(attr)
+class WorksheetView(Widgets):
+    def __init__(self, worksheet):
+        self.worksheet = worksheet
+        self.widgets = gtk.glade.XML("pixmaps/grafity.glade", 'worksheet_view')
+        self.label = gtk.glade.XML("pixmaps/grafity.glade", 'worksheet_view_label').get_widget('worksheet_view_label')
+        self.page = self.worksheet_view
+
+        sheet = Sheet(self.worksheet)
+        self.sheet_box.pack_start(sheet)
+
 
 def folder_list_store(folder):
-    store = gtk.ListStore(str)
+    store = gtk.ListStore(object)
  
     def on_add_item(item):
         if item.parent == folder:
-            item._store_item = store.append([item.name])
+            item._store_item = store.append([item])
 
     def on_remove_item(item):
         if item.parent == folder:
@@ -93,18 +103,18 @@ def folder_list_store(folder):
     store._on_list_remove_item = on_remove_item
         
     for item in folder:
-        item._store_item = store.append([item.name])
+        item._store_item = store.append([item])
 
     folder.project.connect('add-item', on_add_item)
     folder.project.connect('remove-item', on_remove_item)
     return store
 
 def project_tree_store(project):
-    store = gtk.TreeStore(str)
+    store = gtk.TreeStore(object)
 
     def t_on_add_item(item):
         if isinstance(item, grafity.Folder):
-            item._tree_store_item = store.append(item.parent._tree_store_item, [item.name])
+            item._tree_store_item = store.append(item.parent._tree_store_item, [item])
 
     def t_on_remove_item(item):
         if isinstance(item, grafity.Folder):
@@ -113,61 +123,110 @@ def project_tree_store(project):
     store._on_tree_add_item = t_on_add_item
     store._on_tree_remove_item = t_on_remove_item
 
-    project.top._tree_store_item = store.append(None, [project.top.name])
+    project.top._tree_store_item = store.append(None, [project.top])
     for folder in project.top.all_subfolders():
-        folder._tree_store_item = store.append(folder.parent._tree_store_item, [folder.name])
+        folder._tree_store_item = store.append(folder.parent._tree_store_item, [folder])
 
     project.connect('add-item', t_on_add_item, True)
     project.connect('remove-item', t_on_remove_item, True)
 
     return store
 
-class Widgets(object):
+
+class Main(Widgets):
     def __init__(self):
         self.widgets = gtk.glade.XML("pixmaps/grafity.glade", 'mainwin')
         signals = { "on_quit1_activate" : self.on_quit1_activate}
         self.widgets.signal_autoconnect(signals)
 
-        self.project = grafity.Project('test/pdms.gt')
+        graphicon = gtk.gdk.pixbuf_new_from_file('/home/daniel/grafity/data/images/16/graph.png')
+        foldericon = gtk.gdk.pixbuf_new_from_file('/home/daniel/grafity/data/images/16/folder.png')
+        worksheeticon = gtk.gdk.pixbuf_new_from_file('/home/daniel/grafity/data/images/16/worksheet.png')
 
-        self.project._tree_model = project_tree_store(self.project)
-        self.folder_tree.set_model(self.project._tree_model)
-        cell = gtk.CellRendererText()
-        column = gtk.TreeViewColumn("tuples", cell, text=0)
+        def obj_id_str(treeviewcolumn, cell_renderer, model, iter):
+            obj = model.get_value(iter, 0)
+            cell_renderer.set_property('text', obj.name)
+
+        def obj_id_icon(treeviewcolumn, cell_renderer, model, iter):
+            obj = model.get_value(iter, 0)
+            icon = {grafity.Graph: graphicon,
+                    grafity.Worksheet: worksheeticon,
+                    grafity.Folder: foldericon } [type(obj)]
+            cell_renderer.set_property('pixbuf', icon)
+
+        # tree columns
+        cell = gtk.CellRendererPixbuf()
+        column = gtk.TreeViewColumn("icon", cell)
+        column.set_cell_data_func(cell, obj_id_icon)
         self.folder_tree.append_column(column)
 
-        model = folder_list_store(self.project.top)
-
-        self.object_list.set_model(model)
         cell = gtk.CellRendererText()
-        column = gtk.TreeViewColumn("name", cell, text=0)
+        column = gtk.TreeViewColumn("name", cell)
+        column.set_cell_data_func(cell, obj_id_str)
+        self.folder_tree.append_column(column)
+
+        # list columns
+        cell = gtk.CellRendererPixbuf()
+        column = gtk.TreeViewColumn("icon", cell)
+        column.set_cell_data_func(cell, obj_id_icon)
         self.object_list.append_column(column)
 
+        cell = gtk.CellRendererText()
+        column = gtk.TreeViewColumn("name", cell)
+        column.set_cell_data_func(cell, obj_id_str)
+        self.object_list.append_column(column)
 
-        sheet = Sheet(self.project.top.pdms1.pdms1_e2_f)
-        console = Console(banner="Hello there!",
-                          locals={"project":self.project},
+        self.object_list.connect('row-activated', self.on_object_activated)
+        self.folder_tree.get_selection().connect('changed', self.on_tree_select)
+
+        self.console = Console( #                          locals={"project":self.project},
                           use_rlcompleter=True,
-                          start_script="import grafity\n")
-        console.show()
-        self.console_box.add(console)
+                          start_script="from grafity import Folder, Worksheet, Graph\n")
+        self.console_box.add(self.console)
+        self.console.show()
 
         make_panel(self.left_panel, self.left_paned, 'left')
         make_panel(self.bottom_panel, self.bottom_paned, 'bottom')
 
-        g = GraphView(self.project.top.graph0)
-        self.notebook.append_page(g.graph_view, g.label)
-        g.init_ui()
+        self.open_project(grafity.Project('test/pdms.gt'))
 
-    def __getattr__(self, attr):
-        if attr in self.__dict__:
-            return self.__dict__[attr]
-        else:
-            return self.widgets.get_widget(attr)
-        
+    def on_tree_select(self, selection):
+        model, paths = selection.get_selected_rows()
+        self.project.cd(self.folder_tree.get_model()[paths[0]][0])
+
+    def open_project(self, project):
+        self.project = project
+
+        # tree
+        self.project._tree_model = project_tree_store(self.project)
+        self.folder_tree.set_model(self.project._tree_model)
+
+        # folders
+        for folder in self.project.top.all_subfolders():
+            folder._list_model = folder_list_store(folder)
+        self.project.top._list_model = folder_list_store(self.project.top)
+
+        self.project.connect('change-current-folder', self.on_change_folder)
+        self.console.locals['project'] = self.project
+
+    def on_change_folder(self, folder):
+        self.object_list.set_model(folder._list_model)
+
+    def on_object_activated(self, treeview, path, view_column):
+        self.view(treeview.get_model()[path][0])
+
+    def view(self, obj):
+        if isinstance(obj, grafity.Graph):
+            view = GraphView(obj)
+            self.notebook.append_page(view.page, view.label)
+        elif isinstance(obj, grafity.Worksheet):
+            view = WorksheetView(obj)
+            self.notebook.append_page(view.page, view.label)
+
+       
     def on_quit1_activate(self, widget):
         gtk.main_quit()
         
 if __name__ == "__main__":
-    widgets = Widgets()
+    widgets = Main()
     gtk.main()
