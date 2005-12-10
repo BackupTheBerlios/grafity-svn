@@ -11,123 +11,17 @@ import grafity
 from sheet import Sheet
 from pyconsole import Console
 
-class FolderModel(gtk.GenericTreeModel):
-    def __init__(self, folder):
-        self.folder = folder
-        gtk.GenericTreeModel.__init__(self)
+import logging
+logging.basicConfig(format="%(asctime)s [%(name)s] %(message)s")
 
-    def on_get_flags(self): return gtk.TREE_MODEL_LIST_ONLY | gtk.TREE_MODEL_ITERS_PERSIST
-    def on_get_n_columns(self): return 1
-    def on_get_column_type(self, index): return gobject.TYPE_STRING
+from optparse import OptionParser
+parser = OptionParser()
+parser.add_option('-l', '--log', dest='log', help='Log program events')
+options, args = parser.parse_args()
 
-    def on_get_path(self, node):
-        return (list(self.folder).index(node),)
-
-    def on_get_iter(self, path):
-        '''returns the node corresponding to the given path.'''
-        return self.folder[path[0]]
-
-    def on_get_value(self, node, column):
-        '''returns the value stored in a particular column for the node'''
-        assert column == 0
-        return node.name
-
-    def on_iter_next(self, node):
-        '''returns the next node at this level of the tree'''
-        l = list(self.folder)
-        try:
-            return l[l.index(node)+1]
-        except IndexError:
-            return None
-
-    def on_iter_children(self, node): return None
-    def on_iter_has_child(self, node): return False
-    def on_iter_n_children(self, node): return 0
-    def on_iter_nth_child(self, node, n):
-        if node is None:
-            return list(self.folder)[n]
-    def on_iter_parent(self, node): return None
-
-
-
-# to create a new GtkTreeModel from python, you must derive from
-# TreeModel.
-class MyTreeModel(gtk.GenericTreeModel):
-    '''This class represents the model of a tree.  The iterators used
-    to represent positions are converted to python objects when passed
-    to the on_* methods.  This means you can use any python object to
-    represent a node in the tree.  The None object represents a NULL
-    iterator.
-
-    In this tree, we use simple tuples to represent nodes, which also
-    happen to be the tree paths for those nodes.  This model is a tree
-    of depth 3 with 5 nodes at each level of the tree.  The values in
-    the tree are just the string representations of the nodes.'''
-
-    TREE_DEPTH = 4
-    TREE_SIBLINGS = 5
-    def __init__(self):
-        '''constructor for the model.  Make sure you call
-        PyTreeModel.__init__'''
-        gtk.GenericTreeModel.__init__(self)
-
-    # the implementations for TreeModel methods are prefixed with on_
-    def on_get_flags(self):
-        '''returns the GtkTreeModelFlags for this particular type of model'''
-        return 0
-    def on_get_n_columns(self):
-        '''returns the number of columns in the model'''
-        return 1
-    def on_get_column_type(self, index):
-        '''returns the type of a column in the model'''
-        return gobject.TYPE_STRING
-    def on_get_path(self, node):
-        '''returns the tree path(a tuple of indices at the various
-        levels) for a particular node.'''
-        return node
-    def on_get_iter(self, path):
-        '''returns the node corresponding to the given path.  In our
-        case, the node is the path'''
-        return path
-    def on_get_value(self, node, column):
-        '''returns the value stored in a particular column for the node'''
-        assert column == 0
-        return `node`
-    def on_iter_next(self, node):
-        '''returns the next node at this level of the tree'''
-        if node[-1] == self.TREE_SIBLINGS - 1: # last node at level
-            return None
-        return node[:-1] +(node[-1]+1,)
-    def on_iter_children(self, node):
-        '''returns the first child of this node'''
-        if node == None: # top of tree
-            return(0,)
-        if len(node) >= self.TREE_DEPTH: # no more levels
-            return None
-        return node +(0,)
-    def on_iter_has_child(self, node):
-        '''returns true if this node has children'''
-        return len(node) < self.TREE_DEPTH
-    def on_iter_n_children(self, node):
-        '''returns the number of children of this node'''
-        if len(node) < self.TREE_DEPTH:
-            return self.TREE_SIBLINGS
-        else:
-            return 0
-    def on_iter_nth_child(self, node, n):
-        '''returns the nth child of this node'''
-        if node == None:
-            return(n,)
-        if len(node) < self.TREE_DEPTH and n < self.TREE_SIBLINGS:
-            return node +(n,)
-        else:
-            return None
-    def on_iter_parent(self, node):
-        '''returns the parent of this node'''
-        if len(node) == 0:
-            return None
-        else:
-            return node[:-1]
+if options.log is not None:
+    for l in options.log.split(','):
+        logging.getLogger(l).setLevel(logging.DEBUG)
 
 
 def make_panel(notebook, paned_widget, side):
@@ -164,14 +58,13 @@ class Scene(GLScene):
 
 
 class GraphView(object):
-    def __init__(self):
+    def __init__(self, graph):
+        self.graph = graph
         self.widgets = gtk.glade.XML("pixmaps/grafity.glade", 'graph_view')
         self.label = gtk.glade.XML("pixmaps/grafity.glade", 'graph_view_label').get_widget('graph_view_label')
 
-        p = grafity.Project()
-        g = p.new(grafity.Graph, 'arse')
-        graph = Scene(g)
-        area = GLArea(graph)
+        scene = Scene(self.graph)
+        area = GLArea(scene)
         area.set_size_request(300, 300)
         area.show()
         self.box.pack_start(area, True, True, 0)
@@ -184,7 +77,50 @@ class GraphView(object):
             return self.__dict__[attr]
         else:
             return self.widgets.get_widget(attr)
+
+def folder_list_store(folder):
+    store = gtk.ListStore(str)
+ 
+    def on_add_item(item):
+        if item.parent == folder:
+            item._store_item = store.append([item.name])
+
+    def on_remove_item(item):
+        if item.parent == folder:
+            store.remove(item._store_item)
+            
+    store._on_list_add_item = on_add_item
+    store._on_list_remove_item = on_remove_item
         
+    for item in folder:
+        item._store_item = store.append([item.name])
+
+    folder.project.connect('add-item', on_add_item)
+    folder.project.connect('remove-item', on_remove_item)
+    return store
+
+def project_tree_store(project):
+    store = gtk.TreeStore(str)
+
+    def t_on_add_item(item):
+        if isinstance(item, grafity.Folder):
+            item._tree_store_item = store.append(item.parent._tree_store_item, [item.name])
+
+    def t_on_remove_item(item):
+        if isinstance(item, grafity.Folder):
+            store.remove(item._tree_store_item)
+
+    store._on_tree_add_item = t_on_add_item
+    store._on_tree_remove_item = t_on_remove_item
+
+    project.top._tree_store_item = store.append(None, [project.top.name])
+    for folder in project.top.all_subfolders():
+        folder._tree_store_item = store.append(folder.parent._tree_store_item, [folder.name])
+
+    project.connect('add-item', t_on_add_item, True)
+    project.connect('remove-item', t_on_remove_item, True)
+
+    return store
 
 class Widgets(object):
     def __init__(self):
@@ -192,35 +128,25 @@ class Widgets(object):
         signals = { "on_quit1_activate" : self.on_quit1_activate}
         self.widgets.signal_autoconnect(signals)
 
-        self.folder_tree = self.widgets.get_widget('folder_tree')
-        model = MyTreeModel()
-        self.folder_tree.set_model(model)
+        self.project = grafity.Project('test/pdms.gt')
+
+        self.project._tree_model = project_tree_store(self.project)
+        self.folder_tree.set_model(self.project._tree_model)
         cell = gtk.CellRendererText()
         column = gtk.TreeViewColumn("tuples", cell, text=0)
         self.folder_tree.append_column(column)
 
-        self.object_list = self.widgets.get_widget('object_list')
-
-        self.project = grafity.Project('test/pdms.gt')
-        model = FolderModel(self.project.top)
+        model = folder_list_store(self.project.top)
 
         self.object_list.set_model(model)
         cell = gtk.CellRendererText()
         column = gtk.TreeViewColumn("name", cell, text=0)
         self.object_list.append_column(column)
 
-        p = grafity.Project()
-        w = p.new(grafity.Worksheet, 'test')
-        w.a = numarray.arange(1000)
-        w.b = [2,4,5, 5.5]
-        w.c = [3,2,1,3.3]
-        w.d = 2*w.a
-        w.e = w.b * w.c
 
-
-        sheet = Sheet(w)
-#        self.box.pack_start(sheet, True, True, 0)
+        sheet = Sheet(self.project.top.pdms1.pdms1_e2_f)
         console = Console(banner="Hello there!",
+                          locals={"project":self.project},
                           use_rlcompleter=True,
                           start_script="import grafity\n")
         console.show()
@@ -229,10 +155,7 @@ class Widgets(object):
         make_panel(self.left_panel, self.left_paned, 'left')
         make_panel(self.bottom_panel, self.bottom_paned, 'bottom')
 
-        g = GraphView()
-        self.notebook.append_page(g.graph_view, g.label)
-        g.init_ui()
-        g = GraphView()
+        g = GraphView(self.project.top.graph0)
         self.notebook.append_page(g.graph_view, g.label)
         g.init_ui()
 

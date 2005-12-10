@@ -199,6 +199,12 @@ class Folder(Item, HasSignals):
         for f in self.parent.ancestors():
             yield f
 
+    def all_subfolders(self):
+        for item in self.subfolders():
+            yield item
+            for i in item.all_subfolders():
+                yield i
+
     def subfolders(self):
         for item in self.contents():
             if isinstance(item, Folder):
