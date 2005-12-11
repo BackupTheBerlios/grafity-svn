@@ -147,6 +147,8 @@ def project_tree_store(project):
 
     return store
 
+class Cancel(Exception):
+    pass
 
 class Main(Widgets):
     def __init__(self):
@@ -233,17 +235,21 @@ class Main(Widgets):
         self.project.connect('change-current-folder', self.on_change_folder)
         self.console.locals['project'] = self.project
 
-    def close_project(self):
+    def ask_save(self):
         def respond(widget, resp):
-            print resp
-        msg = gtk.MessageDialog(parent=self.mainwin, flags=gtk.DIALOG_MODAL, 
-                                type=gtk.MESSAGE_QUESTION, 
-                                buttons=gtk.BUTTONS_YES_NO, 
-                                message_format='foo')
+            msg.destroy()
+            if resp == gtk.RESPONSE_YES:
+                self.save_project()
+            elif resp == gtk.RESPONSE_NO:
+                pass
+            elif resp == gtk.RESPONSE_CANCEL:
+                raise Cancel
+
+        msg = gtk.glade.XML("pixmaps/grafity.glade", 'ask_save').get_widget('ask_save')
         msg.connect('response', respond)
         msg.show()
-        
-        return
+ 
+    def close_project(self):
         self.project.disconnect('change-current-folder', self.on_change_folder)
         self.folder_tree.set_model(None)
         self.object_list.set_model(None)
@@ -251,6 +257,8 @@ class Main(Widgets):
         self.project = None
 
     def on_file_open(self, pikou):
+        self.ask_save()
+
         filesel = gtk.FileSelection(title="Open Project")
 
         def on_ok(widget):
