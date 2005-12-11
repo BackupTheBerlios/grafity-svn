@@ -98,6 +98,7 @@ class Sheet(gtk.Table):
     def on_key_press_event(self, widget, event):
         keyname = gtk.gdk.keyval_name(event.keyval)
         print "Key %s (%d) was pressed" % (keyname, event.keyval)
+        return False
 
     def on_button_press_event(self, widget, event):
         if event.type == gtk.gdk._2BUTTON_PRESS:

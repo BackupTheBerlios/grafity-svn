@@ -1,6 +1,6 @@
 import gtk
 import gtk.glade
-from gtk.gtkgl.apputils import GLScene, GLArea
+from gtk.gtkgl.apputils import GLScene, GLArea, GLSceneButton, GLSceneButtonMotion
 import gobject
 import numarray
 
@@ -54,13 +54,22 @@ def make_panel(notebook, paned_widget, side):
     on_switch_page(notebook, None, 0, paned_widget)
 
 
-class Scene(GLScene):
+class Scene(GLScene, GLSceneButton, GLSceneButtonMotion):
     def __init__(self, graph):
         self.graph = graph
+        self.graph.mode = 'zoom'
         GLScene.__init__(self, gtk.gdkgl.MODE_RGB|gtk.gdkgl.MODE_DEPTH|gtk.gdkgl.MODE_DOUBLE)
+#        self.btns = {gtk.gdk.LEFTBUTTON:1, gtk.gdk.RIGHTBUTTON:3, gtk.gdk.MIDDLEBUTTON:2 }
     def init(self): return self.graph.init()
     def reshape(self, w, h): return self.graph.reshape(w, h)
     def display(self, w, h): return self.graph.display(w, h)
+
+    def button_press(self, w, h, event): 
+        self.graph.button_press(event.x, event.y, event.button)
+    def button_release(self, w, h, event): 
+        self.graph.button_release(event.x, event.y, event.button)
+    def button_motion(self, w, h, event): 
+        self.graph.button_motion(event.x, event.y, True)
 
 
 class GraphView(Widgets):
@@ -71,11 +80,17 @@ class GraphView(Widgets):
         self.page = self.graph_view
 
         scene = Scene(self.graph)
-        area = GLArea(scene)
+        self.area = area = GLArea(scene)
         area.set_size_request(300, 300)
         area.show()
         self.box.pack_start(area)
         make_panel(self.right_panel, self.graph_view, 'right')
+
+        self.graph.connect('redraw', self.on_redraw, True)
+
+    def on_redraw(self):
+        self.area.queue_draw()
+
 
 class WorksheetView(Widgets):
     def __init__(self, worksheet):
@@ -136,8 +151,15 @@ def project_tree_store(project):
 class Main(Widgets):
     def __init__(self):
         self.widgets = gtk.glade.XML("pixmaps/grafity.glade", 'mainwin')
-        signals = { "on_quit1_activate" : self.on_quit1_activate}
+        signals = { "on_quit" : self.on_quit,
+                    "on_file_open" : self.on_file_open,
+                    "on_object_activated" : self.on_object_activated }
+        class getter(object):
+            def __getattr__(s, attr):
+                return getattr(self, attr)
+        signals = getter()
         self.widgets.signal_autoconnect(signals)
+        print hasattr(self, 'on_file_open')
 
         graphicon = gtk.gdk.pixbuf_new_from_file('/home/daniel/grafity/data/images/16/graph.png')
         foldericon = gtk.gdk.pixbuf_new_from_file('/home/daniel/grafity/data/images/16/folder.png')
@@ -176,7 +198,7 @@ class Main(Widgets):
         column.set_cell_data_func(cell, obj_id_str)
         self.object_list.append_column(column)
 
-        self.object_list.connect('row-activated', self.on_object_activated)
+#        self.object_list.connect('row-activated', self.on_object_activated)
         self.folder_tree.get_selection().connect('changed', self.on_tree_select)
 
         self.console = Console( #                          locals={"project":self.project},
@@ -189,6 +211,8 @@ class Main(Widgets):
         make_panel(self.bottom_panel, self.bottom_paned, 'bottom')
 
         self.open_project(grafity.Project('test/pdms.gt'))
+
+        self.left_panel.set_current_page(1)
 
     def on_tree_select(self, selection):
         model, paths = selection.get_selected_rows()
@@ -209,6 +233,36 @@ class Main(Widgets):
         self.project.connect('change-current-folder', self.on_change_folder)
         self.console.locals['project'] = self.project
 
+    def close_project(self):
+        def respond(widget, resp):
+            print resp
+        msg = gtk.MessageDialog(parent=self.mainwin, flags=gtk.DIALOG_MODAL, 
+                                type=gtk.MESSAGE_QUESTION, 
+                                buttons=gtk.BUTTONS_YES_NO, 
+                                message_format='foo')
+        msg.connect('response', respond)
+        msg.show()
+        
+        return
+        self.project.disconnect('change-current-folder', self.on_change_folder)
+        self.folder_tree.set_model(None)
+        self.object_list.set_model(None)
+        # and close all pages
+        self.project = None
+
+    def on_file_open(self, pikou):
+        filesel = gtk.FileSelection(title="Open Project")
+
+        def on_ok(widget):
+            print filesel.get_filename()
+            self.close_project()
+            self.open_project(grafity.Project(filesel.get_filename()))
+            filesel.destroy()
+
+        filesel.ok_button.connect("clicked", on_ok)
+        filesel.cancel_button.connect("clicked", lambda w: filesel.destroy())
+        filesel.show()
+
     def on_change_folder(self, folder):
         self.object_list.set_model(folder._list_model)
 
@@ -224,7 +278,7 @@ class Main(Widgets):
             self.notebook.append_page(view.page, view.label)
 
        
-    def on_quit1_activate(self, widget):
+    def on_quit(self, widget):
         gtk.main_quit()
         
 if __name__ == "__main__":
