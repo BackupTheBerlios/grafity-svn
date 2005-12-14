@@ -272,10 +272,13 @@
 	  <child>
 	    <widget class="GtkToolButton" id="toolbutton14">
 	      <property name="visible">True</property>
-	      <property name="stock_id">gtk-cut</property>
+	      <property name="label" translatable="yes"></property>
+	      <property name="use_underline">True</property>
+	      <property name="icon">new-worksheet.png</property>
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
+	      <signal name="clicked" handler="on_new_worksheet" last_modification_time="Wed, 14 Dec 2005 21:16:56 GMT"/>
 	    </widget>
 	    <packing>
 	      <property name="expand">False</property>
@@ -286,10 +289,13 @@
 	  <child>
 	    <widget class="GtkToolButton" id="toolbutton15">
 	      <property name="visible">True</property>
-	      <property name="stock_id">gtk-copy</property>
+	      <property name="label" translatable="yes"></property>
+	      <property name="use_underline">True</property>
+	      <property name="icon">new-graph.png</property>
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
+	      <signal name="clicked" handler="on_new_graph" last_modification_time="Wed, 14 Dec 2005 21:17:04 GMT"/>
 	    </widget>
 	    <packing>
 	      <property name="expand">False</property>
@@ -300,37 +306,13 @@
 	  <child>
 	    <widget class="GtkToolButton" id="toolbutton16">
 	      <property name="visible">True</property>
-	      <property name="stock_id">gtk-paste</property>
+	      <property name="label" translatable="yes"></property>
+	      <property name="use_underline">True</property>
+	      <property name="icon">new-folder.png</property>
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
-	    </widget>
-	    <packing>
-	      <property name="expand">False</property>
-	      <property name="homogeneous">False</property>
-	    </packing>
-	  </child>
-
-	  <child>
-	    <widget class="GtkSeparatorToolItem" id="separatortoolitem3">
-	      <property name="visible">True</property>
-	      <property name="draw">True</property>
-	      <property name="visible_horizontal">True</property>
-	      <property name="visible_vertical">True</property>
-	    </widget>
-	    <packing>
-	      <property name="expand">False</property>
-	      <property name="homogeneous">False</property>
-	    </packing>
-	  </child>
-
-	  <child>
-	    <widget class="GtkMenuToolButton" id="menutoolbutton1">
-	      <property name="visible">True</property>
-	      <property name="stock_id">gtk-new</property>
-	      <property name="visible_horizontal">True</property>
-	      <property name="visible_vertical">True</property>
-	      <property name="is_important">False</property>
+	      <signal name="clicked" handler="on_new_folder" last_modification_time="Wed, 14 Dec 2005 21:17:14 GMT"/>
 	    </widget>
 	    <packing>
 	      <property name="expand">False</property>

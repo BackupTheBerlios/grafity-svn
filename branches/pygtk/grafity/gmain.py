@@ -161,7 +161,6 @@ class Main(Widgets):
                 return getattr(self, attr)
         signals = getter()
         self.widgets.signal_autoconnect(signals)
-        print hasattr(self, 'on_file_open')
 
         graphicon = gtk.gdk.pixbuf_new_from_file('/home/daniel/grafity/data/images/16/graph.png')
         foldericon = gtk.gdk.pixbuf_new_from_file('/home/daniel/grafity/data/images/16/folder.png')
@@ -216,11 +215,8 @@ class Main(Widgets):
 
         self.left_panel.set_current_page(1)
 
-    def on_tree_select(self, selection):
-        model, paths = selection.get_selected_rows()
-        self.project.cd(self.folder_tree.get_model()[paths[0]][0])
-
     def open_project(self, project):
+        """Connect a project to the gui"""
         self.project = project
 
         # tree
@@ -234,50 +230,35 @@ class Main(Widgets):
 
         self.project.connect('change-current-folder', self.on_change_folder)
         self.console.locals['project'] = self.project
-
-    def ask_save(self):
-        def respond(widget, resp):
-            msg.destroy()
-            if resp == gtk.RESPONSE_YES:
-                self.save_project()
-            elif resp == gtk.RESPONSE_NO:
-                pass
-            elif resp == gtk.RESPONSE_CANCEL:
-                raise Cancel
-
-        msg = gtk.glade.XML("pixmaps/grafity.glade", 'ask_save').get_widget('ask_save')
-        msg.connect('response', respond)
-        msg.show()
  
     def close_project(self):
+        """Disconnect the current project form the gui"""
         self.project.disconnect('change-current-folder', self.on_change_folder)
         self.folder_tree.set_model(None)
         self.object_list.set_model(None)
         # and close all pages
         self.project = None
 
-    def on_file_open(self, pikou):
-        self.ask_save()
+    def ask_save(self):
+        """Prepare to close the project. Ask the user whether to
+        save changes and save is necessary. Raises Cancel if 
+        the user cancels.
+        """
+        msg = gtk.glade.XML("pixmaps/grafity.glade", 'ask_save').get_widget('ask_save')
+        resp = msg.run()
+        msg.destroy()
+        if resp == gtk.RESPONSE_DELETE_EVENT or resp == gtk.RESPONSE_CANCEL:
+            raise Cancel
+        if resp == gtk.RESPONSE_YES:
+            self.on_file_save(None)
+        elif resp == gtk.RESPONSE_NO:
+            pass
 
-        filesel = gtk.FileSelection(title="Open Project")
-
-        def on_ok(widget):
-            print filesel.get_filename()
-            self.close_project()
-            self.open_project(grafity.Project(filesel.get_filename()))
-            filesel.destroy()
-
-        filesel.ok_button.connect("clicked", on_ok)
-        filesel.cancel_button.connect("clicked", lambda w: filesel.destroy())
-        filesel.show()
-
-    def on_change_folder(self, folder):
-        self.object_list.set_model(folder._list_model)
-
-    def on_object_activated(self, treeview, path, view_column):
-        self.view(treeview.get_model()[path][0])
 
     def view(self, obj):
+        """Create a view for the object `obj` (Worksheet or Graph)
+        in the notebook, or switch to it if one exists,
+        """
         if isinstance(obj, grafity.Graph):
             view = GraphView(obj)
             self.notebook.append_page(view.page, view.label)
@@ -285,9 +266,86 @@ class Main(Widgets):
             view = WorksheetView(obj)
             self.notebook.append_page(view.page, view.label)
 
-       
-    def on_quit(self, widget):
+
+    # Signals from the project
+
+    def on_change_folder(self, folder):
+        """The project's current folder has changer"""
+        self.object_list.set_model(folder._list_model)
+
+
+    # Signals from the gui
+
+    def on_object_activated(self, treeview, path, view_column):
+        """An item in the current folder has been double-clicked"""
+        self.view(treeview.get_model()[path][0])
+
+    def on_tree_select(self, selection):
+        """An item in the project tree has been selected"""
+        model, paths = selection.get_selected_rows()
+        self.project.cd(self.folder_tree.get_model()[paths[0]][0])
+
+
+    # Menu and toolbar actions
+
+    def on_file_open(self, item):
+        """File/Open"""
+        try:
+            self.ask_save()
+        except Cancel:
+            return
+
+        filesel = gtk.FileSelection(title="Open Project")
+        resp = filesel.run()
+        if resp == gtk.RESPONSE_DELETE_EVENT or resp == gtk.RESPONSE_CANCEL:
+            pass
+        if resp == gtk.RESPONSE_OK:
+            self.close_project()
+            self.open_project(grafity.Project(filesel.get_filename()))
+        filesel.destroy()
+
+    def on_file_save(self, item):
+        if self.project.filename is not None:
+            self.project.commit()
+        else:
+            self.on_file_saveas(item)
+
+    def on_file_saveas(self, item):
+        filesel = gtk.FileSelection(title="Save Project")
+        resp = filesel.run()
+        if resp == gtk.RESPONSE_DELETE_EVENT or resp == gtk.RESPONSE_CANCEL:
+            pass
+        if resp == gtk.RESPONSE_OK:
+            self.project.saveto(filesel.get_filename())
+            self.close_project()
+            self.open_project(grafity.Project(filesel.get_filename()))
+        filesel.destroy()
+
+    def on_file_new(self, item):
+        try:
+            self.ask_save()
+        except Cancel:
+            return
+        self.close_project()
+        self.open_project(grafity.Project())
+
+
+    def on_quit(self, item):
+        """File/Quit"""
+        try:
+            self.ask_save()
+        except Cancel:
+            return
         gtk.main_quit()
+
+    def on_new_worksheet(self, item):
+        self.project.new(grafity.Worksheet)
+
+    def on_new_graph(self, item):
+        self.project.new(grafity.Graph)
+
+    def on_new_folder(self, item):
+        self.project.new(grafity.Folder)
         
 if __name__ == "__main__":
     widgets = Main()
