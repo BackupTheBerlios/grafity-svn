@@ -825,13 +825,14 @@
 		      <child>
 			<widget class="GtkRadioToolButton" id="radiotoolbutton19">
 			  <property name="visible">True</property>
-			  <property name="label" translatable="yes"></property>
+			  <property name="label" translatable="yes">arrow</property>
 			  <property name="use_underline">True</property>
 			  <property name="icon">arrow.png</property>
 			  <property name="visible_horizontal">True</property>
 			  <property name="visible_vertical">True</property>
 			  <property name="is_important">False</property>
 			  <property name="active">False</property>
+			  <signal name="toggled" handler="on_mode_changed" last_modification_time="Fri, 16 Dec 2005 18:16:24 GMT"/>
 			</widget>
 			<packing>
 			  <property name="expand">False</property>
@@ -842,7 +843,7 @@
 		      <child>
 			<widget class="GtkRadioToolButton" id="radiotoolbutton5">
 			  <property name="visible">True</property>
-			  <property name="label" translatable="yes"></property>
+			  <property name="label" translatable="yes">zoom</property>
 			  <property name="use_underline">True</property>
 			  <property name="icon">zoom.png</property>
 			  <property name="visible_horizontal">True</property>
@@ -850,6 +851,7 @@
 			  <property name="is_important">False</property>
 			  <property name="active">False</property>
 			  <property name="group">radiotoolbutton19</property>
+			  <signal name="toggled" handler="on_mode_changed" last_modification_time="Fri, 16 Dec 2005 18:16:39 GMT"/>
 			</widget>
 			<packing>
 			  <property name="expand">False</property>
@@ -860,7 +862,7 @@
 		      <child>
 			<widget class="GtkRadioToolButton" id="radiotoolbutton6">
 			  <property name="visible">True</property>
-			  <property name="label" translatable="yes"></property>
+			  <property name="label" translatable="yes">hand</property>
 			  <property name="use_underline">True</property>
 			  <property name="icon">hand.png</property>
 			  <property name="visible_horizontal">True</property>
@@ -868,6 +870,7 @@
 			  <property name="is_important">False</property>
 			  <property name="active">False</property>
 			  <property name="group">radiotoolbutton19</property>
+			  <signal name="toggled" handler="on_mode_changed" last_modification_time="Fri, 16 Dec 2005 18:16:47 GMT"/>
 			</widget>
 			<packing>
 			  <property name="expand">False</property>
@@ -878,7 +881,7 @@
 		      <child>
 			<widget class="GtkRadioToolButton" id="radiotoolbutton7">
 			  <property name="visible">True</property>
-			  <property name="label" translatable="yes"></property>
+			  <property name="label" translatable="yes">range</property>
 			  <property name="use_underline">True</property>
 			  <property name="icon">range.png</property>
 			  <property name="visible_horizontal">True</property>
@@ -886,6 +889,7 @@
 			  <property name="is_important">False</property>
 			  <property name="active">False</property>
 			  <property name="group">radiotoolbutton19</property>
+			  <signal name="toggled" handler="on_mode_changed" last_modification_time="Fri, 16 Dec 2005 18:27:55 GMT"/>
 			</widget>
 			<packing>
 			  <property name="expand">False</property>
@@ -896,7 +900,7 @@
 		      <child>
 			<widget class="GtkRadioToolButton" id="radiotoolbutton8">
 			  <property name="visible">True</property>
-			  <property name="label" translatable="yes"></property>
+			  <property name="label" translatable="yes">dreader</property>
 			  <property name="use_underline">True</property>
 			  <property name="icon">dreader.png</property>
 			  <property name="visible_horizontal">True</property>
@@ -904,6 +908,7 @@
 			  <property name="is_important">False</property>
 			  <property name="active">False</property>
 			  <property name="group">radiotoolbutton19</property>
+			  <signal name="toggled" handler="on_mode_changed" last_modification_time="Fri, 16 Dec 2005 18:28:03 GMT"/>
 			</widget>
 			<packing>
 			  <property name="expand">False</property>
@@ -914,7 +919,7 @@
 		      <child>
 			<widget class="GtkRadioToolButton" id="radiotoolbutton9">
 			  <property name="visible">True</property>
-			  <property name="label" translatable="yes"></property>
+			  <property name="label" translatable="yes">sreader</property>
 			  <property name="use_underline">True</property>
 			  <property name="icon">sreader.png</property>
 			  <property name="visible_horizontal">True</property>
@@ -922,6 +927,7 @@
 			  <property name="is_important">False</property>
 			  <property name="active">False</property>
 			  <property name="group">radiotoolbutton19</property>
+			  <signal name="toggled" handler="on_mode_changed" last_modification_time="Fri, 16 Dec 2005 18:28:13 GMT"/>
 			</widget>
 			<packing>
 			  <property name="expand">False</property>
@@ -945,7 +951,7 @@
 		      <child>
 			<widget class="GtkToolButton" id="toolbutton17">
 			  <property name="visible">True</property>
-			  <property name="label" translatable="yes"></property>
+			  <property name="label" translatable="yes">line</property>
 			  <property name="use_underline">True</property>
 			  <property name="icon">draw-line.png</property>
 			  <property name="visible_horizontal">True</property>
@@ -961,7 +967,7 @@
 		      <child>
 			<widget class="GtkToolButton" id="toolbutton18">
 			  <property name="visible">True</property>
-			  <property name="label" translatable="yes"></property>
+			  <property name="label" translatable="yes">text</property>
 			  <property name="use_underline">True</property>
 			  <property name="icon">draw-text.png</property>
 			  <property name="visible_horizontal">True</property>

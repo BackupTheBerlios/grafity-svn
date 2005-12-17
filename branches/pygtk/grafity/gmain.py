@@ -78,6 +78,8 @@ class GraphView(Widgets):
         self.widgets = gtk.glade.XML("pixmaps/grafity.glade", 'graph_view')
         self.label = gtk.glade.XML("pixmaps/grafity.glade", 'graph_view_label').get_widget('graph_view_label')
         self.page = self.graph_view
+        signals = { 'on_mode_changed': self.on_mode_changed }
+        self.widgets.signal_autoconnect(signals)
 
         scene = Scene(self.graph)
         self.area = area = GLArea(scene)
@@ -87,6 +89,10 @@ class GraphView(Widgets):
         make_panel(self.right_panel, self.graph_view, 'right')
 
         self.graph.connect('redraw', self.on_redraw, True)
+
+    def on_mode_changed(self, button):
+        if button.get_active():
+            self.graph.mode = button.get_label()
 
     def on_redraw(self):
         self.area.queue_draw()
