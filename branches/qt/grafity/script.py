@@ -81,7 +81,7 @@ class Console (QextScintilla):
         sys.ps2 = '... '
 
         self.clear ()
-        self.write ('# Welcome to Grafit\n>>> ')
+        self.write ('# Welcome to Grafity\n>>> ')
 
         self.completer = rlcompleter.Completer()
 

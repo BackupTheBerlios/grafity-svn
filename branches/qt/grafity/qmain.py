@@ -21,6 +21,7 @@ class Panel(QDockWindow):
     """A panel in the main window similar to IDEAl mode"""
     def __init__(self, mainwin, position):
         QDockWindow.__init__(self, QDockWindow.InDock, mainwin)
+        self.setMovingEnabled(False)
         mainwin.moveDockWindow(self, position)
         self.position = position
 
@@ -36,16 +37,21 @@ class Panel(QDockWindow):
         box = Box1(self)
         self.setWidget(box)
 
+        if self.position in [QMainWindow.DockLeft, QMainWindow.DockTop]:
+            self.buttons0 = Box2(box)
+
         self.stack = QWidgetStack(box)
         self.stack.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.buttons0 = Box2(box)
+
+        if self.position in [QMainWindow.DockBottom, QMainWindow.DockRight]:
+            self.buttons0 = Box2(box)
+
         self.buttons = Box2(self.buttons0)
         QLabel(self.buttons0)
         self.buttons.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.btns = {}
         self.stack.hide()
 
- 
     def add(self, name, pixmap, widget):
         if self.position in [QMainWindow.DockTop, QMainWindow.DockBottom]:
             orientation = '-'
@@ -219,15 +225,13 @@ class ProjectExplorer(QListView):
         self.setMaximumSize(QSize(150,32767))
         self.header().hide()
         self.addColumn ('Object', 145)
-        self.connect (self, SIGNAL("doubleClicked(QListViewItem *, const QPoint &, int)"), \
-                      self.on_doubleclick)
-        self.connect (self, SIGNAL("itemRenamed (QListViewItem *, int, const QString &)"), \
-                      self.on_rename)
-        self.connect (self, SIGNAL("contextMenuRequested (QListViewItem *, const QPoint &, int)"), \
+        self.setSelectionMode(QListView.Extended)
+
+        self.connect (self, SIGNAL("doubleClicked(QListViewItem *, const QPoint &, int)"), self.on_doubleclick)
+        self.connect (self, SIGNAL("itemRenamed (QListViewItem *, int, const QString &)"), self.on_rename)
+        self.connect (self, SIGNAL("contextMenuRequested (QListViewItem *, const QPoint &, int)"),
                       self.on_context_menu_requested)
 
-        self.setSelectionMode(QListView.Extended)
-      
         self.wsheet_context_menu = QPopupMenu (self)
         self.wsheet_context_menu.insertItem ('Show', self.wsheet_context_menu_show)
         self.wsheet_context_menu.insertSeparator ()
@@ -241,20 +245,20 @@ class ProjectExplorer(QListView):
         self.graph_context_menu.insertItem ('Properties...', self.graph_context_menu_properties)
         self.graph_context_menu.insertItem ('Fit...', self.graph_context_menu_startfit)
 
-        self.folders = {}
+#        self.folders = {}
 #        names = [o._folder for o in project.worksheets + project.graphs]
-        names = []
-        for n in names:
-            self.folders[n] = QListViewItem(self, n)
-            self.folders[n].setPixmap (0, QPixmap(project.datadir + "pixmaps/open-folder.png"))
-            self.folders[n].setOpen (True)
-
-        self.wsitem = QListViewItem (self, "Worksheets")
-        self.wsitem.setPixmap (0, QPixmap(project.datadir + "pixmaps/open-folder.png"))
-        self.wsitem.setOpen (True)
-        self.gritem = QListViewItem (self, "Graphs")
-        self.gritem.setPixmap (0, QPixmap(project.datadir + "pixmaps/open-folder.png"))
-        self.gritem.setOpen (True)
+#        names = []
+#        for n in names:
+#            self.folders[n] = QListViewItem(self, n)
+#            self.folders[n].setPixmap (0, QPixmap(project.datadir + "pixmaps/open-folder.png"))
+#            self.folders[n].setOpen (True)
+#
+#        self.wsitem = QListViewItem (self, "Worksheets")
+#        self.wsitem.setPixmap (0, QPixmap(project.datadir + "pixmaps/open-folder.png"))
+#        self.wsitem.setOpen (True)
+#        self.gritem = QListViewItem (self, "Graphs")
+#        self.gritem.setPixmap (0, QPixmap(project.datadir + "pixmaps/open-folder.png"))
+#        self.gritem.setOpen (True)
 #        self.historyitem = QListViewItem (self, "History")
 #        self.historyitem.setPixmap (0, QPixmap("pixmaps/history-small.png"))
 
@@ -351,14 +355,6 @@ class MainWindow(QMainWindow):
         self.workspace.setScrollBarsEnabled(True)
         self.connect(self.workspace, SIGNAL("windowActivated(QWidget *)"), self.on_window_activated)
 
-#        self.explorerwindow = QDockWindow(QDockWindow.InDock, self)
-#        self.explorerwindow.show()
-#        self.explorerwindow.setVerticallyStretchable (True)
-#        self.explorerwindow.setSizePolicy(QSizePolicy.Minimum,QSizePolicy.Expanding)
-#        self.moveDockWindow (self.explorerwindow, self.DockLeft)
-
-#        self.resize(QSize(565,362).expandedTo(self.minimumSizeHint()))
-        
 #        self.recent = project.settings['/grafit/recent_projects']
 #        if self.recent in [None, '']:
 #            self.recent = []
@@ -375,30 +371,9 @@ class MainWindow(QMainWindow):
 #        self.history.setCaption('History')
 #        self.history.hide()
 
-#        from grafit.gl import GLGraphWidget
-#        self.gl = GLGraphWidget(self.workspace)
-#        self.gl.show()
-
-#        self.notes = Notes(self.workspace)
-#        self.notes.setIcon(QPixmap(project.datadir + 'pixmaps/notes.png'))
-#        self.notes.hide()
-
 #------------------------------------------------------------------------------------------
 # Project explorer
 
-#        self.tips = QDockWindow(QDockWindow.InDock, self)
-#        self.tips.show()
-#        self.tips.setVerticallyStretchable (True)
-#        self.tips.setSizePolicy(QSizePolicy.Minimum,QSizePolicy.Minimum)
-#        self.moveDockWindow (self.tips, self.DockRight)
-
-#        self.tiplabel = QLabel(self.tips)
-#        self.tiplabel.setText('Welcome to Grafit')
-#        self.tips.setWidget(self.tiplabel)
-
-#        self.explorer = ProjectExplorer(self.explorerwindow)
-#        self.explorerwindow.setWidget (self.explorer)
-#
 #        self.statusBar().message ("Welcome to <b>Grafit</b>", 1000)
 #        self.statuslabel = QLabel (self, 'Pikou')
 #        self.statusBar().addWidget (self.statuslabel, 0, True)
@@ -414,6 +389,10 @@ class MainWindow(QMainWindow):
         self.bpanel = Panel(self, QMainWindow.DockBottom)
         self.script = Console(self.bpanel)
         self.bpanel.add('Script', QPixmap(os.path.join(DATADIR, 'data/images/console.png')), self.script)
+
+        self.lpanel = Panel(self, QMainWindow.DockLeft)
+        self.explorer = ProjectExplorer(self.lpanel)
+        self.lpanel.add('Explorer', QPixmap(os.path.join(DATADIR, 'data/images/console.png')), self.explorer)
 
 ################################################################################################
 #        self.rpanel = Panel(self, QMainWindow.DockRight)
