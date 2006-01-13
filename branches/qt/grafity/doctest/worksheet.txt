@@ -1,0 +1,16 @@
+The ``grafit.worksheet`` module
+================================
+
+Calculated columns
+------------------
+
+When evaluating calculated columns, the namespace used contains the following (in order of precedence):
+
+* math, using ``from grafit.arrays import *`` (which includes numarray)
+
+* ``here``, ``top``, ``up`` and ``this`` with their usual meanings
+
+* all column names of the current worksheet
+
+* all objects in the current folder
+

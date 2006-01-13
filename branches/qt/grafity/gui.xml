@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Resource>
+  <Window name="'mainwin'" title="'mingui.manual'" size="(640, 480)" statusbar="True">
+    <Menubar>
+      <Menu label="'&amp;File'">
+        <Item command="'file-new'"/>
+        <Item command="'file-open'"/>
+        <Item command="'file-save'"/>
+        <Separator/>
+        <Item command="'file-exit'"/>
+      </Menu>
+      <Menu label="'&amp;Edit'">
+        <Item command="'edit-cut'"/>
+        <Item command="'edit-copy'"/>
+        <Item command="'edit-paste'"/>
+      </Menu>
+    </Menubar>
+    <Toolbar>
+      <Item command="'file-new'"/>
+    </Toolbar>
+    <Box orientation="'vertical'">
+      <Splitter orientation="'horizontal'">
+        <Panel position="'left'" _width="230">
+          <Tree columns="['Topics']" _label="'Topics'" _image="'open'" name="'tree'"/>
+        </Panel>
+        <Splitter orientation="'vertical'">
+          <Notebook _stretch="1.">
+            <Html name="'html'" _label="'text'"/>
+            <PythonEditor name="'editor'" _label="'code'"/>
+            <Box _label="'demo'">
+              <Button _expand="False" _stretch="0" text="'button1'" toggle="True"/>
+              <Button name="'bouton'" _expand="False" _stretch="0" text="'button'"/>
+            </Box>
+          </Notebook>
+          <Panel name="'xpanel'" _width="100" position="'bottom'">
+            <PythonShell _label="'Command line'" _image="'console'"/>
+          </Panel>
+        </Splitter>
+      </Splitter>
+    </Box>
+  </Window>
+  <Commands name="'foo'">
+    <Command id="'file-new'" label="'&amp;New'" image="'new'" desc="'Create a new file'" accel="'Ctrl+N'"/>
+    <Command id="'file-open'" label="'&amp;Open...'" image="'open'" desc="'Open a file'"/>
+  </Commands>
+  <Images>
+    <DirImageProvider path="'../data/images'"/>
+  </Images>
+</Resource>
