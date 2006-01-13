@@ -1,203 +1,81 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<Resource>
-  <Commands>
-    <Command id="'file-new'" label="'&amp;New'" image="'new'" desc="'Create a new project'" accel="'Ctrl+N'"/>
-    <Command id="'file-open'" label="'&amp;Open...'" image="'open'" desc="'Open a project'"/>
-    <Command id="'file-save'" label="'&amp;Save'" image="'save'" desc="'Save the project'"/>
-    <Command id="'file-saveas'" label="'Save &amp;As...'" image="'saveas'" desc="'Save the project with a new name'"/>
-    <Command id="'exit'" label="'&amp;Exit'" image="'exit'" desc="'Exit grafit'"/>
-    <Command id="'new-worksheet'" label="'New worksheet'" image="'new-worksheet'" desc="'Create a new worksheet'"/>
-    <Command id="'new-graph'" label="'New graph'" image="'new-graph'" desc="'Create a new graph'"/>
-    <Command id="'new-folder'" label="'New folder'" image="'new-folder'" desc="'Create a new folder'"/>
-  </Commands>
-  <Images>
-    <DirImageProvider path="'../data/images/16'"/>
-    <DirImageProvider path="'../data/images/24'"/>
-  </Images>
-
-
-  <MainWindow name="'mainwin'" title="'Grafity'" size="(640, 480)" statusbar="True">
-
-    <!-- Menus and toolbars -->
-
-    <Menubar>
-      <Menu label="'&amp;File'">
-        <CommandRef id="'file-new'"/>
-        <CommandRef id="'file-open'"/>
-        <Separator/>
-        <CommandRef id="'file-save'"/>
-        <CommandRef id="'file-saveas'"/>
-        <Separator/>
-        <CommandRef id="'exit'"/>
-      </Menu>
-      <Menu label="'&amp;Edit'">
-        <CommandRef id="'edit-cut'"/>
-        <CommandRef id="'edit-copy'"/>
-        <CommandRef id="'edit-paste'"/>
-      </Menu>
-    </Menubar>
-    <Toolbar>
-      <CommandRef id="'file-new'"/>
-      <CommandRef id="'file-open'"/>
-      <CommandRef id="'file-save'"/>
-      <CommandRef id="'file-saveas'"/>
-      <Separator/>
-      <CommandRef id="'new-folder'"/>
-      <CommandRef id="'new-worksheet'"/>
-      <CommandRef id="'new-graph'"/>
-      <Separator/>
-      <CommandRef id="'exit'"/>
-    </Toolbar>
-
-    <!-- Widgets -->
-
-    <Splitter orientation="'horizontal'">
-      <Panel position="'left'" _width="150">
-        <Splitter name="'projectpane'" _label="'project'" _image="'open'" orientation="'vertical'">
-          <ProjectTree _width="160" columns="['Topics']" name="'tree'"/>
-          <FolderBrowser name="'lili'"/>
-        </Splitter>
-      </Panel>
-      <Splitter orientation="'vertical'">
-        <Notebook name="'notebook'" _stretch="1."/>
-        <Panel name="'xpanel'" _width="100" position="'bottom'">
-          <ProjectShell name="'shell'" _label="'Script'" _image="'console'"/>
-        </Panel>
-      </Splitter>
-    </Splitter>
-  </MainWindow>
-
-
-  <WorksheetView name="'worksheet-view'" orientation="'horizontal'">
-    <Commands>
-      <Command id="'mode-arrow'" label="'New'" image="'new'" desc="'Create a new file'" accel="'Ctrl+N'"/>
-      <Command id="'mode-hand'" label="'Open...'" image="'open'" desc="'Open a file'"/>
-      <Command id="'insert-row'" label="'Insert row'" image="'table-insert-row'" desc="'Insert a row'" type="'check'"/>
-      <Command id="'new-column'" label="'Insert row'" image="'table-insert-row'" desc="'Insert a row'" type="'check'"/>
-      <Command id="'move-left'" label="'Insert row'" image="'table-insert-row'" desc="'Insert a row'" type="'check'"/>
-      <Command id="'move-right'" label="'Insert row'" image="'table-insert-row'" desc="'Insert a row'" type="'check'"/>
-      <Command id="'move-first'" label="'Insert row'" image="'table-insert-row'" desc="'Insert a row'" type="'check'"/>
-      <Command id="'move-last'" label="'Insert row'" image="'table-insert-row'" desc="'Insert a row'" type="'check'"/>
-    </Commands>
-    <Toolbar _stretch="0" orientation="'vertical'">
-      <CommandRef object="'^worksheet-view'" id="'insert-row'"/>
-      <CommandRef object="'^worksheet-view'" id="'mode-hand'"/>
-    </Toolbar>
-    <Table name="'table'"/>
-  </WorksheetView>
-
-
-
-  <GraphView name="'graph-view'" orientation="'horizontal'">
-    <Commands>
-      <Command id="'add-dataset'" label="'Add'" image="'add'"/>
-      <Command id="'remove-dataset'" label="'Add'" image="'remove'"/>
-
-      <Command id="'mode:arrow'" label="'Arrow'" image="'arrow'" type="'radio'"/>
-      <Command id="'mode:hand'" label="'Hand'" image="'hand'" type="'radio'"/>
-      <Command id="'mode:zoom'" label="'Zoom'" image="'zoom'" type="'radio'"/>
-      <Command id="'mode:range'" label="'Range'" image="'range'" type="'radio'"/>
-      <Command id="'mode:d-reader'" label="'Data reader'" image="'dreader'" type="'radio'"/>
-      <Command id="'mode:s-reader'" label="'Screen reader'" image="'sreader'" type="'radio'"/>
-
-      <Command id="'mode:draw-line'" label="'Line'" image="'draw-line'"/>
-      <Command id="'mode:draw-text'" label="'Text'" image="'draw-text'"/>
-    </Commands>
-    <Toolbar _stretch="0" orientation="'vertical'">
-      <CommandRef object="'^graph-view'" id="'mode:arrow'"/>
-      <CommandRef object="'^graph-view'" id="'mode:hand'"/>
-      <CommandRef object="'^graph-view'" id="'mode:zoom'"/>
-      <CommandRef object="'^graph-view'" id="'mode:range'"/>
-      <CommandRef object="'^graph-view'" id="'mode:d-reader'"/>
-      <CommandRef object="'^graph-view'" id="'mode:s-reader'"/>
-      <Separator/>
-      <CommandRef object="'^graph-view'" id="'mode:draw-line'"/>
-      <CommandRef object="'^graph-view'" id="'mode:draw-text'"/>
-    </Toolbar>
-    <Splitter orientation="'horizontal'">
-      <Scrolled _stretch="1.">
-        <OpenGLWidget name="'gl-widget'" min_size="(400, 200)"/>
-      </Scrolled>
-
-      <List name="'legend'"/>
-
-      <Panel position="'right'" _width="150">
-
-        <!-- Data panel -->
-
-        <GraphDataPanel _label="'data'" _image="'open'" orientation="'vertical'">
-          <Toolbar _stretch="0" orientation="'horizontal'">
-            <CommandRef object="'^graph-view'" id="'add-dataset'"/>
-            <CommandRef object="'^graph-view'" id="'remove-dataset'"/>
-          </Toolbar>
-          <Label text="'Worksheet'" _stretch="0"/> <List name="'worksheet-list'"/>
-          <Label text="'X column'" _stretch="0"/> <List name="'x-list'"/>
-          <Label text="'Y column'" _stretch="0"/> <List name="'y-list'"/>
-        </GraphDataPanel>
-
-        <!-- Style panel -->
-
-        <GraphStylePanel name="'style-panel'" _label="'style'" _image="'new'" orientation="'vertical'">
-
-          <Frame orientation="'vertical'" title="'Symbol'" _stretch="1">
-            <Grid name="'grid1'" _expand="True" _stretch="1.">
-              <Checkbox name="'check:symbol'" _position="(0,0)"/> 
-              <Label name="'label:symbol'" text="'Symbol'" _position="(0,1)"/> 
-              <ImageChoice name="'symbol'" _position="(0,2)"/>
-              <Checkbox name="'check:color'" _position="(1,0)"/> 
-              <Label name="'label:color'" text="'Color'" _position="(1,1)"/> 
-              <ImageChoice name="'color'" _position="(1,2)"/>
-              <Checkbox name="'check:size'" _position="(2,0)"/> 
-              <Label name="'label:size'" text="'Size'" _position="(2,1)"/> 
-              <Spin name="'size'" _position="(2,2)"/>
-            </Grid>
-          </Frame>
-
-          <Frame orientation="'vertical'" title="'Line'" _stretch="1">
-            <Grid name="'grid2'" _expand="True" _stretch="1">
-              <Checkbox name="'check:line_type'" _position="(0,0)"/> 
-              <Label name="'label:line_type'" text="'Type'" _position="(0,1)"/> 
-              <Choice name="'line_type'" _position="(0,2)"/>
-              <Checkbox name="'check:line_style'" _position="(1,0)"/> 
-              <Label name="'label:line_style'" text="'Style'" _position="(1,1)"/> 
-              <Choice name="'line_style'" _position="(1,2)"/>
-              <Checkbox name="'check:line_width'" _position="(2,0)"/> 
-              <Label name="'label:line_width'" text="'Width'" _position="(2,1)"/> 
-              <Spin name="'line_width'" _position="(2,2)"/>
-            </Grid>
-          </Frame>
-
-          <Box orientation="'horizontal'" _stretch="1">
-            <Label text="'Group'" _stretch="0" _expand="False"/>
-            <Choice name="'multi'" items="['identical', 'series']" _stretch="1" _expand="False"/>
-          </Box>
-
-        </GraphStylePanel>
-
-        <!-- Axes panel -->
-
-        <GraphAxesPanel _label="'Axes'" _image="'new'" orientation="'vertical'">
-          <Frame orientation="'vertical'" title="'X axis'" _stretch="1">
-            <Grid name="'agrid'" _expand="False">
-              <Label text="'Title'" _position="(0,0)"/> <Text _position="(0,1)"/>
-              <Label text="'From'" _position="(1,0)"/> <Text _position="(1,1)"/>
-              <Label text="'To'" _position="(2,0)"/> <Text _position="(2,1)"/>
-              <Label text="'Type'" _position="(3,0)"/> <Choice _position="(3,1)"/>
-            </Grid>
-          </Frame>
-
-          <Frame orientation="'vertical'" title="'Y axis'" _stretch="1">
-            <Grid name="'agrid'" _expand="False">
-              <Label text="'Title'" _position="(0,0)"/> <Text _position="(0,1)"/>
-              <Label text="'From'" _position="(1,0)"/> <Text _position="(1,1)"/>
-              <Label text="'To'" _position="(2,0)"/> <Text _position="(2,1)"/>
-              <Label text="'Type'" _position="(3,0)"/> <Choice _position="(3,1)"/>
-            </Grid>
-          </Frame>
- 
-        </GraphAxesPanel>
-
-      </Panel>
-    </Splitter>
-  </GraphView>
-</Resource>
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>mainwin</class>
+<widget class="MainWindow">
+    <property name="name">
+        <cstring>mainwin</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>482</width>
+            <height>490</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>Grafity</string>
+    </property>
+</widget>
+<menubar>
+    <property name="name">
+        <cstring>menubar</cstring>
+    </property>
+    <item text="Menu" name="PopupMenuEditor">
+        <action name="menuNewAction"/>
+        <action name="menuOpenAction"/>
+        <action name="Action"/>
+    </item>
+</menubar>
+<toolbars>
+    <toolbar dock="2">
+        <property name="name">
+            <cstring>Toolbar</cstring>
+        </property>
+        <property name="label">
+            <string>Toolbar</string>
+        </property>
+        <action name="menuOpenAction"/>
+    </toolbar>
+</toolbars>
+<actions>
+    <action>
+        <property name="name">
+            <cstring>menuNewAction</cstring>
+        </property>
+        <property name="text">
+            <string>New...</string>
+        </property>
+        <property name="menuText">
+            <string>New...</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>menuOpenAction</cstring>
+        </property>
+        <property name="iconSet">
+            <iconset>image0</iconset>
+        </property>
+        <property name="text">
+            <string>Open...</string>
+        </property>
+        <property name="menuText">
+            <string>Open...</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>Action</cstring>
+        </property>
+        <property name="text">
+            <string>Action</string>
+        </property>
+    </action>
+</actions>
+<images>
+    <image name="image0">
+        <data format="PNG" length="113">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff610000003849444154388d6360a022f84f8e26264a6d8519b08a5283181828f402c55e5945ae0b90c1488f05b2012305b633a20b201bd242047b900000bb470a941155f3340000000049454e44ae426082</data>
+    </image>
+</images>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>
