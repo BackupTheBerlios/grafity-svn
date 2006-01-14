@@ -2,18 +2,44 @@ import os
 import sys
 
 from qt import *
-from qttable import *
-import qtui
+from qwt import *
 
-from grafity.settings import settings, DATADIR
-from grafity.script import Console
 import grafity
+from grafity.script import Console
+from grafity.signals import HasSignals
 
-pixmaps = {}
-def getpixmap(name):
+from ui.main import MainWindowUI
+from ui.graph_style import GraphStyleUI
+from ui.graph_data import GraphDataUI
+
+def getpixmap(name, pixmaps={}):
     if name not in pixmaps:
-        pixmaps[name] = QPixmap(os.path.join(DATADIR, 'data', 'images', '16', name+'.png'))
+        pixmaps[name] = QPixmap(os.path.join(grafity.DATADIR, 'data', 'images', '16', name+'.png'))
     return pixmaps[name]
+
+class GraphView(QTabWidget):
+    def __init__(self, parent, graph):
+        QTabWidget.__init__(self, parent)
+        self.graph = graph
+        self.setTabShape(self.Triangular)
+        self.setTabPosition(self.Bottom)
+        self.setIcon(getpixmap('graph'))
+        self.mainpage = QHBox(self)
+        self.addTab(self.mainpage, 'graph')
+
+        self.bg_color = QColor('white')
+
+        self.plot = QwtPlot()
+        self.plot.reparent(self.mainpage, 0, QPoint(0,0))
+        self.plot.setCanvasBackground (self.bg_color)
+        self.plot.enableGridX(True)
+        self.plot.enableGridY(True)
+        self.plot.setOutlineStyle (Qwt.Rect)
+        self.plot.setAutoReplot(False)
+        self.plot.canvas().setLineWidth(0)
+
+
+
 
 class Panel(QDockWindow):
     """A panel in the main window similar to IDEAl mode"""
@@ -120,19 +146,19 @@ class Panel(QDockWindow):
 
         return btn2
 
-class ProjectExplorer(QListView):
+class ProjectExplorer(HasSignals, QListView):
     def __init__(self, parent):
         QListView.__init__(self, parent)
-        self.setSizePolicy(QSizePolicy.Minimum,QSizePolicy.Expanding)
+        self.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Expanding)
         self.setMinimumSize(QSize(150,0))
-        self.setMaximumSize(QSize(150,32767))
+#        self.setMaximumSize(QSize(150,32767))
         self.header().hide()
         self.addColumn ('Object', 145)
         self.setSelectionMode(QListView.Extended)
 
-        self.connect (self, SIGNAL("doubleClicked(QListViewItem *, const QPoint &, int)"), self.on_doubleclick)
-        self.connect (self, SIGNAL("itemRenamed (QListViewItem *, int, const QString &)"), self.on_rename)
-        self.connect (self, SIGNAL("contextMenuRequested (QListViewItem *, const QPoint &, int)"),
+        QObject.connect(self, SIGNAL("doubleClicked(QListViewItem *, const QPoint &, int)"), self.on_doubleclick)
+        QObject.connect(self, SIGNAL("itemRenamed (QListViewItem *, int, const QString &)"), self.on_rename)
+        QObject.connect(self, SIGNAL("contextMenuRequested (QListViewItem *, const QPoint &, int)"),
                       self.on_context_menu_requested)
 
         self.wsheet_context_menu = QPopupMenu (self)
@@ -155,13 +181,14 @@ class ProjectExplorer(QListView):
             self.project.disconnect('add-item', self.on_add_item)
             self.project.disconnect('remove-item', self.on_remove_item)
         self.project = project
+        self.clear()
         if self.project is not None:
             self.project.connect('add-item', self.on_add_item)
             self.project.connect('remove-item', self.on_remove_item)
 
 #        project.top._tree_item = QListViewItem(self, 'top')
-        self.on_add_item(self.project.top, recursive=True)
-        project.top._tree_item.setOpen (True)
+            self.on_add_item(self.project.top, recursive=True)
+            project.top._tree_item.setOpen (True)
 #        for folder in self.project.top.all_subfolders():
 #            self.on_add_item(folder)
             
@@ -176,7 +203,7 @@ class ProjectExplorer(QListView):
                             grafity.Graph: 'graph', 
                             grafity.Folder: 'folder'}[type(obj)])
         item.setPixmap (0, pixmap)
-        item.setOpen (True)
+#        item.setOpen (True)
         item._object = obj
         if recursive and isinstance(obj, grafity.Folder):
             for child in obj:
@@ -193,7 +220,7 @@ class ProjectExplorer(QListView):
             item.obj.name = str(text)
 
     def on_doubleclick(self, item, point, column):
-        print item._object
+        HasSignals.emit(self, 'activated', item._object)
 
     def dragObject(self):
         selected_worksheets = [w.name for w in project.worksheets if self.isSelected(w._explorer_item)]
@@ -235,13 +262,12 @@ class ProjectExplorer(QListView):
         # do something
         pass
 
-from ui.main import MainWindowUI
-from ui.graph_style import GraphStyleUI
-from ui.graph_data import GraphDataUI
+class Cancel(Exception):
+    pass
 
 class MainWindow(MainWindowUI):
     def __init__(self):
-        foo.mainwin.__init__(self)
+        MainWindowUI.__init__(self)
 
         self.mainbox = QVBox(self)
         self.setCentralWidget(self.mainbox)
@@ -250,9 +276,7 @@ class MainWindow(MainWindowUI):
         self.workspace.setScrollBarsEnabled(True)
         self.connect(self.workspace, SIGNAL("windowActivated(QWidget *)"), self.on_window_activated)
 
-        self.project = grafity.Project()
-
-        self.recent = settings.get('windows', 'recent')
+        self.recent = grafity.settings.get('windows', 'recent')
         if self.recent in [None, '']:
             self.recent = []
         else:
@@ -283,19 +307,104 @@ class MainWindow(MainWindowUI):
         self.script = Console(self.bpanel, locals=locals)
         self.script.cmd(['from grafity import *'])
         self.script.cmd(['from grafity.arrays import *'])
-        locals['project'] = self.project
         locals['mainwin'] = self
         self.script.clear()
 
         self.bpanel.add('Script', getpixmap('console'), self.script)
-        self.bpanel.add('Foofoo', getpixmap('console'), pi.Form1(self.bpanel))
 
 ### left panel #################################################################################
         self.lpanel = Panel(self, QMainWindow.DockLeft)
         self.explorer = ProjectExplorer(self.lpanel)
+        self.explorer.connect('activated', self.on_activated)
         self.lpanel.add('Explorer', getpixmap('folder'), self.explorer)
+        self.lpanel._Explorer_callback(True)
+
+### right panel ################################################################################
+        
+        self.rpanel = Panel(self, QMainWindow.DockRight)
+        self.rpanel.add('Data', getpixmap('console'), GraphDataUI(self.bpanel))
+        self.rpanel.add('Axes', getpixmap('console'), GraphStyleUI(self.bpanel))
+
+        self.open_project(grafity.Project('test/pdms.gt'))
+
+    def on_activated(self, obj):
+        if isinstance(obj, grafity.Graph):
+            obj._view = GraphView(self.workspace, obj)
+            obj._view.show()
+
+    def open_project(self, project):
+        """Connect a project to the gui"""
+        self.project = project
 
         self.explorer.set_project(self.project)
+
+#        self.project.connect('change-current-folder', self.on_change_folder)
+        self.script.locals['project'] = self.project
+
+    def close_project(self):
+        """Disconnect the current project form the gui"""
+#        self.project.disconnect('change-current-folder', self.on_change_folder)
+        self.explorer.set_project(None)
+        # and close all pages
+        self.project = None
+
+    def ask_save(self):
+        """Prepare to close the project. Ask the user whether to
+        save changes and save is necessary. Raises Cancel if
+        the user cancels.
+        """
+        if not self.project.modified:
+            return
+        message = "<b>Do you want to save the changes you made to the document?</b>" \
+                  "<p>Your changes will be lost if you don't save them"
+        resp = QMessageBox.information(self, "Grafit", message, 
+                                       "&Save",  "&Cancel", "&Don't Save", 0, 1)
+        if resp == 0:
+            self.on_project_save()
+        if resp == 1:
+            raise Cancel
+        elif resp == 2:
+            pass
+
+    # Menu and toolbar actions
+
+    def on_project_open(self):
+        """File/Open"""
+        try:
+            self.ask_save()
+        except Cancel:
+            return
+
+        filesel = QFileDialog(self)
+        if filesel.exec_loop() != 1:
+            return
+        self.close_project()
+        self.open_project(grafity.Project(str(filesel.selectedFile())))
+
+    def on_project_save(self):
+        if self.project.filename is not None:
+            self.project.commit()
+        else:
+            self.on_file_saveas(item)
+
+    def on_project_saveas(self):
+        filesel = QFileDialog(self)
+        filesel.setMode(QFileDialog.AnyFile)
+        if qfd.exec_loop() != 1:
+            return
+        self.project.saveto(str(qfd.selectedFile()))
+        self.close_project()
+        self.open_project(grafity.Project(str(qfd.selectedFile())))
+
+    def on_project_new(self):
+        try:
+            self.ask_save()
+        except Cancel:
+            return
+        self.close_project()
+        self.open_project(grafity.Project())
+
+
 
     def on_new_folder(self):
         self.project.new(grafity.Folder)
@@ -306,102 +415,102 @@ class MainWindow(MainWindowUI):
     def on_new_graph(self):
         self.project.new(grafity.Graph)
 
-    def on_btn3(self, on, height=[None]):
-        if on:
-            self.rpanel.stack.show()
-            if height[0] is not None:
-                self.rpanel.setFixedExtentWidth(height[0])
-            self.rpanel.stack.raiseWidget(self.Style)
-        else:
-            self.rpanel.stack.hide()
-            height[0] = self.rpanel.width()
-            self.rpanel.setFixedExtentWidth(0)
+#    def on_btn3(self, on, height=[None]):
+#        if on:
+#            self.rpanel.stack.show()
+#            if height[0] is not None:
+#                self.rpanel.setFixedExtentWidth(height[0])
+#            self.rpanel.stack.raiseWidget(self.Style)
+#        else:
+#            self.rpanel.stack.hide()
+#            height[0] = self.rpanel.width()
+#            self.rpanel.setFixedExtentWidth(0)
 
 
-    def on_btn2(self, on, height=[None]):
-        if on:
-            self.rpanel.stack.show()
-            if height[0] is not None:
-                self.rpanel.setFixedExtentWidth(height[0])
-            self.rpanel.stack.raiseWidget(self.Data)
-        else:
-            self.rpanel.stack.hide()
-            height[0] = self.rpanel.width()
-            self.rpanel.setFixedExtentWidth(0)
+#    def on_btn2(self, on, height=[None]):
+#        if on:
+#            self.rpanel.stack.show()
+#            if height[0] is not None:
+#                self.rpanel.setFixedExtentWidth(height[0])
+#            self.rpanel.stack.raiseWidget(self.Data)
+#        else:
+#            self.rpanel.stack.hide()
+#            height[0] = self.rpanel.width()
+#            self.rpanel.setFixedExtentWidth(0)
 
 
-    def on_btn1(self, on, height=[None]):
-        if on:
-            self.stack.show()
-            if height[0] is not None:
-                self.bpanel.setFixedExtentHeight(height[0])
-        else:
-            self.stack.hide()
-            height[0] = self.bpanel.height()
-            self.bpanel.setFixedExtentHeight(0)
-
-    def RunScript(self):
-        qfd = QFileDialog (project.mainwin)
-        qfd.setMode (QFileDialog.AnyFile)
-        if qfd.exec_loop() != 1:
-            return False
-        file = str(qfd.selectedFile())
-        project.mainwin.script.fakeUser(['execfile("%s")' % file])
-
-    def Preferences(self):
-        dlg = preferences_dialog()
-        dlg.exec_loop()
-
-    def MoveColumnLeft(self):
-        aw = self.workspace.activeWindow()
-        if isinstance(aw, WorksheetView):
-            sel = aw.worksheet.selected_columns()
-            aw.worksheet._view._table.clearSelection()
-            for col in sel:
-                aw.worksheet.move_column(col, col-1)
-                aw.worksheet._view._table.selectColumn(col-1)
-
-    def MoveColumnRight(self):
-        aw = self.workspace.activeWindow()
-        if isinstance(aw, WorksheetView):
-            sel = aw.worksheet.selected_columns()
-            aw.worksheet._view._table.clearSelection()
-            for col in sel:
-                aw.worksheet.move_column(col, col+1)
-                aw.worksheet._view._table.selectColumn(col+1)
-
-
-    def insert_menu_item(self, location, callback):
-        path = location.split('/')
-        menu = self.menus[path[0]]
-
-        if len(path) == 2:
-            menu.insertItem(path[1], callback)
-        elif len(path) == 3:
+#    def on_btn1(self, on, height=[None]):
+#        if on:
+#            self.stack.show()
+#            if height[0] is not None:
+#                self.bpanel.setFixedExtentHeight(height[0])
+#        else:
+#            self.stack.hide()
+#            height[0] = self.bpanel.height()
+#            self.bpanel.setFixedExtentHeight(0)
+#
+#    def RunScript(self):
+#        qfd = QFileDialog (project.mainwin)
+#        qfd.setMode (QFileDialog.AnyFile)
+#        if qfd.exec_loop() != 1:
+#            return False
+#        file = str(qfd.selectedFile())
+#        project.mainwin.script.fakeUser(['execfile("%s")' % file])
+#
+#    def Preferences(self):
+#        dlg = preferences_dialog()
+#        dlg.exec_loop()
+#
+#    def MoveColumnLeft(self):
+#        aw = self.workspace.activeWindow()
+#        if isinstance(aw, WorksheetView):
+#            sel = aw.worksheet.selected_columns()
+#            aw.worksheet._view._table.clearSelection()
+#            for col in sel:
+#                aw.worksheet.move_column(col, col-1)
+#                aw.worksheet._view._table.selectColumn(col-1)
+#
+#    def MoveColumnRight(self):
+#        aw = self.workspace.activeWindow()
+#        if isinstance(aw, WorksheetView):
+#            sel = aw.worksheet.selected_columns()
+#            aw.worksheet._view._table.clearSelection()
+#            for col in sel:
+#                aw.worksheet.move_column(col, col+1)
+#                aw.worksheet._view._table.selectColumn(col+1)
+#
+#
+#    def insert_menu_item(self, location, callback):
+#        path = location.split('/')
+#        menu = self.menus[path[0]]
+#
+#        if len(path) == 2:
+#            menu.insertItem(path[1], callback)
+#        elif len(path) == 3:
+##            ids = [menu.idAt(pos) for pos in range(menu.count())]
+##            names = [menu.text(id) for id in ids]
+#            if not hasattr(menu, 'popups'):
+#                menu.popups = {}
+#            if path[1] not in menu.popups:
+#                menu.popups[path[1]] = QPopupMenu()
+#                menu.insertItem(path[1], menu.popups[path[1]])
+#            menu.popups[path[1]].insertItem(path[2], callback)
+#
+#    def remove_menu_item(self, location):
+#        path = location.split('/')
+#        menu = self.menus[path[0]]
+#
+#        if len(path) == 2:
 #            ids = [menu.idAt(pos) for pos in range(menu.count())]
 #            names = [menu.text(id) for id in ids]
-            if not hasattr(menu, 'popups'):
-                menu.popups = {}
-            if path[1] not in menu.popups:
-                menu.popups[path[1]] = QPopupMenu()
-                menu.insertItem(path[1], menu.popups[path[1]])
-            menu.popups[path[1]].insertItem(path[2], callback)
-
-    def remove_menu_item(self, location):
-        path = location.split('/')
-        menu = self.menus[path[0]]
-
-        if len(path) == 2:
-            ids = [menu.idAt(pos) for pos in range(menu.count())]
-            names = [menu.text(id) for id in ids]
-            menu.removeItem(ids[names.index(path[1])])
-        elif len(path) == 3:
-            submenu = menu.popups[path[1]]
-            ids = [submenu.idAt(pos) for pos in range(submenu.count())]
-            names = [submenu.text(id) for id in ids]
-            submenu.removeItem(ids[names.index(path[2])])
-            if submenu.count() == 0:
-                self.remove_menu_item('/'.join(path[:2]))
+#            menu.removeItem(ids[names.index(path[1])])
+#        elif len(path) == 3:
+#            submenu = menu.popups[path[1]]
+#            ids = [submenu.idAt(pos) for pos in range(submenu.count())]
+#            names = [submenu.text(id) for id in ids]
+#            submenu.removeItem(ids[names.index(path[2])])
+#            if submenu.count() == 0:
+#                self.remove_menu_item('/'.join(path[:2]))
         
     def fileMenuAboutToShow(self):
         return
@@ -431,22 +540,22 @@ class MainWindow(MainWindowUI):
 
     def on_window_activated(self, window):
         self.active = window
-        toolbars = { WorksheetView : 'Worksheet',
-                          GraphView : 'Graph', }
-        [self.toolbars[i].hide() for i in toolbars.itervalues()]
-        self.rpanel.hide()
-        if window is None or not window.isVisible() or window.__class__ not in toolbars:
-            return
-
-        self.toolbars[toolbars[window.__class__]].show()
-
-        if isinstance(window, GraphView):
-            self.rpanel.show()
-            self.rpanel.Style.open()
-            self.rpanel.Data.open()
-            self.rpanel.Axes.open()
-        elif isinstance(window, WorksheetView):
-            pass
+#        toolbars = { WorksheetView : 'Worksheet',
+#                          GraphView : 'Graph', }
+#        [self.toolbars[i].hide() for i in toolbars.itervalues()]
+#        self.rpanel.hide()
+#        if window is None or not window.isVisible() or window.__class__ not in toolbars:
+#            return
+#
+#        self.toolbars[toolbars[window.__class__]].show()
+#
+#        if isinstance(window, GraphView):
+#            self.rpanel.show()
+#            self.rpanel.Style.open()
+#            self.rpanel.Data.open()
+#            self.rpanel.Axes.open()
+#        elif isinstance(window, WorksheetView):
+#            pass
 
     def on_add_column(self):
         aw = self.workspace.activeWindow()
@@ -597,23 +706,11 @@ class MainWindow(MainWindowUI):
                 w = project.new_worksheet(os.path.splitext(os.path.split(str(f))[1])[0], [])
                 w.import_ascii (str(f))
 
-    def save_if_changed (self):
-        return True
-        if not project.modified:
-             return True
-        flag = QMessageBox.information (self, "Grafit", "<b>Do you want to save the changes you made to the document?</b><p>Your changes will be lost if you don't save them", "&Save",  "&Cancel", "&Don't Save", 0, 1)
-        if flag == 0:
-            return self.save_project_do()
-        elif flag == 1:
-            return False
-        elif flag == 2: 
-            return True
-
     def closeEvent (self, event):
         self.exit()
 
-    def exit (self):
-        settings.set('windows', 'recent', ' '.join(self.recent))
+    def exit(self):
+        grafity.settings.set('windows', 'recent', ' '.join(self.recent))
         
 #        s = QString()
 #        st = QTextStream(s, IO_WriteOnly)
@@ -621,14 +718,14 @@ class MainWindow(MainWindowUI):
 #        s = str(s)
 #        settings.set('windows', 'toolbars', s)
 #        project.settings['/grafit/console/history'] = '\n'.join(self.script.history[-20:])
-        settings.set('script', 'history', '\n'.join(self.script.history[-20:]))
-
+        grafity.settings.set('script', 'history', '\n'.join(self.script.history[-20:]))
         
-        if not self.save_if_changed ():
+        try:
+            self.ask_save()
+        except Cancel:
             return
-#        project.settings.settings.sync()
-        QApplication.exit(0)
-        
+        else:
+            QApplication.exit(0)
         
     def status_message(self, msg, time = 1000):
         self.statusBar().message(msg, time)
@@ -642,35 +739,6 @@ class MainWindow(MainWindowUI):
         h = HelpWidget(self)
         h.show()
 
-
-    def open_project_do(self):
-        if not project.mainwin.save_if_changed ():
-            return
-        qfd = QFileDialog (project.mainwin)
-        if qfd.exec_loop() != 1:
-            return
-        project.load (str(qfd.selectedFile()))
-
-    def save_project_do(self): 
-        if project.filename is None:
-            qfd = QFileDialog (project.mainwin)
-            qfd.setMode (QFileDialog.AnyFile)
-            if qfd.exec_loop() != 1:
-                return False
-            project.filename = str(qfd.selectedFile())
-        return project.save (project.filename)
-
-    def save_project_as_do(self): 
-        qfd = QFileDialog (project.mainwin)
-        qfd.setMode (QFileDialog.AnyFile)
-        if qfd.exec_loop() != 1:
-            return False
-        return project.save (str(qfd.selectedFile()))
-
-    def new_project_do(self): 
-        if not project.mainwin.save_if_changed ():
-            return
-        project.clear ()
 
     def duplicate_do(self):
         aw = project.mainwin.workspace.activeWindow()
@@ -687,6 +755,9 @@ class MainWindow(MainWindowUI):
         new.name = 'another_' + obj.name
         project.add(new)
         self.obj = new
+
+
+
 
 
 def main ():

@@ -13,7 +13,6 @@ from grafity.graph_axis import Axis, Grid
 from grafity.graph_objects import Rubberband, Cross, Line, Text, Move, DrawFunction, Rangehandle
 from grafity.graph_dataset import Dataset, Function
 from grafity.graph_text import FONTFILE, TextPainter, encodeTTFasPS
-from grafity.graph_render import *
 from grafity.settings import DATADIR
 from grafity.thirdparty.ft2font import FT2Font
 
@@ -39,31 +38,31 @@ class Graph(Item, HasSignals):
     def __init__(self, project, name=None, parent=None, location=None):
         Item.__init__(self, project, name, parent, location)
     
-        self.paint_xor_objects =  False
-        self.selected_datasets = []
-
-        self.mode = 'arrow'
-
-        self.graph_objects = []
-        self.dragobj = None
-
-        self.selected_object = None
-
-        self.plot_height = 100
-        self.plot_width = 100
-
+#        self.paint_xor_objects =  False
+#        self.selected_datasets = []
+#
+#        self.mode = 'arrow'
+#
+#        self.graph_objects = []
+#        self.dragobj = None
+#
+#        self.selected_object = None
+#
+#        self.plot_height = 100
+#        self.plot_width = 100
+#
         self.datasets = []
         if location is not None:
             for i, l in enumerate(self.data.datasets):
                 if not l.id.startswith('-'):
                     self.datasets.append(Dataset(self, i))
                     self.datasets[-1].connect('modified', self.on_dataset_modified)
-            for l in self.data.lines:
-                if not l.id.startswith('-'):
-                    self.graph_objects.append(Line(self, l))
-            for l in self.data.text:
-                if not l.id.startswith('-'):
-                    self.graph_objects.append(Text(self, l))
+#            for l in self.data.lines:
+#                if not l.id.startswith('-'):
+#                    self.graph_objects.append(Line(self, l))
+#            for l in self.data.text:
+#                if not l.id.startswith('-'):
+#                    self.graph_objects.append(Text(self, l))
 
         self.functions = []
 #        if location is not None:
@@ -74,44 +73,44 @@ class Graph(Item, HasSignals):
 #                    f.connect('modified', self.on_dataset_modified)
 #                    f.func.connect('modified', self.on_dataset_modified)
 
-        self.ps = False
-
-        self.axis_top = Axis('top', self)
-        self.axis_bottom = Axis('bottom', self)
-        self.axis_right = Axis('right', self)
-        self.axis_left = Axis('left', self)
-
-        self.axes = [self.axis_top, self.axis_right, self.axis_bottom, self.axis_left]
-
-        self.grid_h = Grid('horizontal', self)
-        self.grid_v = Grid('vertical', self)
-
-        self.set_range(0.0, 100.5)
-        if location is None:
-            self.xmin, self.ymin = 0,0  
-            self.ymax, self.xmax = 10, 10
-        self.newf()
-
-        if self.xtype == '':
-            self._xtype = 'linear'
-        if self.ytype == '':
-            self._ytype = 'linear'
-        self.selected_function = None
-
-        self.rubberband = Rubberband(self)
-        self.cross = Cross(self)
-        self.rangehandle = Rangehandle(self)
-
-        self.objects = [self.rubberband, self.cross, self.rangehandle]
-        self.textpainter = TextPainter(self)
-        self.recalc = True
-
-        # style
-        self.axis_title_font_size = 12.
-        self.background_color = (1., 1., 1., 1.)
-        self.pwidth = 120.
-        self.pheight = 100.
-
+#        self.ps = False
+#
+#        self.axis_top = Axis('top', self)
+#        self.axis_bottom = Axis('bottom', self)
+#        self.axis_right = Axis('right', self)
+#        self.axis_left = Axis('left', self)
+#
+#        self.axes = [self.axis_top, self.axis_right, self.axis_bottom, self.axis_left]
+#
+#        self.grid_h = Grid('horizontal', self)
+#        self.grid_v = Grid('vertical', self)
+#
+#        self.set_range(0.0, 100.5)
+#        if location is None:
+#            self.xmin, self.ymin = 0,0  
+#            self.ymax, self.xmax = 10, 10
+#        self.newf()
+#
+#        if self.xtype == '':
+#            self._xtype = 'linear'
+#        if self.ytype == '':
+#            self._ytype = 'linear'
+#        self.selected_function = None
+#
+#        self.rubberband = Rubberband(self)
+#        self.cross = Cross(self)
+#        self.rangehandle = Rangehandle(self)
+#
+#        self.objects = [self.rubberband, self.cross, self.rangehandle]
+#        self.textpainter = TextPainter(self)
+#        self.recalc = True
+#
+#        # style
+#        self.axis_title_font_size = 12.
+#        self.background_color = (1., 1., 1., 1.)
+#        self.pwidth = 120.
+#        self.pheight = 100.
+#
 
     default_name_prefix = 'graph'
 

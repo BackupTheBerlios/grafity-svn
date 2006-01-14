@@ -2,7 +2,6 @@ import re
 from grafity.arrays import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
-from grafity.graph_render import *
 
 from __builtin__ import round
 

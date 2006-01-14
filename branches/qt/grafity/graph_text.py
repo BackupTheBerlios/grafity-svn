@@ -5,15 +5,10 @@ import numarray.mlab as mlab
 import Image
 import ImageFont
 import ImageDraw
-from thirdparty.ft2font import FT2Font
 
-import grafity.thirdparty.mathtextg as mathtext
 from grafity.settings import DATADIR
 from grafity.arrays import *
-from OpenGL.GL import *
 import time
-
-from graph_render import *
 
 from __builtin__ import round
 
