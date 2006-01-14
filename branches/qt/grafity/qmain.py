@@ -159,19 +159,28 @@ class ProjectExplorer(QListView):
             self.project.connect('add-item', self.on_add_item)
             self.project.connect('remove-item', self.on_remove_item)
 
-        project.top._tree_item = QListViewItem(self, 'top')
+#        project.top._tree_item = QListViewItem(self, 'top')
+        self.on_add_item(self.project.top, recursive=True)
         project.top._tree_item.setOpen (True)
-        for folder in self.project.top.all_subfolders():
-            self.on_add(folder)
+#        for folder in self.project.top.all_subfolders():
+#            self.on_add_item(folder)
+            
 
-    def on_add_item(self, obj):
-        item = obj._tree_item = QListViewItem(obj.parent._tree_item, obj.name)
+    def on_add_item(self, obj, recursive=False):
+        try:
+            parent = obj.parent._tree_item
+        except AttributeError:
+            parent = self
+        item = obj._tree_item = QListViewItem(parent, obj.name)
         pixmap = getpixmap({grafity.Worksheet: 'worksheet', 
                             grafity.Graph: 'graph', 
                             grafity.Folder: 'folder'}[type(obj)])
         item.setPixmap (0, pixmap)
         item.setOpen (True)
         item._object = obj
+        if recursive and isinstance(obj, grafity.Folder):
+            for child in obj:
+                self.on_add_item(child, recursive=True)
 
     def on_remove_item(self, obj):
         obj.parent._tree_item.takeItem(obj._tree_item)
@@ -226,9 +235,11 @@ class ProjectExplorer(QListView):
         # do something
         pass
 
-import foo
+from ui.main import MainWindowUI
+from ui.graph_style import GraphStyleUI
+from ui.graph_data import GraphDataUI
 
-class MainWindow(foo.mainwin):
+class MainWindow(MainWindowUI):
     def __init__(self):
         foo.mainwin.__init__(self)
 
@@ -268,13 +279,16 @@ class MainWindow(foo.mainwin):
 ### bottom panel ###############################################################################
 
         locals = {}
-        locals['project'] = self.project
-        locals['mainwin'] = self
         self.bpanel = Panel(self, QMainWindow.DockBottom)
         self.script = Console(self.bpanel, locals=locals)
         self.script.cmd(['from grafity import *'])
+        self.script.cmd(['from grafity.arrays import *'])
+        locals['project'] = self.project
+        locals['mainwin'] = self
+        self.script.clear()
 
         self.bpanel.add('Script', getpixmap('console'), self.script)
+        self.bpanel.add('Foofoo', getpixmap('console'), pi.Form1(self.bpanel))
 
 ### left panel #################################################################################
         self.lpanel = Panel(self, QMainWindow.DockLeft)

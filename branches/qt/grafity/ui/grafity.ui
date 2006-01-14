@@ -1,16 +1,30 @@
 <!DOCTYPE UI><UI version="3.3" stdsetdef="1">
-<class>mainwin</class>
+<class>MainWindowUI</class>
 <widget class="QMainWindow">
     <property name="name">
-        <cstring>mainwin</cstring>
+        <cstring>MainWindowUI</cstring>
     </property>
     <property name="geometry">
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>482</width>
-            <height>490</height>
+            <width>764</width>
+            <height>503</height>
         </rect>
+    </property>
+    <property name="sizePolicy">
+        <sizepolicy>
+            <hsizetype>5</hsizetype>
+            <vsizetype>5</vsizetype>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
+    </property>
+    <property name="minimumSize">
+        <size>
+            <width>21</width>
+            <height>143</height>
+        </size>
     </property>
     <property name="caption">
         <string>Grafity</string>
@@ -21,13 +35,21 @@
         <cstring>menubar</cstring>
     </property>
     <item text="&amp;File" name="File">
-        <action name="project_new"/>
-        <action name="project_open"/>
+        <action name="act_project_new"/>
+        <action name="act_project_open"/>
         <separator/>
-        <action name="project_save"/>
-        <action name="project_saveas"/>
+        <action name="act_project_save"/>
+        <action name="act_project_saveas"/>
+        <separator/>
+        <action name="act_exit"/>
     </item>
     <item text="&amp;Edit" name="Edit">
+        <action name="act_undo"/>
+        <action name="act_redo"/>
+        <separator/>
+        <action name="act_cut"/>
+        <action name="act_copy"/>
+        <action name="act_paste"/>
     </item>
 </menubar>
 <toolbars>
@@ -38,20 +60,25 @@
         <property name="label">
             <string>Toolbar</string>
         </property>
-        <action name="project_new"/>
-        <action name="project_open"/>
-        <action name="project_save"/>
-        <action name="project_saveas"/>
+        <action name="act_project_new"/>
+        <action name="act_project_open"/>
+        <action name="act_project_save"/>
+        <action name="act_project_saveas"/>
         <separator/>
-        <action name="new_worksheet"/>
-        <action name="new_graph"/>
-        <action name="new_folder"/>
+        <action name="act_new_worksheet"/>
+        <action name="act_new_graph"/>
+        <action name="act_new_folder"/>
+        <separator/>
+        <action name="act_undo"/>
+        <action name="act_redo"/>
+        <separator/>
+        <action name="act_exit"/>
     </toolbar>
 </toolbars>
 <actions>
     <action>
         <property name="name">
-            <cstring>project_new</cstring>
+            <cstring>act_project_new</cstring>
         </property>
         <property name="iconSet">
             <iconset>image0</iconset>
@@ -65,7 +92,7 @@
     </action>
     <action>
         <property name="name">
-            <cstring>project_save</cstring>
+            <cstring>act_project_save</cstring>
         </property>
         <property name="iconSet">
             <iconset>image1</iconset>
@@ -79,7 +106,7 @@
     </action>
     <action>
         <property name="name">
-            <cstring>project_open</cstring>
+            <cstring>act_project_open</cstring>
         </property>
         <property name="iconSet">
             <iconset>image2</iconset>
@@ -93,7 +120,7 @@
     </action>
     <action>
         <property name="name">
-            <cstring>project_saveas</cstring>
+            <cstring>act_project_saveas</cstring>
         </property>
         <property name="iconSet">
             <iconset>image3</iconset>
@@ -107,7 +134,7 @@
     </action>
     <action>
         <property name="name">
-            <cstring>new_graph</cstring>
+            <cstring>act_new_graph</cstring>
         </property>
         <property name="iconSet">
             <iconset>image4</iconset>
@@ -118,7 +145,7 @@
     </action>
     <action>
         <property name="name">
-            <cstring>new_folder</cstring>
+            <cstring>act_new_folder</cstring>
         </property>
         <property name="iconSet">
             <iconset>image5</iconset>
@@ -129,13 +156,73 @@
     </action>
     <action>
         <property name="name">
-            <cstring>new_worksheet</cstring>
+            <cstring>act_new_worksheet</cstring>
         </property>
         <property name="iconSet">
             <iconset>image6</iconset>
         </property>
         <property name="text">
             <string>Action</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>act_exit</cstring>
+        </property>
+        <property name="iconSet">
+            <iconset>image7</iconset>
+        </property>
+        <property name="text">
+            <string>Exit</string>
+        </property>
+        <property name="menuText">
+            <string>E&amp;xit</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>act_cut</cstring>
+        </property>
+        <property name="text">
+            <string>Cut</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>act_copy</cstring>
+        </property>
+        <property name="text">
+            <string>Copy</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>act_paste</cstring>
+        </property>
+        <property name="text">
+            <string>Paste</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>act_undo</cstring>
+        </property>
+        <property name="iconSet">
+            <iconset>image8</iconset>
+        </property>
+        <property name="text">
+            <string>Undo</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>act_redo</cstring>
+        </property>
+        <property name="iconSet">
+            <iconset>image9</iconset>
+        </property>
+        <property name="text">
+            <string>Redo</string>
         </property>
     </action>
 </actions>
@@ -161,49 +248,76 @@
     <image name="image6">
         <data format="PNG" length="379">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff610000014249444154388dc5934d4b025114869f3b338cf95184b3480ca4da086150ab59b472d7c7be7dfb68d36f10fa3b2505d1c2cd44e4c266d1b2d914a114925ae8a8e3dc1692258ea510f4ecee39f7bce77d2f5cc10438d7870bb1f0dca6a2cd6ca9faec4adb6da12b9ee379ee850064c04c1bf0811ee06f6492627fcfd47776b74346721d5555787e2c719a3f971a8094c31a954a25944824bed4deee797dba226a6408cfaf0260f47c96976ca17d5eaa56ab8301cbb2c866b383b3ef36a8d5ea448d51ab0290e57219cbb2c6be414c6fb2186f108984f81ee1247fd61790520e3928140ac30ebc77ee4a97aca5e328a24bb7d3a1d9ea7170748c16b07004458dd070a3104e23651b45875afd859bdb87c9220461db36b95c6eb2084135c771304d1365aab501fc7f040da0582c8ea8a752a95f6b83085379ff6b04a0d3ff75e3f8a9c7073451a23213561b570000000049454e44ae426082</data>
     </image>
+    <image name="image7">
+        <data format="PNG" length="495">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff61000001b649444154388da5934f4b5b4114c57f6fe665de1f6ba84abbea2ab48b82a0a0964a41092294822bc1b5f801ecb2b82aeefc0485ee5c282208225a2c144323b873d31ae9a68bf062a41ac7e6252896242f5d0493bcc480e0850bc39d7bce993373071e1846877af5be78b3d38ee7a5f1fd3c5a6bb4be249b3d657efe7d5b5f2bc19dcaaeeb62dbd69d42a2b57032370940b95cae9dd130104220840440d90acbb14204d5a644f63d657b7a8c58ec39954aa54dd17614b6a3c2166e55012afa9cfebf69b6a65e313838c4dede3772b95c83a0cb464a817f590cdfc1e1ce4148c98814f83cfa9289894916163ee07919002cc742ca86f3faeaecfc3a94bfb2797a54cd77b158241e8f03e03e7270bb9d160bbf4fb11f77214c49f6a200406cbc9f99648a6432c1cdcd3f3299931a4049948a84095eef1fd70b4b4de054ea075aeb90b56a50c56c26985d7c5bb7b1fcf16b700bf6bc3485820f40a954c2f7f300c88844598df1699bc499640a802008b8babae6e7d11189ef093637b6188e0f10ed8b62353d63e82f984aaa672f9e94d2c77f82dddd2facaeafb0b2bcc69b7723447bbb51b6c2342586106c7cda06301efc99eed9d739fe03f938966bee1e42680000000049454e44ae426082</data>
+    </image>
+    <image name="image8">
+        <data format="PNG" length="443">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff610000018249444154388d95934b28844100c77f1f6eb49b440929eb20893db88ae4428972d803a2445ac49522459452b48f835c948b226d1e490e42617120ad52f2fa3c37bbde6bbdc6c57ed65a6bfd6a6aa6e9f79f7fd30cfc8e08b0a7101248769ecc0693f15376dded8b7f37d06ab500c2fd7889eb78c8bb89000680fc800180703fc83c1c9801b897c77039d671ca0b187b1aab8169a0c33740fa924f793ab7f0e6bef05bf57877938ce271804e735751abbec5a204885ba78c704cfc2a7bd8b2ae905339e37d306180a48a8c178b234da8ec837e45b52607556226b19a346006403f6cd099cb1a46943b90b2747dd8d5157e036ef6e6395b1e243a2a028b211bc094921c037cbf4429afdcc45564150019f5f7ca58de79e1d575cdcda195b8e474009212a37e040048b9a5fdd8c34b943550576b7273e678e7f95a56c4bff07d487a406c1a2384c3d62e00313f5ae3b781f7c9de98014213f2989ab301742f59f7836ae2a11010476bcd9e66a9ffb201b13a59277adb0a82fe23be68816d60e373aef0019b7893e283f7d06a0000000049454e44ae426082</data>
+    </image>
+    <image name="image9">
+        <data format="PNG" length="425">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff610000017049444154388d8d52c14a0251143de3488bd6da26830a2a9d5a14b40dfc02b72dfc8120a2651406412d83248c304321b07021461b89c24d8b82c40251933009296c6a4673b269087c2d6aa67174740ebcc57df79e7bce7df701c640f41226830d749b186e100aef7574a205f357ac9cd2eb1dd9f66fca714707f30e8723138e04c1f26594b922d86a093591c3e4cc00fc075b4d4e282d1980ef269f427f9f154ffc3d689a82205650972a4a51eeea0d8b734b0040d12af22880f8c95904cc0803b65604d000ff51c6d7b7d0a462b5f5c24cf7e0f63abb6656ddbb5d2e1726ec53a87ebe20910c81e51fda3e5021c3e168270d00947a04124f44611f1fc3e1e9324449684bcea5584477b3caf86a07181c1ac679320851127e55bc6925e709385bc880660b0d531d8fcf29bc73924ca6e4e242866b216b412ef3c7c41370cabb5e57e760e42706fd61d82cd372b8aaa9d55596c10020b10b9fac36db8dd00e6461c54df6631bba96bbc182ff79bd46083f6c2197fbe65ddfa10000000049454e44ae426082</data>
+    </image>
 </images>
 <connections>
     <connection>
-        <sender>new_folder</sender>
+        <sender>act_new_folder</sender>
         <signal>activated()</signal>
-        <receiver>mainwin</receiver>
+        <receiver>MainWindowUI</receiver>
         <slot>on_new_folder()</slot>
     </connection>
     <connection>
-        <sender>new_graph</sender>
+        <sender>act_new_graph</sender>
         <signal>activated()</signal>
-        <receiver>mainwin</receiver>
+        <receiver>MainWindowUI</receiver>
         <slot>on_new_graph()</slot>
     </connection>
     <connection>
-        <sender>new_worksheet</sender>
+        <sender>act_new_worksheet</sender>
         <signal>activated()</signal>
-        <receiver>mainwin</receiver>
+        <receiver>MainWindowUI</receiver>
         <slot>on_new_worksheet()</slot>
     </connection>
     <connection>
-        <sender>project_new</sender>
+        <sender>act_project_new</sender>
         <signal>activated()</signal>
-        <receiver>mainwin</receiver>
+        <receiver>MainWindowUI</receiver>
         <slot>on_project_new()</slot>
     </connection>
     <connection>
-        <sender>project_open</sender>
+        <sender>act_project_open</sender>
         <signal>activated()</signal>
-        <receiver>mainwin</receiver>
+        <receiver>MainWindowUI</receiver>
         <slot>on_project_open()</slot>
     </connection>
     <connection>
-        <sender>project_save</sender>
+        <sender>act_project_save</sender>
         <signal>activated()</signal>
-        <receiver>mainwin</receiver>
+        <receiver>MainWindowUI</receiver>
         <slot>on_project_save()</slot>
     </connection>
     <connection>
-        <sender>project_saveas</sender>
+        <sender>act_project_saveas</sender>
         <signal>activated()</signal>
-        <receiver>mainwin</receiver>
+        <receiver>MainWindowUI</receiver>
         <slot>on_project_saveas()</slot>
+    </connection>
+    <connection>
+        <sender>act_undo</sender>
+        <signal>activated()</signal>
+        <receiver>MainWindowUI</receiver>
+        <slot>on_undo()</slot>
+    </connection>
+    <connection>
+        <sender>act_redo</sender>
+        <signal>activated()</signal>
+        <receiver>MainWindowUI</receiver>
+        <slot>on_redo()</slot>
+    </connection>
+    <connection>
+        <sender>act_exit</sender>
+        <signal>activated()</signal>
+        <receiver>MainWindowUI</receiver>
+        <slot>exit()</slot>
     </connection>
 </connections>
 <slots>
@@ -214,6 +328,9 @@
     <slot>on_project_new()</slot>
     <slot>on_project_save()</slot>
     <slot>on_project_saveas()</slot>
+    <slot>on_redo()</slot>
+    <slot>on_undo()</slot>
+    <slot>exit()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

@@ -241,7 +241,7 @@ class Folder(Item, HasSignals):
         try:
             return self[key]
         except KeyError:
-            raise AttributeError, err
+            raise AttributeError
 
     def __getitem__(self, key):
         cn = [i.name for i in self.contents()]
