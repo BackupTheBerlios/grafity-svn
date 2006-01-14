@@ -1,9 +1,5 @@
-import inspect
 import os
 import sys
-
-try: sys.modules['__main__'].splash_message('loading Main')
-except: pass
 
 from qt import *
 from qttable import *
@@ -11,11 +7,13 @@ import qtui
 
 from grafity.settings import settings, DATADIR
 from grafity.script import Console
+import grafity
 
-#from grafit.project import project
-#from grafit.script import Console
-#from grafit.worksheet import Worksheet, WorksheetView
-#from grafit.graph import Graph, GraphView
+pixmaps = {}
+def getpixmap(name):
+    if name not in pixmaps:
+        pixmaps[name] = QPixmap(os.path.join(DATADIR, 'data', 'images', '16', name+'.png'))
+    return pixmaps[name]
 
 class Panel(QDockWindow):
     """A panel in the main window similar to IDEAl mode"""
@@ -100,9 +98,9 @@ class Panel(QDockWindow):
 
         p = QPixmap()
         if orientation == '-':
-            p.resize (70, 20)
+            p.resize (90, 20)
         elif orientation == '|':
-            p.resize (20, 70)
+            p.resize (20, 90)
         p.fill (bgcolor)
 
         paint = QPainter()
@@ -121,101 +119,6 @@ class Panel(QDockWindow):
         btn2.setPixmap(p)
 
         return btn2
-
-
-
-class Notes(QTabWidget):
-    def __init__(self, parent):
-        QTabWidget.__init__(self, parent)
-        self.setCaption('Notes')
-        self.addTab(QTextEdit(), 'Note 1')
-
-class ListViewItem (QListViewItem):
-    def __init__ (self, parent, text, obj):
-        QListViewItem.__init__ (self, parent, text)
-        self.obj=obj
-
-
-
-class AboutWindow(QDialog):
-    def __init__(self,parent = None,name = None,modal = 0,fl = 0):
-        QDialog.__init__(self,parent,name,modal,fl)
-
-        self.image0 = QPixmap(project.datadir + 'pixmaps/logo.png')
-
-        if not name:
-            self.setName("About")
-
-        Form1Layout = QVBoxLayout(self,11,6,"Form1Layout")
-
-        self.tabWidget3 = QTabWidget(self,"tabWidget3")
-
-        self.tab = QWidget(self.tabWidget3,"tab")
-        tabLayout = QVBoxLayout(self.tab,11,6,"tabLayout")
-
-        self.textLabel1 = QLabel(self.tab,"textLabel1")
-        self.textLabel1.setSizePolicy(QSizePolicy(5,0,0,0,self.textLabel1.sizePolicy().hasHeightForWidth()))
-        self.textLabel1.setMargin(20)
-        self.textLabel1.setAlignment(QLabel.WordBreak | QLabel.AlignTop | QLabel.AlignHCenter)
-        tabLayout.addWidget(self.textLabel1)
-
-        self.pixmapLabel1 = QLabel(self.tab,"pixmapLabel1")
-        self.pixmapLabel1.setSizePolicy(QSizePolicy(5,7,0,0,self.pixmapLabel1.sizePolicy().hasHeightForWidth()))
-        self.pixmapLabel1.setPixmap(self.image0)
-        self.pixmapLabel1.setScaledContents(1)
-        tabLayout.addWidget(self.pixmapLabel1)
-        self.tabWidget3.insertTab(self.tab,QString(""))
-
-        self.tab_2 = QWidget(self.tabWidget3,"tab_2")
-        tabLayout_2 = QHBoxLayout(self.tab_2,11,6,"tabLayout_2")
-
-        self.textLabel1_2 = QLabel(self.tab_2,"textLabel1_2")
-        self.textLabel1_2.setMargin(20)
-        self.textLabel1_2.setAlignment(QLabel.WordBreak | QLabel.AlignTop | QLabel.AlignHCenter)
-        tabLayout_2.addWidget(self.textLabel1_2)
-        self.tabWidget3.insertTab(self.tab_2,QString(""))
-
-        self.TabPage = QWidget(self.tabWidget3,"TabPage")
-        TabPageLayout = QHBoxLayout(self.TabPage,11,6,"TabPageLayout")
-
-        self.textBrowser1 = QTextBrowser(self.TabPage,"textBrowser1")
-        TabPageLayout.addWidget(self.textBrowser1)
-        self.tabWidget3.insertTab(self.TabPage,QString(""))
-        Form1Layout.addWidget(self.tabWidget3)
-
-        layout2 = QHBoxLayout(None,0,6,"layout2")
-        spacer2 = QSpacerItem(311,31,QSizePolicy.Expanding,QSizePolicy.Minimum)
-        layout2.addItem(spacer2)
-
-        self.closebtn = QPushButton(self,"closebtn")
-        layout2.addWidget(self.closebtn)
-        Form1Layout.addLayout(layout2)
-
-        self.languageChange()
-
-        self.resize(QSize(357,324).expandedTo(self.minimumSizeHint()))
-        self.clearWState(Qt.WState_Polished)
-
-    def languageChange(self):
-        self.setCaption(self.__tr("About grafit"))
-        self.textLabel1.setText(self.__tr("<b>grafit</b> version 0.0.r%s<br>\n"
-"Data directory: /home/daniel/grafit/<br>Latest revision: %s" % (project.revision, project.latestrevision)))
-        self.tabWidget3.changeTab(self.tab,self.__tr("Version"))
-        self.textLabel1_2.setText(self.__tr("<b>Daniel Fragiadakis</b> <a href='mailto:danielf@mail.ntua.gr'>danielf@mail.ntua.gr</a><br><br>"))
-        self.tabWidget3.changeTab(self.tab_2,self.__tr("Authors"))
-        self.textBrowser1.setText(self.__tr("grafit is Copyright (C) 2003-2004 by Daniel Fragiadakis\n"
-"\n"
-"This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.\n"
-"\n"
-"Grafit is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
-"See the GNU General Public License for more details.\n"
-"You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA."))
-        self.tabWidget3.changeTab(self.TabPage,"Copyright")
-        self.closebtn.setText("Close")
-        self.connect(self.closebtn, SIGNAL('clicked()'), self.close)
-
-    def __tr(self,s,c = None):
-        return qApp.translate("Form1",s,c)
 
 class ProjectExplorer(QListView):
     def __init__(self, parent):
@@ -245,32 +148,43 @@ class ProjectExplorer(QListView):
         self.graph_context_menu.insertItem ('Properties...', self.graph_context_menu_properties)
         self.graph_context_menu.insertItem ('Fit...', self.graph_context_menu_startfit)
 
-#        self.folders = {}
-#        names = [o._folder for o in project.worksheets + project.graphs]
-#        names = []
-#        for n in names:
-#            self.folders[n] = QListViewItem(self, n)
-#            self.folders[n].setPixmap (0, QPixmap(project.datadir + "pixmaps/open-folder.png"))
-#            self.folders[n].setOpen (True)
-#
-#        self.wsitem = QListViewItem (self, "Worksheets")
-#        self.wsitem.setPixmap (0, QPixmap(project.datadir + "pixmaps/open-folder.png"))
-#        self.wsitem.setOpen (True)
-#        self.gritem = QListViewItem (self, "Graphs")
-#        self.gritem.setPixmap (0, QPixmap(project.datadir + "pixmaps/open-folder.png"))
-#        self.gritem.setOpen (True)
-#        self.historyitem = QListViewItem (self, "History")
-#        self.historyitem.setPixmap (0, QPixmap("pixmaps/history-small.png"))
+        self.project = None
 
-    def on_doubleclick (self, item, point, column):
-        if item==None:
-            return
+    def set_project(self, project):
+        if self.project is not None:
+            self.project.disconnect('add-item', self.on_add_item)
+            self.project.disconnect('remove-item', self.on_remove_item)
+        self.project = project
+        if self.project is not None:
+            self.project.connect('add-item', self.on_add_item)
+            self.project.connect('remove-item', self.on_remove_item)
+
+        project.top._tree_item = QListViewItem(self, 'top')
+        project.top._tree_item.setOpen (True)
+        for folder in self.project.top.all_subfolders():
+            self.on_add(folder)
+
+    def on_add_item(self, obj):
+        item = obj._tree_item = QListViewItem(obj.parent._tree_item, obj.name)
+        pixmap = getpixmap({grafity.Worksheet: 'worksheet', 
+                            grafity.Graph: 'graph', 
+                            grafity.Folder: 'folder'}[type(obj)])
+        item.setPixmap (0, pixmap)
+        item.setOpen (True)
+        item._object = obj
+
+    def on_remove_item(self, obj):
+        obj.parent._tree_item.takeItem(obj._tree_item)
+        del obj._tree_item
+
+    def on_rename (self, item, column, text):
         if item.parent() == self.wsitem:
-            project.w[item.text(0)]._view.hide()
-            project.w[item.text(0)]._view.show()
+            item.obj.name = str(text)
         elif item.parent() == self.gritem:
-            project.g[item.text(0)].hide()
-            project.g[item.text(0)].show()
+            item.obj.name = str(text)
+
+    def on_doubleclick(self, item, point, column):
+        print item._object
 
     def dragObject(self):
         selected_worksheets = [w.name for w in project.worksheets if self.isSelected(w._explorer_item)]
@@ -281,43 +195,13 @@ class ProjectExplorer(QListView):
     def on_context_menu_requested(self, item, point, column):
         if item is None:
             return
-        if item.parent() == self.wsitem:
-            self.wsheet_context_menu.popup (point)
-            self.wscontextitem = project.w[item.text(0)]
-        elif item.parent() == self.gritem:
-            self.graph_context_menu.popup (point)
-            self.grcontextitem = project.g[item.text(0)]
-
-    def on_rename (self, item, column, text):
-        if item.parent() == self.wsitem:
-            item.obj.name = str(text)
-        elif item.parent() == self.gritem:
-            item.obj.name = str(text)
-
-    def remove (self, obj):
-        if isinstance (obj, Worksheet):
-            self.wsitem.takeItem(obj._explorer_item)
-            del obj._explorer_item
-        if isinstance (obj, Graph):
-            self.gritem.takeItem(obj._explorer_item)
-            del obj._explorer_item
-
-    def add (self, obj):
-        if isinstance (obj, Worksheet):
-            i = ListViewItem (self.wsitem, obj.name, obj)
-            i.setRenameEnabled (0, True)
-            i.setDragEnabled (True)
-            i.setPixmap (0, QPixmap(project.datadir + 'pixmaps/wsheet.png'))
-            obj._explorer_item = i
-#            for name in obj.column_names:
-#                i = ListViewItem (obj._explorer_item, name, name)
-        elif isinstance (obj, Graph):
-            i = ListViewItem (self.gritem, obj.name, obj)
-            i.setRenameEnabled (0, True)
-            i.setDragEnabled (True)
-            i.setPixmap (0, QPixmap(project.datadir + 'pixmaps/graph.png'))
-            obj._explorer_item = i
-
+        if isinstance(item._object, grafity.Worksheet):
+            self.wscontextitem = item._object
+            self.wsheet_context_menu.popup(point)
+        elif isinstance(item._object, grafity.Graph):
+            self.grcontextitem = item._object
+            self.graph_context_menu.popup(point)
+            
     def graph_context_menu_show (self):
         self.grcontextitem.show()
 
@@ -342,11 +226,11 @@ class ProjectExplorer(QListView):
         # do something
         pass
 
+import foo
 
-
-class MainWindow(QMainWindow):
+class MainWindow(foo.mainwin):
     def __init__(self):
-        QMainWindow.__init__(self)
+        foo.mainwin.__init__(self)
 
         self.mainbox = QVBox(self)
         self.setCentralWidget(self.mainbox)
@@ -355,15 +239,14 @@ class MainWindow(QMainWindow):
         self.workspace.setScrollBarsEnabled(True)
         self.connect(self.workspace, SIGNAL("windowActivated(QWidget *)"), self.on_window_activated)
 
-#        self.recent = project.settings['/grafit/recent_projects']
-#        if self.recent in [None, '']:
-#            self.recent = []
-#        else:
-#            self.recent = [s for s in self.recent.split(' ') if os.path.isfile(s)]
-#        self.recentids = []
+        self.project = grafity.Project()
 
-#------------------------------------------------------------------------------------------
-# Console
+        self.recent = settings.get('windows', 'recent')
+        if self.recent in [None, '']:
+            self.recent = []
+        else:
+            self.recent = [s for s in self.recent.split(' ') if os.path.isfile(s)]
+        self.recentids = []
 
 #        self.history = QListBox(self.workspace)
 #        self.connect(self.history, SIGNAL("doubleClicked(QListBoxItem*)"), self.history_select)
@@ -371,56 +254,43 @@ class MainWindow(QMainWindow):
 #        self.history.setCaption('History')
 #        self.history.hide()
 
-#------------------------------------------------------------------------------------------
-# Project explorer
+### status bar #################################################################################
 
-#        self.statusBar().message ("Welcome to <b>Grafit</b>", 1000)
-#        self.statuslabel = QLabel (self, 'Pikou')
-#        self.statusBar().addWidget (self.statuslabel, 0, True)
-#        self.statuslabel.setText ("")
-#        self.progressbar = QProgressBar(100, self)
-#        self.statusBar().addWidget (self.progressbar, 0, True)
-#        self.progressbar.hide()
+        self.statusBar().show()
+        self.statusBar().message ("Welcome to Grafity", 1000)
+        self.statuslabel = QLabel (self, 'Pikou')
+        self.statusBar().addWidget (self.statuslabel, 0, True)
+        self.statuslabel.setText ("")
+        self.progressbar = QProgressBar(100, self)
+        self.statusBar().addWidget (self.progressbar, 0, True)
+        self.progressbar.hide()
 
-#        project.addobserver (self.observe_project)
+### bottom panel ###############################################################################
 
-################################################################################################
-
+        locals = {}
+        locals['project'] = self.project
+        locals['mainwin'] = self
         self.bpanel = Panel(self, QMainWindow.DockBottom)
-        self.script = Console(self.bpanel)
-        self.bpanel.add('Script', QPixmap(os.path.join(DATADIR, 'data/images/console.png')), self.script)
+        self.script = Console(self.bpanel, locals=locals)
+        self.script.cmd(['from grafity import *'])
 
+        self.bpanel.add('Script', getpixmap('console'), self.script)
+
+### left panel #################################################################################
         self.lpanel = Panel(self, QMainWindow.DockLeft)
         self.explorer = ProjectExplorer(self.lpanel)
-        self.lpanel.add('Explorer', QPixmap(os.path.join(DATADIR, 'data/images/console.png')), self.explorer)
+        self.lpanel.add('Explorer', getpixmap('folder'), self.explorer)
 
-################################################################################################
-#        self.rpanel = Panel(self, QMainWindow.DockRight)
+        self.explorer.set_project(self.project)
 
-#        from grafit.graph_properties import GraphDataPanel, GraphStylePanel, GraphAxesPanel
-#        self.rpanel.Data = GraphDataPanel(self.rpanel)
-#        self.rpanel.add('Data', QPixmap(project.datadir +'pixmaps/wsheet.png'), self.rpanel.Data)
-#        self.rpanel.Style = GraphStylePanel(self.rpanel)
-#        self.rpanel.add('Style', QPixmap(project.datadir+'pixmaps/style.png'), self.rpanel.Style)
-#        self.rpanel.Axes = GraphAxesPanel(self.rpanel)
-#        self.rpanel.add('Axes', QPixmap(project.datadir+'pixmaps/axes.png'), self.rpanel.Axes)
-
-################################################################################################        
-
-#------------------------------------------------------------------------------------------
-# Menus and toolbars
-
-#        w = qtui.QWidgetFactory.create('grafity.ui')
-#        w.show()
-#        self.MenuBar.reparent(self, 0, QPoint(0,0))
-#        self.MenuBar.show()
-#        print 'a'
+    def on_new_folder(self):
+        self.project.new(grafity.Folder)
         
+    def on_new_worksheet(self):
+        self.project.new(grafity.Worksheet)
 
-
-        # panels always start closed
-        self.bpanel.setFixedExtentHeight(0)
-#        self.rpanel.setFixedExtentWidth(0)
+    def on_new_graph(self):
+        self.project.new(grafity.Graph)
 
     def on_btn3(self, on, height=[None]):
         if on:
@@ -545,27 +415,6 @@ class MainWindow(QMainWindow):
             menu.setItemParameter(id, i)
             menu.setItemChecked(id, self.workspace.activeWindow() == win)
 
-    def action_from_tuple (self, a):
-        act = QAction (self, None, a[4])
-        act.setText (a[0])
-        act.setMenuText (a[1])
-        if isinstance(a[2], QPixmap):
-            act.setIconSet (QIconSet(a[2]))
-        elif a[2] is not None:
-            act.setIconSet (QIconSet(QPixmap(project.datadir + "pixmaps/" + a[2])))
-        if a[5]: act.setAccel (QKeySequence (a[5]))
-        if inspect.isclass(a[3]):
-            callback = self.make_callback(a[3])
-        else:
-            callback = a[3]
-        if callback is not None:    
-            if a[4]: 
-                self.connect (act, SIGNAL("toggled(bool)"), callback)
-            else: 
-                self.connect (act, SIGNAL("activated()"), callback)
-        return act
-
- 
     def on_window_activated(self, window):
         self.active = window
         toolbars = { WorksheetView : 'Worksheet',
@@ -735,6 +584,7 @@ class MainWindow(QMainWindow):
                 w.import_ascii (str(f))
 
     def save_if_changed (self):
+        return True
         if not project.modified:
              return True
         flag = QMessageBox.information (self, "Grafit", "<b>Do you want to save the changes you made to the document?</b><p>Your changes will be lost if you don't save them", "&Save",  "&Cancel", "&Don't Save", 0, 1)
@@ -749,18 +599,20 @@ class MainWindow(QMainWindow):
         self.exit()
 
     def exit (self):
-        project.settings['/grafit/recent_projects'] = ' '.join(self.recent)
+        settings.set('windows', 'recent', ' '.join(self.recent))
         
-        s = QString()
-        st = QTextStream(s, IO_WriteOnly)
-        st << self
-        s = str(s)
-        project.settings['/grafit/windows/toolbars'] = s
-        project.settings['/grafit/console/history'] = '\n'.join(self.script.history[-20:])
+#        s = QString()
+#        st = QTextStream(s, IO_WriteOnly)
+#        st << self
+#        s = str(s)
+#        settings.set('windows', 'toolbars', s)
+#        project.settings['/grafit/console/history'] = '\n'.join(self.script.history[-20:])
+        settings.set('script', 'history', '\n'.join(self.script.history[-20:]))
+
         
         if not self.save_if_changed ():
             return
-        project.settings.settings.sync()
+#        project.settings.settings.sync()
         QApplication.exit(0)
         
         
@@ -822,18 +674,11 @@ class MainWindow(QMainWindow):
         project.add(new)
         self.obj = new
 
-class MyWidgetFactory(qtui.QWidgetFactory):
-    def createWidget(self, className, parent, name):
-        if className == 'MainWindow':
-            return MainWindow()
-
 
 def main ():
     app = QApplication(sys.argv)
-    qtui.QWidgetFactory.addWidgetFactory(MyWidgetFactory())
-    mainwin = qtui.QWidgetFactory.create('grafity.ui')
+    mainwin = MainWindow()
     app.setMainWidget(mainwin)
-#    MainWindow ()
     mainwin.show()
 
     app.exec_loop()

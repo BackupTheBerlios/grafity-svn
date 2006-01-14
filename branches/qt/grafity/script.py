@@ -8,6 +8,7 @@ import sets
 
 from qt import *
 from qtext import QextScintilla,QextScintillaLexerPython, QextScintillaAPIs
+from grafity.settings import settings
 
 #from grafit.project import project
 
@@ -69,12 +70,12 @@ class Console (QextScintilla):
         self.reading = False
 
         # history
+        self.history = settings.get('script', 'history')
 #        self.history = project.settings['/grafit/console/history']
-#        if self.history is None:
-#            self.history = []
-#        else:
-#            self.history = self.history.split('\n')
-        self.history = []
+        if self.history is None:
+            self.history = []
+        else:
+            self.history = self.history.split('\n')
         self.pointer = 0
 
         sys.ps1 = '>>> '
@@ -113,7 +114,7 @@ class Console (QextScintilla):
         last_line_len = self.lineLength (last_line)
         self.setCursorPosition (last_line, last_line_len+1)
 
-    def fakeUser(self, lines):
+    def cmd(self, lines):
         """
         Simulate a user: lines is a sequence of strings, (Python statements).
         """

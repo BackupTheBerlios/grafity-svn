@@ -1,6 +1,5 @@
 import sys
 import os
-import mingui as gui
 
 from grafity.thirdparty import odr
 
@@ -383,6 +382,7 @@ class Function(HasSignals):
 registry = FunctionsRegistry([os.path.join(DATADIR, 'data', 'functions'), 
                               os.path.join(USERDATADIR, 'functions')])
 
+"""
 class FunctionsWindow(gui.Window):
     def __init__(self):
         gui.Window.__init__(self, title='Functions', size=(500, 300))
@@ -468,3 +468,4 @@ class FunctionsWindow(gui.Window):
 
 if __name__ == '__main__':
     gui.Application().run(FunctionsWindow)
+"""

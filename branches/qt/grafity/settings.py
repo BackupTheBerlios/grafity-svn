@@ -51,6 +51,9 @@ class Settings(object):
 
     def get(self, section, key):
         log.info('Getting option %s/%s', section, key)
-        return self.config.get(section, key)
+        try:
+            return self.config.get(section, key)
+        except ConfigParser.NoSectionError:
+            return None
 
 settings = Settings(os.path.join(USERDATADIR,'grafity.cfg'))
