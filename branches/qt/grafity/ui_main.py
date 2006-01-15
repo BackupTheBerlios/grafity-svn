@@ -5,13 +5,13 @@ from qt import *
 from qwt import *
 
 import grafity
-from grafity.script import Console
 from grafity.signals import HasSignals
 from grafity.actions import undo, redo
 
-from ui.main import MainWindowUI
-from ui.graph_style import GraphStyleUI
-from ui.graph_data import GraphDataUI
+from grafity.ui.main import MainWindowUI
+from grafity.ui.graph_style import GraphStyleUI
+from grafity.ui.graph_data import GraphDataUI
+from grafity.ui_console import Console
 
 class EventHandler(QObject):
     def __init__(self, object, callback):

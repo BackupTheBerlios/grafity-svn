@@ -21,7 +21,7 @@ class GrafitSplash(QSplashScreen):
 app = QApplication(sys.argv)
 splash = GrafitSplash(QPixmap(DATADIR + '/data/images/logos/grafit.png'))
 splash.show()
-from qmain import MainWindow
+from ui_main import MainWindow
 mainwin = MainWindow()
 splash.finish(mainwin)
 app.setMainWidget(mainwin)
