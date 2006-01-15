@@ -9,7 +9,6 @@ from OpenGL.GL import *
 from grafity.signals import HasSignals
 from grafity.project import Item, wrap_attribute, register_class, create_id
 from grafity.actions import action_from_methods, action_from_methods2, StopAction
-from grafity.graph_axis import Axis, Grid
 from grafity.graph_dataset import Dataset, Function
 from grafity.settings import DATADIR
 
