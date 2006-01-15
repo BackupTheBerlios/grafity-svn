@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>150</width>
-            <height>264</height>
+            <width>193</width>
+            <height>428</height>
         </rect>
     </property>
     <property name="caption">
@@ -23,119 +23,231 @@
             <number>0</number>
         </property>
         <property name="spacing">
-            <number>0</number>
+            <number>8</number>
         </property>
-        <widget class="QGroupBox">
+        <widget class="QLayoutWidget">
             <property name="name">
-                <cstring>groupBox4</cstring>
+                <cstring>layout9</cstring>
             </property>
-            <property name="title">
-                <string>symbol</string>
-            </property>
-            <grid>
+            <vbox>
                 <property name="name">
                     <cstring>unnamed</cstring>
-                </property>
-                <property name="margin">
-                    <number>0</number>
                 </property>
                 <property name="spacing">
                     <number>0</number>
                 </property>
-                <widget class="QCheckBox" row="0" column="0">
+                <widget class="QLabel">
                     <property name="name">
-                        <cstring>checkBox1</cstring>
+                        <cstring>textLabel1</cstring>
                     </property>
                     <property name="text">
-                        <string></string>
+                        <string>&lt;b&gt;symbol&lt;/b&gt;</string>
                     </property>
                 </widget>
-                <widget class="QLabel" row="0" column="1">
+                <widget class="QLayoutWidget">
                     <property name="name">
-                        <cstring>textLabel4</cstring>
+                        <cstring>layout5</cstring>
                     </property>
-                    <property name="text">
-                        <string>shape</string>
-                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <property name="margin">
+                            <number>0</number>
+                        </property>
+                        <property name="spacing">
+                            <number>0</number>
+                        </property>
+                        <spacer>
+                            <property name="name">
+                                <cstring>spacer3</cstring>
+                            </property>
+                            <property name="orientation">
+                                <enum>Horizontal</enum>
+                            </property>
+                            <property name="sizeType">
+                                <enum>Fixed</enum>
+                            </property>
+                            <property name="sizeHint">
+                                <size>
+                                    <width>8</width>
+                                    <height>20</height>
+                                </size>
+                            </property>
+                        </spacer>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>layout4</cstring>
+                            </property>
+                            <grid>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <property name="margin">
+                                    <number>0</number>
+                                </property>
+                                <property name="spacing">
+                                    <number>0</number>
+                                </property>
+                                <widget class="QCheckBox" row="3" column="0">
+                                    <property name="name">
+                                        <cstring>checkBox4</cstring>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>0</hsizetype>
+                                            <vsizetype>0</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="text">
+                                        <string></string>
+                                    </property>
+                                </widget>
+                                <widget class="QCheckBox" row="1" column="0">
+                                    <property name="name">
+                                        <cstring>checkBox2</cstring>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>0</hsizetype>
+                                            <vsizetype>0</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="text">
+                                        <string></string>
+                                    </property>
+                                </widget>
+                                <widget class="QLabel" row="1" column="1">
+                                    <property name="name">
+                                        <cstring>textLabel5</cstring>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>0</hsizetype>
+                                            <vsizetype>0</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="text">
+                                        <string>fill</string>
+                                    </property>
+                                </widget>
+                                <widget class="QLabel" row="0" column="1">
+                                    <property name="name">
+                                        <cstring>textLabel4</cstring>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>0</hsizetype>
+                                            <vsizetype>0</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="text">
+                                        <string>shape</string>
+                                    </property>
+                                </widget>
+                                <widget class="QCheckBox" row="0" column="0">
+                                    <property name="name">
+                                        <cstring>checkBox1</cstring>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>0</hsizetype>
+                                            <vsizetype>0</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="text">
+                                        <string></string>
+                                    </property>
+                                </widget>
+                                <widget class="QCheckBox" row="2" column="0">
+                                    <property name="name">
+                                        <cstring>checkBox3</cstring>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>0</hsizetype>
+                                            <vsizetype>0</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="text">
+                                        <string></string>
+                                    </property>
+                                </widget>
+                                <widget class="QLabel" row="2" column="1">
+                                    <property name="name">
+                                        <cstring>textLabel6</cstring>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>0</hsizetype>
+                                            <vsizetype>0</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="text">
+                                        <string>size</string>
+                                    </property>
+                                </widget>
+                                <widget class="QComboBox" row="0" column="2">
+                                    <property name="name">
+                                        <cstring>comboBox1</cstring>
+                                    </property>
+                                </widget>
+                                <widget class="QComboBox" row="1" column="2">
+                                    <property name="name">
+                                        <cstring>comboBox2</cstring>
+                                    </property>
+                                </widget>
+                                <widget class="QLabel" row="3" column="1">
+                                    <property name="name">
+                                        <cstring>textLabel7</cstring>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>0</hsizetype>
+                                            <vsizetype>0</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="text">
+                                        <string>color</string>
+                                    </property>
+                                </widget>
+                                <widget class="QSpinBox" row="2" column="2">
+                                    <property name="name">
+                                        <cstring>spinBox1</cstring>
+                                    </property>
+                                </widget>
+                                <widget class="QComboBox" row="3" column="2">
+                                    <property name="name">
+                                        <cstring>comboBox3</cstring>
+                                    </property>
+                                </widget>
+                            </grid>
+                        </widget>
+                    </hbox>
                 </widget>
-                <widget class="QComboBox" row="0" column="2">
-                    <property name="name">
-                        <cstring>comboBox1</cstring>
-                    </property>
-                </widget>
-                <widget class="QCheckBox" row="1" column="0">
-                    <property name="name">
-                        <cstring>checkBox2</cstring>
-                    </property>
-                    <property name="text">
-                        <string></string>
-                    </property>
-                </widget>
-                <widget class="QCheckBox" row="3" column="0">
-                    <property name="name">
-                        <cstring>checkBox4</cstring>
-                    </property>
-                    <property name="text">
-                        <string></string>
-                    </property>
-                </widget>
-                <widget class="QCheckBox" row="2" column="0">
-                    <property name="name">
-                        <cstring>checkBox3</cstring>
-                    </property>
-                    <property name="text">
-                        <string></string>
-                    </property>
-                </widget>
-                <widget class="QComboBox" row="1" column="2">
-                    <property name="name">
-                        <cstring>comboBox2</cstring>
-                    </property>
-                </widget>
-                <widget class="QSpinBox" row="2" column="2">
-                    <property name="name">
-                        <cstring>spinBox1</cstring>
-                    </property>
-                </widget>
-                <widget class="QComboBox" row="3" column="2">
-                    <property name="name">
-                        <cstring>comboBox3</cstring>
-                    </property>
-                </widget>
-                <widget class="QLabel" row="3" column="1">
-                    <property name="name">
-                        <cstring>textLabel7</cstring>
-                    </property>
-                    <property name="text">
-                        <string>color</string>
-                    </property>
-                </widget>
-                <widget class="QLabel" row="1" column="1">
-                    <property name="name">
-                        <cstring>textLabel5</cstring>
-                    </property>
-                    <property name="text">
-                        <string>fill</string>
-                    </property>
-                </widget>
-                <widget class="QLabel" row="2" column="1">
-                    <property name="name">
-                        <cstring>textLabel6</cstring>
-                    </property>
-                    <property name="text">
-                        <string>size</string>
-                    </property>
-                </widget>
-            </grid>
+            </vbox>
         </widget>
-        <widget class="QGroupBox">
+        <widget class="QLayoutWidget">
             <property name="name">
-                <cstring>groupBox4_2</cstring>
+                <cstring>layout10</cstring>
             </property>
-            <property name="title">
-                <string>line</string>
-            </property>
-            <grid>
+            <vbox>
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
@@ -145,70 +257,175 @@
                 <property name="spacing">
                     <number>0</number>
                 </property>
-                <widget class="QCheckBox" row="0" column="0">
+                <widget class="QLabel">
                     <property name="name">
-                        <cstring>checkBox1_2</cstring>
+                        <cstring>textLabel1_2</cstring>
                     </property>
                     <property name="text">
-                        <string></string>
+                        <string>&lt;b&gt;line&lt;/b&gt;</string>
                     </property>
                 </widget>
-                <widget class="QLabel" row="0" column="1">
+                <widget class="QLayoutWidget">
                     <property name="name">
-                        <cstring>textLabel4_2</cstring>
+                        <cstring>layout8</cstring>
                     </property>
-                    <property name="text">
-                        <string>shape</string>
-                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <property name="margin">
+                            <number>0</number>
+                        </property>
+                        <property name="spacing">
+                            <number>0</number>
+                        </property>
+                        <spacer>
+                            <property name="name">
+                                <cstring>spacer3_2</cstring>
+                            </property>
+                            <property name="orientation">
+                                <enum>Horizontal</enum>
+                            </property>
+                            <property name="sizeType">
+                                <enum>Fixed</enum>
+                            </property>
+                            <property name="sizeHint">
+                                <size>
+                                    <width>8</width>
+                                    <height>20</height>
+                                </size>
+                            </property>
+                        </spacer>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>layout7</cstring>
+                            </property>
+                            <grid>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <property name="margin">
+                                    <number>0</number>
+                                </property>
+                                <property name="spacing">
+                                    <number>0</number>
+                                </property>
+                                <widget class="QCheckBox" row="2" column="0">
+                                    <property name="name">
+                                        <cstring>checkBox3_2</cstring>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>0</hsizetype>
+                                            <vsizetype>5</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="text">
+                                        <string></string>
+                                    </property>
+                                </widget>
+                                <widget class="QSpinBox" row="2" column="2">
+                                    <property name="name">
+                                        <cstring>spinBox1_2</cstring>
+                                    </property>
+                                </widget>
+                                <widget class="QComboBox" row="1" column="2">
+                                    <property name="name">
+                                        <cstring>comboBox2_2</cstring>
+                                    </property>
+                                </widget>
+                                <widget class="QLabel" row="1" column="1">
+                                    <property name="name">
+                                        <cstring>textLabel5_2</cstring>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>0</hsizetype>
+                                            <vsizetype>5</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="text">
+                                        <string>style</string>
+                                    </property>
+                                </widget>
+                                <widget class="QLabel" row="2" column="1">
+                                    <property name="name">
+                                        <cstring>textLabel6_2</cstring>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>0</hsizetype>
+                                            <vsizetype>5</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="text">
+                                        <string>width</string>
+                                    </property>
+                                </widget>
+                                <widget class="QCheckBox" row="0" column="0">
+                                    <property name="name">
+                                        <cstring>checkBox1_2</cstring>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>0</hsizetype>
+                                            <vsizetype>5</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="text">
+                                        <string></string>
+                                    </property>
+                                </widget>
+                                <widget class="QCheckBox" row="1" column="0">
+                                    <property name="name">
+                                        <cstring>checkBox2_2</cstring>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>0</hsizetype>
+                                            <vsizetype>5</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="text">
+                                        <string></string>
+                                    </property>
+                                </widget>
+                                <widget class="QLabel" row="0" column="1">
+                                    <property name="name">
+                                        <cstring>textLabel4_2</cstring>
+                                    </property>
+                                    <property name="sizePolicy">
+                                        <sizepolicy>
+                                            <hsizetype>0</hsizetype>
+                                            <vsizetype>5</vsizetype>
+                                            <horstretch>0</horstretch>
+                                            <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                    </property>
+                                    <property name="text">
+                                        <string>type</string>
+                                    </property>
+                                </widget>
+                                <widget class="QComboBox" row="0" column="2">
+                                    <property name="name">
+                                        <cstring>comboBox1_2</cstring>
+                                    </property>
+                                </widget>
+                            </grid>
+                        </widget>
+                    </hbox>
                 </widget>
-                <widget class="QComboBox" row="0" column="2">
-                    <property name="name">
-                        <cstring>comboBox1_2</cstring>
-                    </property>
-                </widget>
-                <widget class="QCheckBox" row="1" column="0">
-                    <property name="name">
-                        <cstring>checkBox2_2</cstring>
-                    </property>
-                    <property name="text">
-                        <string></string>
-                    </property>
-                </widget>
-                <widget class="QCheckBox" row="2" column="0">
-                    <property name="name">
-                        <cstring>checkBox3_2</cstring>
-                    </property>
-                    <property name="text">
-                        <string></string>
-                    </property>
-                </widget>
-                <widget class="QComboBox" row="1" column="2">
-                    <property name="name">
-                        <cstring>comboBox2_2</cstring>
-                    </property>
-                </widget>
-                <widget class="QSpinBox" row="2" column="2">
-                    <property name="name">
-                        <cstring>spinBox1_2</cstring>
-                    </property>
-                </widget>
-                <widget class="QLabel" row="1" column="1">
-                    <property name="name">
-                        <cstring>textLabel5_2</cstring>
-                    </property>
-                    <property name="text">
-                        <string>fill</string>
-                    </property>
-                </widget>
-                <widget class="QLabel" row="2" column="1">
-                    <property name="name">
-                        <cstring>textLabel6_2</cstring>
-                    </property>
-                    <property name="text">
-                        <string>size</string>
-                    </property>
-                </widget>
-            </grid>
+            </vbox>
         </widget>
         <widget class="QLayoutWidget">
             <property name="name">
@@ -222,8 +439,16 @@
                     <property name="name">
                         <cstring>textLabel4_2_2</cstring>
                     </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>0</hsizetype>
+                            <vsizetype>5</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
                     <property name="text">
-                        <string>group</string>
+                        <string>&lt;b&gt;group&lt;/b&gt;</string>
                     </property>
                 </widget>
                 <widget class="QComboBox">
@@ -246,7 +471,7 @@
             <property name="sizeHint">
                 <size>
                     <width>20</width>
-                    <height>40</height>
+                    <height>70</height>
                 </size>
             </property>
         </spacer>

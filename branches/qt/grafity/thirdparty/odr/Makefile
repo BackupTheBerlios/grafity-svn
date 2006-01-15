@@ -9,6 +9,6 @@ install:
 	cp odr-0.6.1/build/lib.linux-i686-2.4/__odrpack.so __odrpack.so
 clean:
 	@rm -rf odr-0.6.1 *.pyc
+
 cleanall: clean
 	@rm -f __odrpack.so __init__.py
-

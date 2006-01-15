@@ -1,0 +1,2 @@
+all:
+	@(cd odr; make)

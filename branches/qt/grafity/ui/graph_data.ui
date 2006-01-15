@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>153</width>
-            <height>404</height>
+            <width>180</width>
+            <height>373</height>
         </rect>
     </property>
     <property name="caption">
@@ -82,28 +82,9 @@
                 <string>&lt;b&gt;worksheet&lt;/b&gt;</string>
             </property>
         </widget>
-        <widget class="QListView">
-            <column>
-                <property name="text">
-                    <string>Column 1</string>
-                </property>
-                <property name="clickable">
-                    <bool>true</bool>
-                </property>
-                <property name="resizable">
-                    <bool>true</bool>
-                </property>
-            </column>
-        <item>
-            <property name="text">
-                <string>New Item</string>
-            </property>
-            <property name="pixmap">
-                <pixmap></pixmap>
-            </property>
-        </item>
+        <widget class="QListBox">
             <property name="name">
-                <cstring>listView1</cstring>
+                <cstring>listBox1</cstring>
             </property>
         </widget>
         <widget class="QLabel">
@@ -114,28 +95,9 @@
                 <string>&lt;b&gt;x axis&lt;/b&gt;</string>
             </property>
         </widget>
-        <widget class="QListView">
-            <column>
-                <property name="text">
-                    <string>Column 1</string>
-                </property>
-                <property name="clickable">
-                    <bool>true</bool>
-                </property>
-                <property name="resizable">
-                    <bool>true</bool>
-                </property>
-            </column>
-        <item>
-            <property name="text">
-                <string>New Item</string>
-            </property>
-            <property name="pixmap">
-                <pixmap></pixmap>
-            </property>
-        </item>
+        <widget class="QListBox">
             <property name="name">
-                <cstring>listView2</cstring>
+                <cstring>listBox2</cstring>
             </property>
         </widget>
         <widget class="QLabel">
@@ -146,28 +108,9 @@
                 <string>&lt;b&gt;y axis&lt;/b&gt;</string>
             </property>
         </widget>
-        <widget class="QListView">
-            <column>
-                <property name="text">
-                    <string>Column 1</string>
-                </property>
-                <property name="clickable">
-                    <bool>true</bool>
-                </property>
-                <property name="resizable">
-                    <bool>true</bool>
-                </property>
-            </column>
-        <item>
-            <property name="text">
-                <string>New Item</string>
-            </property>
-            <property name="pixmap">
-                <pixmap></pixmap>
-            </property>
-        </item>
+        <widget class="QListBox">
             <property name="name">
-                <cstring>listView3</cstring>
+                <cstring>listBox3</cstring>
             </property>
         </widget>
     </vbox>

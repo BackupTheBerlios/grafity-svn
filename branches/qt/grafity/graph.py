@@ -10,11 +10,8 @@ from grafity.signals import HasSignals
 from grafity.project import Item, wrap_attribute, register_class, create_id
 from grafity.actions import action_from_methods, action_from_methods2, StopAction
 from grafity.graph_axis import Axis, Grid
-from grafity.graph_objects import Rubberband, Cross, Line, Text, Move, DrawFunction, Rangehandle
 from grafity.graph_dataset import Dataset, Function
-from grafity.graph_text import FONTFILE, TextPainter, encodeTTFasPS
 from grafity.settings import DATADIR
-from grafity.thirdparty.ft2font import FT2Font
 
 import wx
 

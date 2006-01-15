@@ -56,19 +56,65 @@ class GraphView(QTabWidget):
         self.graph.connect('style-changed', self.on_change_style)
         self.graph.connect('zoom-changed', self.on_zoom_changed)
 
-        for d in self.graph.datasets:
-            d._curveid = self.plot.insertCurve('')
-            d.connect('data-changed', lambda x,y: self.on_recalc(d, x, y), True)
-            d.recalculate()
-            for s in ['symbol', 'color', 'size', 'linetype', 'linestyle', 'linewidth']:
-                self.on_change_style(d, s, d.get_style(s))
-        
+       
         connectevents(self.plot.canvas(), self.on_canvas_event)
         self.connect(self.plot, SIGNAL('plotMouseMoved(const QMouseEvent&)'), self.on_mouse_moved)
         self.connect(self.plot, SIGNAL('plotMousePressed(const QMouseEvent&)'), self.on_mouse_pressed)
         self.connect(self.plot, SIGNAL('plotMouseReleased(const QMouseEvent&)'), self.on_mouse_released)
 
         self.legend = QListBox(self.mainpage)
+        pal = QPalette(self.legend.palette())
+        cg = QColorGroup(pal.active())
+        self.legend_background_color = cg.color(QColorGroup.Background)
+        cg.setColor(QColorGroup.Base, self.legend_background_color)
+        pal.setActive(cg)
+        self.legend.setPalette(pal)
+        self.legend.setFrameShape(QFrame.NoFrame)
+        self.legend.setSelectionMode(QListBox.Extended)
+
+        for d in self.graph.datasets:
+            d._curveid = self.plot.insertCurve('')
+            d.connect('data-changed', lambda x,y: self.on_recalc(d, x, y), True)
+            d.recalculate()
+            for s in ['symbol', 'color', 'size', 'linetype', 'linestyle', 'linewidth']:
+                self.on_change_style(d, s, d.get_style(s))
+        self.update_legend()
+ 
+    def update_legend(self):
+        selected = [self.legend.isSelected(it) for it in range(self.legend.numRows())]
+        current = self.legend.currentItem()
+
+        self.legend.clear()
+        self.legend.insertStrList([str(d) for d in self.graph.datasets])
+        for n, dset in enumerate(self.graph.datasets):
+            self.legend.changeItem(self.draw_pixmap(dset), self.legend.text(n), n)
+
+        for i,on in enumerate(selected):
+            self.legend.setSelected(i, on)
+        self.legend.setCurrentItem(current)
+
+
+    def draw_pixmap(self, dataset):
+        p = QPixmap()
+        p.resize(20, 10)
+        p.fill(self.legend_background_color)
+        paint = QPainter()
+        paint.begin(p)
+
+        paint.setPen (self.plot.curve(dataset._curveid).pen())
+        paint.drawLine (2,5, 18,5)
+
+        self.plot.curve(dataset._curveid).symbol().draw(paint, 10, 5)
+
+#        if dataset in self.graph.fit_datasets():
+#            paint.setPen(QPen(Qt.black, 1))
+#            paint.setBrush(Qt.NoBrush)
+#            paint.drawRect(2, 2, 16, 8)
+
+        paint.end()
+        p.setMask(p.createHeuristicMask())
+        return p
+
 
     def on_zoom_changed(self, xmin, xmax, ymin, ymax):
         self.plot.setAxisScale(self.plot.xBottom, xmin, xmax)
@@ -613,14 +659,9 @@ class MainWindow(MainWindowUI):
         from grafit.help import HelpWidget
         h = HelpWidget(self)
         h.show()
+def splash_message(text):
+    if __name__ == '__main__':
+        splash.message (text, Qt.AlignLeft, Qt.gray)
+    pass
 
 
-
-
-def main ():
-    app = QApplication(sys.argv)
-    mainwin = MainWindow()
-    app.setMainWidget(mainwin)
-    mainwin.show()
-
-    app.exec_loop()
