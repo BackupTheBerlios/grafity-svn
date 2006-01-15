@@ -20,97 +20,18 @@ import wx
 
 log = False
 
-if log:
-    def wrap_func(func):
-        def r(*args, **kwds):
-            print func.__name__, args, kwds
-            return func(*args, **kwds)
-        return r
-
-    g = {}
-    for name, func in dict(globals()).iteritems():
-        if name.startswith('gl') and hasattr(func, '__call__'):
-            g[name] = wrap_func(func)
-
-    globals().update(g)
-
 class Graph(Item, HasSignals):
     def __init__(self, project, name=None, parent=None, location=None):
         Item.__init__(self, project, name, parent, location)
     
-#        self.paint_xor_objects =  False
-#        self.selected_datasets = []
-#
-#        self.mode = 'arrow'
-#
-#        self.graph_objects = []
-#        self.dragobj = None
-#
-#        self.selected_object = None
-#
-#        self.plot_height = 100
-#        self.plot_width = 100
-#
         self.datasets = []
         if location is not None:
             for i, l in enumerate(self.data.datasets):
                 if not l.id.startswith('-'):
                     self.datasets.append(Dataset(self, i))
                     self.datasets[-1].connect('modified', self.on_dataset_modified)
-#            for l in self.data.lines:
-#                if not l.id.startswith('-'):
-#                    self.graph_objects.append(Line(self, l))
-#            for l in self.data.text:
-#                if not l.id.startswith('-'):
-#                    self.graph_objects.append(Text(self, l))
 
         self.functions = []
-#        if location is not None:
-#            for i in range(len(self.data.functions)):
-#                if not self.data.functions[i].id.startswith('-'):
-#                    f = Function(self, i)
-#                    self.functions.append(f)
-#                    f.connect('modified', self.on_dataset_modified)
-#                    f.func.connect('modified', self.on_dataset_modified)
-
-#        self.ps = False
-#
-#        self.axis_top = Axis('top', self)
-#        self.axis_bottom = Axis('bottom', self)
-#        self.axis_right = Axis('right', self)
-#        self.axis_left = Axis('left', self)
-#
-#        self.axes = [self.axis_top, self.axis_right, self.axis_bottom, self.axis_left]
-#
-#        self.grid_h = Grid('horizontal', self)
-#        self.grid_v = Grid('vertical', self)
-#
-#        self.set_range(0.0, 100.5)
-#        if location is None:
-#            self.xmin, self.ymin = 0,0  
-#            self.ymax, self.xmax = 10, 10
-#        self.newf()
-#
-#        if self.xtype == '':
-#            self._xtype = 'linear'
-#        if self.ytype == '':
-#            self._ytype = 'linear'
-#        self.selected_function = None
-#
-#        self.rubberband = Rubberband(self)
-#        self.cross = Cross(self)
-#        self.rangehandle = Rangehandle(self)
-#
-#        self.objects = [self.rubberband, self.cross, self.rangehandle]
-#        self.textpainter = TextPainter(self)
-#        self.recalc = True
-#
-#        # style
-#        self.axis_title_font_size = 12.
-#        self.background_color = (1., 1., 1., 1.)
-#        self.pwidth = 120.
-#        self.pheight = 100.
-#
 
     default_name_prefix = 'graph'
 
@@ -196,6 +117,9 @@ class Graph(Item, HasSignals):
     set_xtitle = action_from_methods2('graph/set-xtitle', set_xtitle, undo_set_xtitle, redo=redo_set_xtitle)
     xtitle = property(get_xtitle, set_xtitle)
 
+    def reshape(self):
+        pass
+
     def set_ytitle(self, state, title):
         state['old'], state['new'] = self._ytitle, title
         self._ytitle = title
@@ -216,21 +140,6 @@ class Graph(Item, HasSignals):
 
     def __repr__(self):
         return '<Graph %s%s>' % (self.name, '(deleted)'*self.id.startswith('-'))
-
-    def newf(self):
-#        ind = self.data.functions.append(id=create_id())
-        f = Function(self)
-        f.connect('modified', self.on_dataset_modified)
-        f.func.connect('modified', self.on_dataset_modified)
-        f.func.connect('add-term', self.on_dataset_modified)
-        f.func.connect('remove-term', self.on_dataset_modified)
-        self.functions.append(f)
-        self.emit('add-function', f)
-        return f
-
-    def create_legend(self):
-        legend = self.new_object(Text)
-        legend.text = '\n'.join('@%d@'%i + str(d) for i, d in enumerate(self.datasets))
 
     # add and remove graph objects
     def new_object(self, state, typ):
@@ -348,82 +257,6 @@ class Graph(Item, HasSignals):
         self.grid_h.paint()
         self.grid_v.paint()
 
-    def pos2y(self, pos):
-        if pos.endswith('%'):
-            return float(pos[:-1])*self.plot_height/100., '%'
-        elif pos.endswith('y'):
-            return self.data_to_phys(self.ymin, float(pos[:-1]))[1], 'y'
-        elif pos.endswith('mm'):
-            return float(pos[:-2]), 'mm'
-        else:
-            return float(pos), 'mm'
-
-    def pos2x(self, pos):
-        if pos.endswith('%'):
-            return float(pos[:-1])*self.plot_width/100., '%'
-        elif pos.endswith('x'):
-            return self.data_to_phys(float(pos[:-1]), self.xmin)[0], 'x'
-        elif pos.endswith('mm'):
-            return float(pos[:-2]), 'mm'
-        else:
-            return float(pos), 'mm'
-
-    def x2pos(self, x, typ):
-        if typ=='%':
-            return str(x*100./self.plot_width)+'%'
-        elif typ=='x':
-            return str(self.phys_to_data(x, 0)[0])+'x'
-        elif typ=='mm':
-            return str(x)+'mm'
-
-    def y2pos(self, y, typ):
-        if typ=='%':
-            return str(y*100./self.plot_height)+'%'
-        elif typ=='y':
-            return str(self.phys_to_data(0, y)[1])+'y'
-        elif typ=='mm':
-            return str(y)+'mm'
-
-    def data_to_phys(self, x, y):
-        """
-        Takes a point x,y in data coordinates and transforms to
-        physical coordinates
-        """
-        x, xmin, xmax = map(self.axis_bottom.transform, (x, self.xmin, self.xmax))
-        y, ymin, ymax = map(self.axis_left.transform, (y, self.ymin, self.ymax))
-
-        px = self.plot_width * (x-xmin)/(xmax-xmin)
-        py = self.plot_height * (y-ymin)/(ymax-ymin)
-
-#        bt = self.axis_bottom.transform
-#        lt = self.axis_left.transform
-#
-#        px = self.plot_width * (bt(x) - bt(self.xmin)) / (bt(self.xmax) - bt(self.xmin))
-#        py = self.plot_height * (bt(y) - bt(self.ymin)) / (bt(self.ymax) - bt(self.ymin)) 
-
-        return px, py
-
-    def phys_to_data(self, x, y):
-        """
-        Takes a point x,y in physical coordinates and transforms to
-        data coordinates
-        """
-        xmin, xmax = map(self.axis_bottom.transform, (self.xmin, self.xmax))
-        ymin, ymax = map(self.axis_left.transform, (self.ymin, self.ymax))
-
-        px = x*(xmax-xmin)/self.plot_width + xmin
-        py = y*(ymax-ymin)/self.plot_height + ymin
-
-        return self.axis_bottom.invtransform(px), self.axis_left.invtransform(py)
-
-    def mouse_to_phys(self, xm, ym):
-        x = (xm / self.res) - self.marginl
-        y = ((self.height_pixels-ym) / self.res) - self.marginb
-        return x, y
-
-    def mouse_to_data(self, xm, ym):
-        x, y = self.mouse_to_phys(xm, ym)
-        return self.phys_to_data(x, y)
 
     def autoscale(self):
         if len(self.datasets):
@@ -447,14 +280,17 @@ class Graph(Item, HasSignals):
             return
         self.xmin, self.xmax, self.ymin, self.ymax = xmin, xmax, ymin, ymax
         state['new'] = (xmin, xmax, ymin, ymax)
+        self.emit('zoom-changed', self.xmin, self.xmax, self.ymin, self.ymax)
 
     def zoom_redo(self, state):
         self.xmin, self.xmax, self.ymin, self.ymax = state['new']
+        self.emit('zoom-changed', self.xmin, self.xmax, self.ymin, self.ymax)
         self.reshape()
         self.redraw(True)
 
     def zoom_undo(self, state):
         self.xmin, self.xmax, self.ymin, self.ymax = state['old']
+        self.emit('zoom-changed', self.xmin, self.xmax, self.ymin, self.ymax)
         self.reshape()
         self.redraw(True)
 
@@ -463,6 +299,11 @@ class Graph(Item, HasSignals):
 
     zoom = action_from_methods2('graph-zoom', zoom_do, zoom_undo, redo=zoom_redo, combine=zoom_combine)
 
+    def zoom_out(self, xmin, xmax, ymin, ymax):
+        xmin, xmax = self.zoomout(self.xmin, self.xmax, xmin, xmax)
+        ymin, ymax = self.zoomout(self.ymin, self.ymax, ymin, ymax)
+        self.zoom(xmin, xmax, ymin, ymax)
+        
  
     def zoomout(self,x1, x2,x3, x4):
         if x3 == x4:
@@ -489,212 +330,6 @@ class Graph(Item, HasSignals):
         glPixelStorei(GL_PACK_ALIGNMENT, 1)
 
         self.listno = glGenLists(1)
-
-    def display(self, width=-1, height=-1):
-        if not hasattr(self, 'listno'):
-            return
-        if width == -1 and height == -1:
-            width, height = self.last_width, self.last_height
-        else:
-            self.last_width, self.last_height = width, height
-
-        if not self.paint_xor_objects:
-            if self.recalc:
-                if not self.ps:
-                    for i, d in enumerate(self.datasets):
-                        glClearColor(*self.background_color)
-                        glClear(GL_COLOR_BUFFER_BIT)
-
-                        w, h, _, renderer=self.textpainter.render_text_chunk_symbol(str(i))
-                        if renderer is not None:
-                            renderer((w/2)/self.res, (h/2)/self.res)
-
-                            i = wx.EmptyImage(w, h)
-                            data = glReadPixels(int(self.marginl*self.res), int(self.marginb*self.res), 
-                                                   int(w), int(h), GL_RGB, GL_UNSIGNED_BYTE)
-                            i.SetData(data)
-                            d._legend_wxbitmap = i.ConvertToBitmap()
-                    self.emit('shape-changed')
-
-                glDeleteLists(self.listno, 1)
-                glNewList(self.listno, GL_COMPILE)
-
-                glClearColor(*self.background_color)
-                glClear(GL_COLOR_BUFFER_BIT)
-
-                # set up clipping
-                glClipPlane(GL_CLIP_PLANE0, [  1,  0,  0,  0 ])
-                glClipPlane(GL_CLIP_PLANE1, [ -1,  0,  0,  self.plot_width ])
-                glClipPlane(GL_CLIP_PLANE2, [  0,  1,  0,  0 ])
-                glClipPlane(GL_CLIP_PLANE3, [  0, -1,  0,  self.plot_height ])
-
-                if len(self.datasets):
-		    for plane in [GL_CLIP_PLANE0, GL_CLIP_PLANE1, GL_CLIP_PLANE2, GL_CLIP_PLANE3]:
-		       glEnable(plane)
-
-                for d in self.datasets:
-                    d.paint()
-                for f in self.functions:
-                    f.paint()
-
-                if len(self.datasets):
-	            for plane in [GL_CLIP_PLANE0, GL_CLIP_PLANE1, GL_CLIP_PLANE2, GL_CLIP_PLANE3]:
-		        glDisable(plane)
-
-                self.paint_axes()
-
-                glEndList()
-                self.recalc = False
-
-            glCallList(self.listno)
-
-            for axis in self.axes:
-                axis.paint_text()
-                axis.paint_title()
-
-            for o in self.graph_objects:
-                o.draw()
-                if self.mode == 'arrow' and self.selected_object == o:
-                    o.draw_handles()
-        else:
-            glLogicOp(GL_XOR)
-            glEnable(GL_COLOR_LOGIC_OP)
-            for o in self.objects:
-                o.redraw()
-            glDisable(GL_COLOR_LOGIC_OP)
-
-    def reshape(self, width=-1, height=-1):
-#        if width < 10 and height < 10:
-#            width, height = 200, 200
-        if not hasattr(self, 'listno'):
-            return
-        t = time.time()
-        if width == -1 and height == -1:
-            width, height = self.last_width, self.last_height
-        else:
-            self.last_width, self.last_height = width, height
-
-        # aspect ratio (width/height)
-        self.aspect = self.pwidth/self.pheight 
-
-        # resolution (in pixels/mm)
-        self.res = min(width/self.pwidth, height/self.pheight)
-        displaydpi = 100.
-        self.displayres = displaydpi / 25.4     # 25.4 = mm/inch
-        self.magnification = self.res / self.displayres
-
-        # set width and height
-        self.width_pixels, self.height_pixels = width, height
-        self.width_mm = width / self.res
-        self.height_mm = height / self.res
-
-        # measure titles
-        facesize = self.axis_title_font_size*self.magnification
-        if self.xtitle != '':
-            _, tith = self.textpainter.render_text(self.xtitle, facesize, 0, 0, 
-                                                   measure_only=True)
-        else:
-            tith=0
-
-        if self.ytitle != '':
-            titw, _ = self.textpainter.render_text(self.ytitle, facesize, 0, 0, 
-                                                 measure_only=True, orientation='v')
-        else:
-            titw=0
-
-        # measure tick labels
-        try:
-            self.ticw = max(self.textpainter.render_text(self.axis_left.totex(y), 
-                                                         facesize, 0, 0, measure_only=True)[0] 
-                            for y in self.axis_left.tics(self.ymin, self.ymax)[0]) # :-)
-        except ValueError:
-            self.ticw = 0
-
-        try:
-            self.tich = max(self.textpainter.render_text(self.axis_bottom.totex(x), 
-                                                         facesize, 0, 0, measure_only=True)[1] 
-                            for x in self.axis_bottom.tics(self.xmin, self.xmax)[0])
-        except ValueError:
-            self.tich = 0
-
-        # set margins (units are in mm)
-        self.marginb = tith + self.tich + self.axis_title_font_size*self.magnification/2 + 2 
-        self.margint = self.height_mm * 0.03
-        self.marginl = titw + self.ticw + self.axis_title_font_size*self.magnification/2 + 2
-        self.marginr = self.width_mm * 0.03
-
-        if self.width_mm/self.height_mm > self.aspect:
-            self.marginr += (self.width_mm - self.height_mm*self.aspect)/2
-            self.marginl += (self.width_mm - self.height_mm*self.aspect)/2
-        else:
-            self.margint += (self.height_mm - self.width_mm/self.aspect)/2
-            self.marginb += (self.height_mm - self.width_mm/self.aspect)/2
-
-        # width and height of the plot rectangle in mm
-        self.plot_width = self.width_mm - self.marginl - self.marginr
-        self.plot_height = self.height_mm - self.margint - self.marginb
-
-        # resize the viewport
-        glViewport(0, 0, int(width), int(height))
-        self.viewport = glGetIntegerv(GL_VIEWPORT)
-
-        # set opengl projection matrix with the origin
-        # at the bottom left corner # of the graph 
-        # and scale in mm
-        glMatrixMode (GL_PROJECTION)
-        glLoadIdentity()
-        glTranslated(-1.+2.*self.marginl/self.width_mm, 
-                     -1.+2.*self.marginb/self.height_mm, 0)
-        glScaled(2./self.width_mm, 2./self.height_mm, 1)
-#        print >>sys.stderr, 'R: ', time.time()-t, "seconds"
-
-
-    def export_ascii(self, outfile):
-        # mathtext is not rendered directly
-        self.pstext = []
-
-        save = self.width_pixels, self.height_pixels
-        self.reshape(self.pwidth*self.displayres, self.pheight*self.displayres)
-
-        d = tempfile.mkdtemp()
-        filename = self.name + '.eps'
-        f = open(os.path.join(d, filename), 'wb')
-
-        gl2ps_BeginPage("Title", "Producer", self.viewport, f, filename)
-        self.ps = True
-        self.recalc = True
-        self.display()
-        self.ps = False
-        gl2ps_EndPage()
-        
-        f.close()
-
-        self.reshape(*save)
-
-        f = open(d+'/'+filename, 'rb')
-        for line in f:
-            if line == '%%EndProlog\n':
-                # insert encoded mathtext fonts
-                # at the end of the prolog
-                type42 = []
-                type42.append(FONTFILE)
-                for fn in ['r', 'ex', 'mi', 'sy', 'tt']:
-                    type42.append(os.path.join(DATADIR, 'data', 'fonts', 
-                                               'bakoma-cm', 'cm%s10.ttf'%fn))
-                for font in type42:
-                    print >>outfile, "%%BeginFont: "+FT2Font(str(font)).postscript_name
-                    print >>outfile, encodeTTFasPS(font)
-                    print >>outfile, "%%EndFont"
-                outfile.write(line)
-            elif line == 'showpage\n':
-                # insert mathtext chunks
-                # at the end of the file
-                outfile.write(''.join(self.pstext))
-                outfile.write(line)
-            else:
-                # copy lines
-                outfile.write(line)
-        f.close()
 
     def show(self):
         for d in self.datasets:
@@ -927,11 +562,6 @@ class Graph(Item, HasSignals):
                 else:
                     self.emit('request-cursor', 'arrow')
 
-    def key_down(self, keycode):
-        import wx
-        if keycode == wx.WXK_DELETE and self.selected_object is not None:
-            self.delete_object(self.selected_object)
-    
     _xtype = wrap_attribute('xtype')
     _ytype = wrap_attribute('ytype')
     _xtitle = wrap_attribute('xtitle')
@@ -956,8 +586,4 @@ graphs [
     text [ id:S, position:S, text:S ]
 ]
 """
-
-for w in string.whitespace:
-    desc = desc.replace(w, '')
-
 register_class(Graph, desc)

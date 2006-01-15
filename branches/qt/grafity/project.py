@@ -1,6 +1,7 @@
 import sys
 import re
 import time, random, socket, md5
+import string
 
 try:
     import metakit
@@ -31,8 +32,10 @@ def create_id(*args):
 # register_class(class, metakit_desc)
 storage_desc = {}
 
-def register_class(cls, description):
-    storage_desc[cls] = description
+def register_class(cls, desc):
+    for w in string.whitespace:
+        desc = desc.replace(w, '')
+    storage_desc[cls] = desc
 
 def wrap_attribute(name, signal=None):
     """Wrap a metakit column in a class attribute.

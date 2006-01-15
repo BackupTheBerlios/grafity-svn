@@ -7,15 +7,30 @@ from qwt import *
 import grafity
 from grafity.script import Console
 from grafity.signals import HasSignals
+from grafity.actions import undo, redo
 
 from ui.main import MainWindowUI
 from ui.graph_style import GraphStyleUI
 from ui.graph_data import GraphDataUI
 
+class EventHandler(QObject):
+    def __init__(self, object, callback):
+        QObject.__init__(self, object)
+        self.object, self.callback = object, callback
+
+    def eventFilter(self, object, event):
+        return self.callback(event)
+
+def connectevents(object, callback):
+    object.installEventFilter(EventHandler (object, callback))
+
 def getpixmap(name, pixmaps={}):
     if name not in pixmaps:
         pixmaps[name] = QPixmap(os.path.join(grafity.DATADIR, 'data', 'images', '16', name+'.png'))
     return pixmaps[name]
+
+class WorksheetView:
+    pass
 
 class GraphView(QTabWidget):
     def __init__(self, parent, graph):
@@ -24,7 +39,7 @@ class GraphView(QTabWidget):
         self.setTabShape(self.Triangular)
         self.setTabPosition(self.Bottom)
         self.setIcon(getpixmap('graph'))
-        self.mainpage = QHBox(self)
+        self.mainpage = QSplitter(QSplitter.Horizontal, self)
         self.addTab(self.mainpage, 'graph')
 
         self.bg_color = QColor('white')
@@ -37,8 +52,104 @@ class GraphView(QTabWidget):
         self.plot.setOutlineStyle (Qwt.Rect)
         self.plot.setAutoReplot(False)
         self.plot.canvas().setLineWidth(0)
+        
+        self.graph.connect('style-changed', self.on_change_style)
+        self.graph.connect('zoom-changed', self.on_zoom_changed)
+
+        for d in self.graph.datasets:
+            d._curveid = self.plot.insertCurve('')
+            d.connect('data-changed', lambda x,y: self.on_recalc(d, x, y), True)
+            d.recalculate()
+            for s in ['symbol', 'color', 'size', 'linetype', 'linestyle', 'linewidth']:
+                self.on_change_style(d, s, d.get_style(s))
+        
+        connectevents(self.plot.canvas(), self.on_canvas_event)
+        self.connect(self.plot, SIGNAL('plotMouseMoved(const QMouseEvent&)'), self.on_mouse_moved)
+        self.connect(self.plot, SIGNAL('plotMousePressed(const QMouseEvent&)'), self.on_mouse_pressed)
+        self.connect(self.plot, SIGNAL('plotMouseReleased(const QMouseEvent&)'), self.on_mouse_released)
+
+        self.legend = QListBox(self.mainpage)
+
+    def on_zoom_changed(self, xmin, xmax, ymin, ymax):
+        self.plot.setAxisScale(self.plot.xBottom, xmin, xmax)
+        self.plot.setAxisScale(self.plot.yLeft, ymin, ymax)
+        self.plot.replot()
+
+    def on_mouse_pressed(self, e):
+        self.xpos, self.ypos = e.pos().x(), e.pos().y()
+        self.plot.enableOutline(True)
+        self.plot.setOutlinePen(QPen(Qt.blue, 0, Qt.DotLine))
+        self.plot.setOutlineStyle(Qwt.Rect)
+        self.zooming = True
+        self.on_mouse_moved(e)
+
+    def on_mouse_released(self, e):
+        x1 = self.plot.invTransform(self.plot.xBottom, self.xpos) 
+        x2 = self.plot.invTransform(self.plot.xBottom, e.pos().x())
+        y1 = self.plot.invTransform(self.plot.yLeft, self.ypos) 
+        y2 = self.plot.invTransform(self.plot.yLeft, e.pos().y())
+        exmin, exmax, eymin, eymax = min(x1, x2), max(x1, x2), min(y1, y2), max(y1, y2)
+        if e.button() == Qt.LeftButton:
+            self.graph.zoom(exmin, exmax, eymin, eymax)
+        elif e.button() == Qt.RightButton:
+            self.graph.zoom_out(exmin, exmax, eymin, eymax)
+
+    def on_mouse_moved(self, e):
+        pass
+#        print e.pos().x(), e.pos().y()
+
+    def on_canvas_event(self, event):
+        return False
+
+    def on_recalc(self, d, x, y):
+        self.plot.setCurveData(d._curveid, x, y)
+        self.plot.replot()
+
+    symbols = {'circle': QwtSymbol.Ellipse,
+               'square': QwtSymbol.Rect,
+               'diamond': QwtSymbol.Diamond,
+               'triangleup': QwtSymbol.UTriangle,
+              }
 
 
+    colors = [Qt.black, Qt.red, Qt.darkRed, Qt.green, Qt.darkGreen,
+              Qt.blue, Qt.darkBlue, Qt.cyan, Qt.darkCyan, Qt.magenta, Qt.darkMagenta,
+              Qt.yellow, Qt.darkYellow, Qt.gray, Qt.darkGray, Qt.lightGray, Qt.black]
+
+    extracolornames = [ 'CadetBlue3', 'CornflowerBlue', 'DarkGoldenrod1',
+                        'DarkOliveGreen2', 'DarkOrange1', 'DarkSalmon',
+                        'DarkTurquoise', 'DeepPink2', 'DeepSkyBlue1',
+                        'DodgerBlue3', 'HotPink', 'HotPink3', 'IndianRed',
+                        'LightGreen', 'MediumPurple4', 'MediumViloetRed' ]
+
+    colors += [QColor(s) for s in extracolornames]
+
+    def on_change_style(self, d, style, value):
+#        print >>sys.stderr, d, style, value
+        curve = self.plot.curve(d._curveid)
+        try:
+            if style == 'symbol':
+                curve.symbol().setStyle(self.symbols[value.split('-')[0]])
+#            try:
+#                curve.symbol().brush().setStyle(self.symbol_brushes[value.split('-')[1]])
+#            except IndexError:
+#                pass
+            elif style == 'color':
+                curve.symbol().brush().setColor(self.colors[value])
+                curve.symbol().pen().setColor(self.colors[value])
+                curve.pen().setColor(self.colors[value])
+            elif style == 'size':
+                curve.symbol().setSize(value)
+            elif style == 'linetype':
+                curve.setStyle(self.linetypes[value])
+            elif style == 'linestyle':
+                curve.pen().setStyle(self.linestyles[value])
+            elif style == 'linewidth':
+                curve.pen().setWidth(value)
+
+            self.plot.replot()
+        except:
+            pass
 
 
 class Panel(QDockWindow):
@@ -46,7 +157,8 @@ class Panel(QDockWindow):
     def __init__(self, mainwin, position):
         QDockWindow.__init__(self, QDockWindow.InDock, mainwin)
         self.setMovingEnabled(False)
-        mainwin.moveDockWindow(self, position)
+        self.setVerticallyStretchable(True)
+        mainwin.moveDockWindow(self, position, True, 0)
         self.position = position
 
         if self.position in [QMainWindow.DockTop, QMainWindow.DockBottom]:
@@ -308,6 +420,8 @@ class MainWindow(MainWindowUI):
         self.script.cmd(['from grafity import *'])
         self.script.cmd(['from grafity.arrays import *'])
         locals['mainwin'] = self
+        locals['undo'] = undo
+        locals['redo'] = redo
         self.script.clear()
 
         self.bpanel.add('Script', getpixmap('console'), self.script)
@@ -368,6 +482,11 @@ class MainWindow(MainWindowUI):
 
     # Menu and toolbar actions
 
+    def on_graph_mode(self):
+        modes = ['arrow', 'hand', 'zoom', 'range', 'dreader', 'sreader']
+        mode = modes[[getattr(self, 'act_graph_%s'%a).isOn() for a in modes].index(True)]
+ 
+
     def on_project_open(self):
         """File/Open"""
         try:
@@ -404,8 +523,6 @@ class MainWindow(MainWindowUI):
         self.close_project()
         self.open_project(grafity.Project())
 
-
-
     def on_new_folder(self):
         self.project.new(grafity.Folder)
         
@@ -415,103 +532,6 @@ class MainWindow(MainWindowUI):
     def on_new_graph(self):
         self.project.new(grafity.Graph)
 
-#    def on_btn3(self, on, height=[None]):
-#        if on:
-#            self.rpanel.stack.show()
-#            if height[0] is not None:
-#                self.rpanel.setFixedExtentWidth(height[0])
-#            self.rpanel.stack.raiseWidget(self.Style)
-#        else:
-#            self.rpanel.stack.hide()
-#            height[0] = self.rpanel.width()
-#            self.rpanel.setFixedExtentWidth(0)
-
-
-#    def on_btn2(self, on, height=[None]):
-#        if on:
-#            self.rpanel.stack.show()
-#            if height[0] is not None:
-#                self.rpanel.setFixedExtentWidth(height[0])
-#            self.rpanel.stack.raiseWidget(self.Data)
-#        else:
-#            self.rpanel.stack.hide()
-#            height[0] = self.rpanel.width()
-#            self.rpanel.setFixedExtentWidth(0)
-
-
-#    def on_btn1(self, on, height=[None]):
-#        if on:
-#            self.stack.show()
-#            if height[0] is not None:
-#                self.bpanel.setFixedExtentHeight(height[0])
-#        else:
-#            self.stack.hide()
-#            height[0] = self.bpanel.height()
-#            self.bpanel.setFixedExtentHeight(0)
-#
-#    def RunScript(self):
-#        qfd = QFileDialog (project.mainwin)
-#        qfd.setMode (QFileDialog.AnyFile)
-#        if qfd.exec_loop() != 1:
-#            return False
-#        file = str(qfd.selectedFile())
-#        project.mainwin.script.fakeUser(['execfile("%s")' % file])
-#
-#    def Preferences(self):
-#        dlg = preferences_dialog()
-#        dlg.exec_loop()
-#
-#    def MoveColumnLeft(self):
-#        aw = self.workspace.activeWindow()
-#        if isinstance(aw, WorksheetView):
-#            sel = aw.worksheet.selected_columns()
-#            aw.worksheet._view._table.clearSelection()
-#            for col in sel:
-#                aw.worksheet.move_column(col, col-1)
-#                aw.worksheet._view._table.selectColumn(col-1)
-#
-#    def MoveColumnRight(self):
-#        aw = self.workspace.activeWindow()
-#        if isinstance(aw, WorksheetView):
-#            sel = aw.worksheet.selected_columns()
-#            aw.worksheet._view._table.clearSelection()
-#            for col in sel:
-#                aw.worksheet.move_column(col, col+1)
-#                aw.worksheet._view._table.selectColumn(col+1)
-#
-#
-#    def insert_menu_item(self, location, callback):
-#        path = location.split('/')
-#        menu = self.menus[path[0]]
-#
-#        if len(path) == 2:
-#            menu.insertItem(path[1], callback)
-#        elif len(path) == 3:
-##            ids = [menu.idAt(pos) for pos in range(menu.count())]
-##            names = [menu.text(id) for id in ids]
-#            if not hasattr(menu, 'popups'):
-#                menu.popups = {}
-#            if path[1] not in menu.popups:
-#                menu.popups[path[1]] = QPopupMenu()
-#                menu.insertItem(path[1], menu.popups[path[1]])
-#            menu.popups[path[1]].insertItem(path[2], callback)
-#
-#    def remove_menu_item(self, location):
-#        path = location.split('/')
-#        menu = self.menus[path[0]]
-#
-#        if len(path) == 2:
-#            ids = [menu.idAt(pos) for pos in range(menu.count())]
-#            names = [menu.text(id) for id in ids]
-#            menu.removeItem(ids[names.index(path[1])])
-#        elif len(path) == 3:
-#            submenu = menu.popups[path[1]]
-#            ids = [submenu.idAt(pos) for pos in range(submenu.count())]
-#            names = [submenu.text(id) for id in ids]
-#            submenu.removeItem(ids[names.index(path[2])])
-#            if submenu.count() == 0:
-#                self.remove_menu_item('/'.join(path[:2]))
-        
     def fileMenuAboutToShow(self):
         return
         menu = self.menus['&File']
@@ -539,61 +559,20 @@ class MainWindow(MainWindowUI):
             menu.setItemChecked(id, self.workspace.activeWindow() == win)
 
     def on_window_activated(self, window):
+        if window is None:
+            return
+
         self.active = window
-#        toolbars = { WorksheetView : 'Worksheet',
-#                          GraphView : 'Graph', }
-#        [self.toolbars[i].hide() for i in toolbars.itervalues()]
-#        self.rpanel.hide()
-#        if window is None or not window.isVisible() or window.__class__ not in toolbars:
-#            return
-#
-#        self.toolbars[toolbars[window.__class__]].show()
-#
-#        if isinstance(window, GraphView):
-#            self.rpanel.show()
-#            self.rpanel.Style.open()
-#            self.rpanel.Data.open()
-#            self.rpanel.Axes.open()
-#        elif isinstance(window, WorksheetView):
-#            pass
+        self.worksheet_toolbar.hide()
+        self.graph_toolbar.hide()
+        self.rpanel.hide()
 
-    def on_add_column(self):
-        aw = self.workspace.activeWindow()
-        if isinstance(aw, WorksheetView):
-            aw.worksheet.add_column()
- 
-    def on_remove_column(self):
-        aw = self.workspace.activeWindow()
-        if isinstance(aw, WorksheetView):
-            ws = aw.worksheet
-            for nam in [ws.column_names[ind] for ind in ws.selected_columns()]:
-                del ws[nam]
+        if isinstance(window, GraphView):
+            self.rpanel.show()
+            self.graph_toolbar.show()
+        elif isinstance(window, WorksheetView):
+            self.worksheet_toolbar.show()
     
-   
-    def make_callback(self, command_class):
-        def callback():
-            command = command_class()
-            if hasattr(command_class, 'undo'):
-                project.undolist.append(command)
-            command.do()
-        setattr(self, command_class.__name__ + '_callback', callback)
-        return callback
-
-    def cut (self):
-        aw = self.workspace.activeWindow()
-        if isinstance(aw, WorksheetView):
-            self.clipboard = aw.cut_selected()
-
-    def copy (self):
-        aw = self.workspace.activeWindow()
-        if isinstance(aw, WorksheetView):
-            self.clipboard = aw.copy_selected()
-
-    def paste (self):
-        aw = self.workspace.activeWindow()
-        if isinstance(aw, WorksheetView):
-            aw.paste_selected(self.clipboard)
-
     def clear (self):
         aw = self.workspace.activeWindow()
         if isinstance(aw, WorksheetView):
@@ -601,110 +580,6 @@ class MainWindow(MainWindowUI):
 
     def delete (self):
         pass
-
-    def history_select(self, item):
-        pos = self.history.index(item)
-        id = len(project.undolist) - pos - 1
-        curr = project.undolist[id]
-
-        if hasattr(curr, 'undone') and curr.undone:
-            for com in project.undolist:
-                if hasattr(com, 'undone') and com.undone:
-                    break
-            last = project.undolist.index(com)
-
-            for com in project.undolist[last:id+1]:
-                self.do_redo(com)
-        else:
-            for com in project.undolist[::-1]:
-                if not hasattr(com, 'undone') or not com.undone:
-                    break
-            last = project.undolist.index(com)
-
-            for com in project.undolist[last:id:-1]:
-                self.do_undo(com)
-        self.history.setCurrentItem(pos)
-        
-    def do_undo(self, com):
-        id = len(project.undolist) - project.undolist.index(com) - 1
-        self.history.changeItem(QPixmap(project.datadir + 'pixmaps/undo.png'), self.history.text(id), id)
-        project.lock_undo()
-        try:
-            com.undo()
-        finally:
-            project.unlock_undo()
-        com.undone = True
-
-    def do_redo(self, com):
-        id = len(project.undolist) - project.undolist.index(com) - 1
-        if hasattr(com, 'pixmap') and com.pixmap is not None:
-            self.history.changeItem(com.pixmap, self.history.text(id), id)
-        else:
-            self.history.changeItem(self.history.text(id), id)
-        project.lock_undo()
-        try:
-            com.do()
-        finally:
-            project.unlock_undo()
-        com.undone = False
-        
-    def undo (self): 
-        for com in project.undolist[::-1]:
-            if not hasattr(com, 'undone') or not com.undone:
-                break
-        if com and (not hasattr(com, 'undone') or not com.undone):
-            self.do_undo(com)
-        else:
-            self.statusBar().message ("No more commands to undo", 1000)
-        
-    def redo (self):
-        for com in project.undolist:
-            if hasattr(com, 'undone') and com.undone:
-                break
-        if com and (hasattr(com, 'undone') and com.undone):
-            self.do_redo(com)
-        else:
-            self.statusBar().message ("No more commands to redo", 1000)
-
-
-    def view_history (self, show):
-        if show: self.history.show ()
-        else: self.history.hide ()
-
-#    def view_notes (self, show):
-#        if show: self.notes.show ()
-#        else: self.notes.hide ()
-
-    def graph_mode (self, on): 
-        modes = [ 'g_arrow', 'g_zoom', 'g_range', 'g_dreader', 'g_sreader', 'g_hand' ]
-        ons = [self.actions[m].isOn() for m in modes]
-        if ons.count (True) != 1: return
-        Graph.graph_mode = ons.index (True)
-        for g in project.graphs: g.set_mode ()
-
-    def observe_project (self, obj, **arg):
-        signal =  arg['msg']
-        if signal == 'add_worksheet':
-            if arg['wsheet']._view is None:
-                arg['wsheet']._view = WorksheetView (arg['wsheet'])
-            self.explorer.add (arg['wsheet'])
-        elif signal == 'add_graph':
-            self.explorer.add (arg['graph'])
-        elif signal == 'remove_worksheet':
-            self.explorer.remove (arg['wsheet'])
-            arg['wsheet']._view.close()
-            arg['wsheet'].vogel()
-        elif signal == 'remove_graph':
-            self.explorer.remove (arg['graph'])
-            arg['graph'].vogel()
-
-    def importAscii(self):
-        self.qfd = QFileDialog (self)
-        self.qfd.setMode (QFileDialog.ExistingFiles)
-        if self.qfd.exec_loop() == 1:
-            for f in self.qfd.selectedFiles():
-                w = project.new_worksheet(os.path.splitext(os.path.split(str(f))[1])[0], [])
-                w.import_ascii (str(f))
 
     def closeEvent (self, event):
         self.exit()
@@ -738,24 +613,6 @@ class MainWindow(MainWindowUI):
         from grafit.help import HelpWidget
         h = HelpWidget(self)
         h.show()
-
-
-    def duplicate_do(self):
-        aw = project.mainwin.workspace.activeWindow()
-        if aw.__class__.__name__ == 'WorksheetView':
-           obj = aw.worksheet
-        elif aw.__class__.__name__ == 'Graph':
-           obj = aw
-        else:
-           return
-        
-        elem = obj.to_element()
-        new = obj.__class__()
-        new.from_element(elem)
-        new.name = 'another_' + obj.name
-        project.add(new)
-        self.obj = new
-
 
 
 

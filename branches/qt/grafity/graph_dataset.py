@@ -6,11 +6,10 @@ from grafity.project import wrap_attribute
 from numarray.ieeespecial import isfinite
 
 class Dataset(HasSignals):
+    """Handles storing the description of a dataset in the database."""
     def __init__(self, graph, ind):
         self.graph, self.ind = graph, ind
         self.data = self.graph.data.datasets[ind]
-
-#        DrawWithStyle.__init__(self, graph, self.data)
 
         self.worksheet = self.graph.project.items[self.data.worksheet]
         self.x, self.y = self.worksheet[self.data.x], self.worksheet[self.data.y]
@@ -19,7 +18,6 @@ class Dataset(HasSignals):
         self.y.connect('rename', self.on_y_rename)
 
         self.xfrom, self.xto = -inf, inf
-#        self.recalculate()
 
     def on_x_rename(self, oldname, name):
         self.data.x = name.encode('utf-8')
@@ -39,10 +37,6 @@ class Dataset(HasSignals):
         self.recalculate()
         self.emit('modified', self)
 
-#    def __repr__(self):
-#        return '<Dataset %s (#%d in graph "%s"), (%s, %s, %s)>' % (self.id, self.graph.datasets.index(self), self.graph.name,
-#                                                         self.worksheet.name, self.x.name, self.y.name)
-
     def active_data(self):
         length = min(len(self.x), len(self.y))
         x = asarray(self.x)[:length]
@@ -51,25 +45,28 @@ class Dataset(HasSignals):
         return ind
 
     def recalculate(self):
-#        length = min(len(self.x), len(self.y))
-#        x = asarray(self.x)[:length]
-#        y = asarray(self.y)[:length]
-#        ind = isfinite(x) & isfinite(y) & (self.xfrom <= x) & (x <= self.xto)
-#        self.xx = x[ind]
-#        self.yy = y[ind]
-        self.xx = asarray(self.x)
-        self.yy = asarray(self.y)
+        length = min(len(self.x), len(self.y))
+        x = asarray(self.x)[:length]
+        y = asarray(self.y)[:length]
+        ind = isfinite(x) & isfinite(y) & (self.xfrom <= x) & (x <= self.xto)
+        xx = x[ind]
+        yy = y[ind]
+        self.emit('data-changed', xx, yy)
+#        self.xx = asarray(self.x)
+#        self.yy = asarray(self.y)
 
     def set_range(self, _state, range):
         _state['old'] = self.xfrom, self.xto
         self.xfrom, self.xto = range
-#        self.recalculate()
-        self.emit('modified', self)
+#        self.recalculate(s)
+        self.recalculate()
+#        self.emit('modified', self)
 
     def undo_set_range(self, _state):
         self.xfrom, self.xto = _state['old']
 #        self.recalculate()
-        self.emit('modified', self)
+#        self.emit('modified', self)
+        self.recalculate()
 
     def get_range(self):
         return self.xfrom, self.xto
@@ -78,21 +75,9 @@ class Dataset(HasSignals):
 
     range = property(get_range, set_range)
 
-
-    def paint(self):
-#        t = time.time()
-#        for i in xrange(10):
-#            xx, yy = self.graph.data_to_phys(self.xx, self.yy)
-#        print >>sys.stderr, 'o', (t - time.time())*1000,
-#        t = time.time()
-#        for i in xrange(10):
-        if not hasattr(self, 'xx'):
-            self.recalculate()
-        self.paint_lines(self.xx, self.yy)
-        self.paint_symbols(self.xx, self.yy)
-#        print >>sys.stderr, 'i', (t - time.time())*1000
-
     id = wrap_attribute('id')
+    xfrom = wrap_attribute('xfrom')
+    xto = wrap_attribute('xto')
 
     # this is nescessary! see graph.remove
     def __eq__(self, other):
@@ -103,6 +88,36 @@ class Dataset(HasSignals):
 
     def __str__(self):
         return self.x.worksheet.name+':'+self.y.name+'('+self.x.name+')'
+
+    def get_style(self, style):
+        if style == 'color':
+            return self.data.color
+        elif style == 'symbol':
+            return self.data.symbol
+        elif style == 'size':
+            return self.data.size
+        elif style == 'linestyle':
+            return self.data.linestyle
+        elif style == 'linewidth':
+            return self.data.linewidth
+        elif style == 'linetype':
+            return self.data.linetype
+
+    def set_style(self, style, value):
+        if style == 'color':
+            self.data.color = value
+        elif style == 'symbol':
+            self.data.symbol = value
+        elif style == 'size':
+            self.data.size = value
+        elif style == 'linestyle':
+            self.data.linestyle = value
+        elif style == 'linewidth':
+            self.data.linewidth = value
+        elif style == 'linetype':
+            self.data.linetype = value
+
+        self.graph.emit('style-changed', self, style, value)
 
 class Nop:
     pass
