@@ -32,6 +32,36 @@ def getpixmap(name, pixmaps={}):
 class WorksheetView:
     pass
 
+class GraphData(GraphDataUI):
+    def __init__(self, parent, mainwin):
+        GraphDataUI.__init__(self, parent)
+        self.mainwin = mainwin
+#        self.mainwin.project
+
+    def set_project(self, project):
+        self.project = project
+        if self.project is not None:
+            self.worksheet_list.clear()
+            self.on_add_item(self.project.top, recursive=True)
+            project.top._gd_item.setOpen(True)
+
+    def on_add_item(self, obj, recursive=False):
+        try:
+            parent = obj.parent._gd_item
+        except AttributeError:
+            parent = self.worksheet_list
+        item = obj._gd_item = QListViewItem(parent, obj.name)
+        pixmap = getpixmap({grafity.Worksheet: 'worksheet', 
+                            grafity.Graph: 'graph', 
+                            grafity.Folder: 'folder'}[type(obj)])
+        item.setPixmap (0, pixmap)
+#        item.setOpen (True)
+        item._object = obj
+        if recursive and isinstance(obj, grafity.Folder):
+            for child in obj:
+                self.on_add_item(child, recursive=True)
+
+
 class GraphView(QTabWidget):
     def __init__(self, parent, graph):
         QTabWidget.__init__(self, parent)
@@ -142,7 +172,6 @@ class GraphView(QTabWidget):
 
     def on_mouse_moved(self, e):
         pass
-#        print e.pos().x(), e.pos().y()
 
     def on_canvas_event(self, event):
         return False
@@ -171,7 +200,6 @@ class GraphView(QTabWidget):
     colors += [QColor(s) for s in extracolornames]
 
     def on_change_style(self, d, style, value):
-#        print >>sys.stderr, d, style, value
         curve = self.plot.curve(d._curveid)
         try:
             if style == 'symbol':
@@ -482,8 +510,10 @@ class MainWindow(MainWindowUI):
 ### right panel ################################################################################
         
         self.rpanel = Panel(self, QMainWindow.DockRight)
-        self.rpanel.add('Data', getpixmap('console'), GraphDataUI(self.bpanel))
-        self.rpanel.add('Axes', getpixmap('console'), GraphStyleUI(self.bpanel))
+        self.graph_data = GraphData(self.bpanel, self)
+        self.graph_style = GraphStyleUI(self.bpanel)
+        self.rpanel.add('Data', getpixmap('console'), self.graph_data)
+        self.rpanel.add('Axes', getpixmap('console'), self.graph_style)
 
         self.open_project(grafity.Project('test/pdms.gt'))
 
@@ -497,6 +527,7 @@ class MainWindow(MainWindowUI):
         self.project = project
 
         self.explorer.set_project(self.project)
+        self.graph_data.set_project(self.project)
 
 #        self.project.connect('change-current-folder', self.on_change_folder)
         self.script.locals['project'] = self.project

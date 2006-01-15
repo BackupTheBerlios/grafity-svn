@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>180</width>
-            <height>373</height>
+            <width>154</width>
+            <height>443</height>
         </rect>
     </property>
     <property name="caption">
@@ -82,9 +82,23 @@
                 <string>&lt;b&gt;worksheet&lt;/b&gt;</string>
             </property>
         </widget>
-        <widget class="QListBox">
+        <widget class="QListView">
+            <column>
+                <property name="text">
+                    <string>Column 1</string>
+                </property>
+                <property name="clickable">
+                    <bool>true</bool>
+                </property>
+                <property name="resizable">
+                    <bool>true</bool>
+                </property>
+            </column>
             <property name="name">
-                <cstring>listBox1</cstring>
+                <cstring>worksheet_list</cstring>
+            </property>
+            <property name="resizePolicy">
+                <enum>AutoOneFit</enum>
             </property>
         </widget>
         <widget class="QLabel">
@@ -97,7 +111,7 @@
         </widget>
         <widget class="QListBox">
             <property name="name">
-                <cstring>listBox2</cstring>
+                <cstring>x_list</cstring>
             </property>
         </widget>
         <widget class="QLabel">
@@ -110,7 +124,7 @@
         </widget>
         <widget class="QListBox">
             <property name="name">
-                <cstring>listBox3</cstring>
+                <cstring>y_list</cstring>
             </property>
         </widget>
     </vbox>
