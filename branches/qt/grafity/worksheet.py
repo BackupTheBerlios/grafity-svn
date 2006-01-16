@@ -1,5 +1,10 @@
 import sys
-#print >>sys.stderr, "import worksheet"
+
+try:
+   sys.modules['__main__'].splash.message('loading worksheet')
+except:
+    pass
+
 
 from grafity.signals import HasSignals
 from grafity.actions import action_from_methods, action_from_methods2, StopAction

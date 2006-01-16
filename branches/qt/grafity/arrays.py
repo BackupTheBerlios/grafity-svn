@@ -1,5 +1,10 @@
 import struct
 
+try:
+   sys.modules['__main__'].splash.message('loading arrays')
+except:
+    pass
+
 import metakit
 from numarray import *
 from numarray.ieeespecial import nan, inf, isfinite

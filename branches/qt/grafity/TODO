@@ -1,15 +1,4 @@
-bugs
-----
-* cut/copy/paste in worksheets
-* delete in worksheets
-* differentiate between insert line / insert cell
-* when drawing lines, ignore nans
-* when auto zooming, ignore nans & add a small margin
-* save data range
-* rename graphs/worksheets/folders with context menu, not click
-* ask whether to save changes on exit
-* open recent files (at the end of file menu)
-* update total function curve when term is moved
-* show/hide xorobjects correctly
-* align vertical text correctly
-* minor tics for logarithmic axes
+* finish graph properties ui
+* make graph style ui work
+* make graph axes ui work
+* graph freeze/unfreeze

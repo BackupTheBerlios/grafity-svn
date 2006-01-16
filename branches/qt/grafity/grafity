@@ -1,26 +1,30 @@
 #!/usr/bin/env python
+
 import os, sys
+from qt import QSplashScreen, QPixmap, QApplication
+
 DATADIR = os.path.normpath(os.path.abspath(os.path.dirname(sys.argv[0]))+'/../') + '/'
 sys.path.append(DATADIR)
 sys.path.append(DATADIR+'/grafity/thirdparty/')
 
-from qt import QSplashScreen, QPixmap, QApplication
 
 class GrafitSplash(QSplashScreen):
     def __init__(self, pixmap):
         QSplashScreen.__init__(self, pixmap)
 
     def drawContents(self, painter):
-        QSplashScreen.drawContents(self, painter)
         font = painter.font()
-        font.setPointSize(11)
-        text = 'r'+REVISION
-        painter.drawText(418, 100, text, len(text))
+        font.setPointSize(10)
+        QSplashScreen.drawContents(self, painter)
+#        text = 'r'+REVISION
+#        painter.drawText(418, 100, text, len(text))
 
 
 app = QApplication(sys.argv)
 splash = GrafitSplash(QPixmap(DATADIR + '/data/images/logos/grafit.png'))
 splash.show()
+splash.message('')
+
 from ui_main import MainWindow
 mainwin = MainWindow()
 splash.finish(mainwin)

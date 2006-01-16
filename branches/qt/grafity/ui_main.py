@@ -1,4 +1,8 @@
 import os
+try:
+    sys.modules['__main__'].splash.message('loading main')
+except:
+    pass
 import sys
 
 from qt import *
@@ -156,10 +160,12 @@ class GraphView(QTabWidget):
         for s in ['symbol', 'color', 'size', 'linetype', 'linestyle', 'linewidth']:
             self.on_change_style(d, s, d.get_style(s))
         self.plot.replot()
+        self.update_legend()
      
     def on_remove_dataset(self, d):
         self.plot.removeCurve(d._curveid)
         self.plot.replot()
+        self.update_legend()
 
     def on_legend_select(self):
         self.datasets = [self.graph.datasets[n] for n in range(self.legend.count())
@@ -174,7 +180,8 @@ class GraphView(QTabWidget):
         self.legend.clear()
         self.legend.insertStrList([str(d) for d in self.graph.datasets])
         for n, dset in enumerate(self.graph.datasets):
-            self.legend.changeItem(self.draw_pixmap(dset), self.legend.text(n), n)
+            if hasattr(dset, '_curveid'):
+                self.legend.changeItem(self.draw_pixmap(dset), self.legend.text(n), n)
 
         for i,on in enumerate(selected):
             self.legend.setSelected(i, on)
@@ -188,8 +195,8 @@ class GraphView(QTabWidget):
         paint = QPainter()
         paint.begin(p)
 
-        paint.setPen (self.plot.curve(dataset._curveid).pen())
-        paint.drawLine (2,5, 18,5)
+        paint.setPen(self.plot.curve(dataset._curveid).pen())
+        paint.drawLine(2,5, 18,5)
 
         self.plot.curve(dataset._curveid).symbol().draw(paint, 10, 5)
 

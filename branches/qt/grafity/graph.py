@@ -3,8 +3,14 @@ import time
 import string
 import tempfile
 
+try:
+   sys.modules['__main__'].splash.message('loading graph')
+except:
+    pass
+
+
 from grafity.arrays import *
-from OpenGL.GL import *
+#from OpenGL.GL import *
 
 from grafity.signals import HasSignals
 from grafity.project import Item, wrap_attribute, register_class, create_id
