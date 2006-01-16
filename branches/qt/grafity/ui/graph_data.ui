@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>154</width>
-            <height>443</height>
+            <width>163</width>
+            <height>498</height>
         </rect>
     </property>
     <property name="caption">
@@ -35,7 +35,7 @@
                 </property>
                 <widget class="QToolButton">
                     <property name="name">
-                        <cstring>toolButton1</cstring>
+                        <cstring>add_button</cstring>
                     </property>
                     <property name="text">
                         <string></string>
@@ -46,7 +46,7 @@
                 </widget>
                 <widget class="QToolButton">
                     <property name="name">
-                        <cstring>toolButton2</cstring>
+                        <cstring>remove_button</cstring>
                     </property>
                     <property name="text">
                         <string></string>
@@ -74,58 +74,126 @@
                 </spacer>
             </hbox>
         </widget>
-        <widget class="QLabel">
+        <widget class="QSplitter">
             <property name="name">
-                <cstring>textLabel1</cstring>
+                <cstring>splitter1</cstring>
             </property>
-            <property name="text">
-                <string>&lt;b&gt;worksheet&lt;/b&gt;</string>
+            <property name="orientation">
+                <enum>Vertical</enum>
             </property>
-        </widget>
-        <widget class="QListView">
-            <column>
-                <property name="text">
-                    <string>Column 1</string>
+            <property name="opaqueResize">
+                <bool>true</bool>
+            </property>
+            <widget class="QLayoutWidget">
+                <property name="name">
+                    <cstring>layout2</cstring>
                 </property>
-                <property name="clickable">
-                    <bool>true</bool>
+                <vbox>
+                    <property name="name">
+                        <cstring>unnamed</cstring>
+                    </property>
+                    <property name="margin">
+                        <number>0</number>
+                    </property>
+                    <property name="spacing">
+                        <number>0</number>
+                    </property>
+                    <widget class="QLabel">
+                        <property name="name">
+                            <cstring>textLabel1</cstring>
+                        </property>
+                        <property name="text">
+                            <string>&lt;b&gt;worksheet&lt;/b&gt;</string>
+                        </property>
+                    </widget>
+                    <widget class="QListView">
+                        <column>
+                            <property name="text">
+                                <string>Column 1</string>
+                            </property>
+                            <property name="clickable">
+                                <bool>true</bool>
+                            </property>
+                            <property name="resizable">
+                                <bool>true</bool>
+                            </property>
+                        </column>
+                        <property name="name">
+                            <cstring>worksheet_list</cstring>
+                        </property>
+                        <property name="resizePolicy">
+                            <enum>AutoOneFit</enum>
+                        </property>
+                        <property name="selectionMode">
+                            <enum>Extended</enum>
+                        </property>
+                    </widget>
+                </vbox>
+            </widget>
+            <widget class="QLayoutWidget">
+                <property name="name">
+                    <cstring>layout3</cstring>
                 </property>
-                <property name="resizable">
-                    <bool>true</bool>
+                <vbox>
+                    <property name="name">
+                        <cstring>unnamed</cstring>
+                    </property>
+                    <property name="margin">
+                        <number>0</number>
+                    </property>
+                    <property name="spacing">
+                        <number>0</number>
+                    </property>
+                    <widget class="QLabel">
+                        <property name="name">
+                            <cstring>textLabel2</cstring>
+                        </property>
+                        <property name="text">
+                            <string>&lt;b&gt;x axis&lt;/b&gt;</string>
+                        </property>
+                    </widget>
+                    <widget class="QListBox">
+                        <property name="name">
+                            <cstring>x_list</cstring>
+                        </property>
+                        <property name="selectionMode">
+                            <enum>Extended</enum>
+                        </property>
+                    </widget>
+                </vbox>
+            </widget>
+            <widget class="QLayoutWidget">
+                <property name="name">
+                    <cstring>layout4</cstring>
                 </property>
-            </column>
-            <property name="name">
-                <cstring>worksheet_list</cstring>
-            </property>
-            <property name="resizePolicy">
-                <enum>AutoOneFit</enum>
-            </property>
-        </widget>
-        <widget class="QLabel">
-            <property name="name">
-                <cstring>textLabel2</cstring>
-            </property>
-            <property name="text">
-                <string>&lt;b&gt;x axis&lt;/b&gt;</string>
-            </property>
-        </widget>
-        <widget class="QListBox">
-            <property name="name">
-                <cstring>x_list</cstring>
-            </property>
-        </widget>
-        <widget class="QLabel">
-            <property name="name">
-                <cstring>textLabel3</cstring>
-            </property>
-            <property name="text">
-                <string>&lt;b&gt;y axis&lt;/b&gt;</string>
-            </property>
-        </widget>
-        <widget class="QListBox">
-            <property name="name">
-                <cstring>y_list</cstring>
-            </property>
+                <vbox>
+                    <property name="name">
+                        <cstring>unnamed</cstring>
+                    </property>
+                    <property name="margin">
+                        <number>0</number>
+                    </property>
+                    <property name="spacing">
+                        <number>0</number>
+                    </property>
+                    <widget class="QLabel">
+                        <property name="name">
+                            <cstring>textLabel3</cstring>
+                        </property>
+                        <property name="text">
+                            <string>&lt;b&gt;y axis&lt;/b&gt;</string>
+                        </property>
+                    </widget>
+                    <widget class="QListBox">
+                        <property name="name">
+                            <cstring>y_list</cstring>
+                        </property>
+                        <property name="selectionMode">
+                            <enum>Extended</enum>
+                        </property>
+                    </widget>
+                </vbox>
+            </widget>
         </widget>
     </vbox>
 </widget>
@@ -137,5 +205,30 @@
         <data format="PNG" length="657">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff610000025849444154388dad914d48546114869f3b7f28fe41fe2468192d2c33cc2c50c230828a8c188a202b7715b4a855449b56419b10a94d448b22125a08410bd15053b23068c6bf4c48c414c7506a46ef5c67eedcfbddef7e2d4a999c5df46ece81f7bccfe23df0bf350a8d83d03102b59bbdf770b947a3af0b4ede064f4678161e46ce1e72c5ddf36a4cd3dea57b213831555964ab8b956aa1a640f578b551d84451e585c1b2e65acd1780adc7f61c0e432b4018ea545941675553b91fd3c2cef1634915ce00c422d14e31b704964569fd0e9cc29cf65e386a17e7771f0c56e5a1af615882a99158c407373300f9f07c7e7052a18094cdfe60757156515e5f434b4d097a1c573a4c7cd6dd3ccbbd720af40cc02e988c0ecf0ce108100efe6c3f8d2d7b35741da4607ac120be90787404deac67329a34a5db3637340dd206cb82780284cd8f58922f9fa26306dc4abfff0b108272136e641564831060db20ecdfbb2970142b1ef0a667b4f5f911aeb26dcbfd03a7ab0b7c320549131ce70f448092c456530c7c8885f25d82c7e1fb06e02d9ca9a8af78b5b3a10c56e2e0489012296cbcd2c11512e948502ea99460206c2c9949b7b505fa3d00aba0bbc2829f3148a5c0b288af25e8ea5d7466e70d3424ca95388e834f5334d565959a7067a303bf576bdf5e910ba60996c5b29e60607039aa0cd1343aa63ffe1631c175518ec49692d0ac4d009e02f8009252f54b636d9f95ad311d31f93aae8fe7b8ea5c33cc00c3af270cc7de9d7d9d00cc2cda5851f9e012bcd8e8a0038a72039e6ed7a795a492f2491cdaae8195def64bb86740200f9e5d80a9cdefff67fd028d3e2abf20b2b5210000000049454e44ae426082</data>
     </image>
 </images>
+<connections>
+    <connection>
+        <sender>add_button</sender>
+        <signal>clicked()</signal>
+        <receiver>GraphDataUI</receiver>
+        <slot>on_add()</slot>
+    </connection>
+    <connection>
+        <sender>remove_button</sender>
+        <signal>clicked()</signal>
+        <receiver>GraphDataUI</receiver>
+        <slot>on_remove()</slot>
+    </connection>
+    <connection>
+        <sender>worksheet_list</sender>
+        <signal>selectionChanged()</signal>
+        <receiver>GraphDataUI</receiver>
+        <slot>on_wslist_select()</slot>
+    </connection>
+</connections>
+<slots>
+    <slot>on_add()</slot>
+    <slot>on_remove()</slot>
+    <slot>on_wslist_select()</slot>
+</slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

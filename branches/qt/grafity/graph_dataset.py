@@ -51,7 +51,7 @@ class Dataset(HasSignals):
         ind = isfinite(x) & isfinite(y) & (self.xfrom <= x) & (x <= self.xto)
         xx = x[ind]
         yy = y[ind]
-        self.emit('data-changed', xx, yy)
+        self.graph.emit('data-changed', self, xx, yy)
 #        self.xx = asarray(self.x)
 #        self.yy = asarray(self.y)
 

@@ -35,8 +35,45 @@ class WorksheetView:
 class GraphData(GraphDataUI):
     def __init__(self, parent, mainwin):
         GraphDataUI.__init__(self, parent)
+        self.worksheet_list.header().hide()
         self.mainwin = mainwin
-#        self.mainwin.project
+
+    def set_graph(self, graph):
+        self.graph = graph
+        print >>sys.stderr, self.graph
+
+    def on_wslist_select(self):
+        selected = []
+        it = QListViewItemIterator(self.worksheet_list)
+        while it.current():
+            if it.current().isSelected() and isinstance(it.current()._object, grafity.Worksheet):
+                selected.append(it.current()._object)
+            it += 1
+        self.selected = selected
+        self.x_list.clear()
+        self.y_list.clear()
+
+        if selected == []:
+            return
+
+        colnames = list(reduce(set.intersection, (set(w.column_names) for w in selected)))
+        colnames.sort(key=selected[0].column_names.index)
+
+        self.x_list.insertStrList(colnames)
+        self.y_list.insertStrList(colnames)
+
+    def on_add(self):
+        xcols = [str(self.x_list.text(a)) for a in range(self.x_list.count()) if self.x_list.isSelected(a)]
+        ycols = [str(self.y_list.text(a)) for a in range(self.y_list.count()) if self.y_list.isSelected(a)]
+
+        for w in self.selected:
+            for x in xcols:
+                for y in ycols:
+                    self.graph.add(w[x], w[y])
+
+    def on_remove(self):
+        for d in self.graph._view.datasets:
+            self.graph.remove(d)
 
     def set_project(self, project):
         self.project = project
@@ -59,7 +96,8 @@ class GraphData(GraphDataUI):
         item._object = obj
         if recursive and isinstance(obj, grafity.Folder):
             for child in obj:
-                self.on_add_item(child, recursive=True)
+                if isinstance(child, (grafity.Folder, grafity.Worksheet)):
+                    self.on_add_item(child, recursive=True)
 
 
 class GraphView(QTabWidget):
@@ -85,8 +123,13 @@ class GraphView(QTabWidget):
         
         self.graph.connect('style-changed', self.on_change_style)
         self.graph.connect('zoom-changed', self.on_zoom_changed)
+        self.graph.connect('data-changed', self.on_recalc)
 
-       
+        self.graph.connect('add-dataset', self.on_add_dataset)
+        self.graph.connect('remove-dataset', self.on_remove_dataset)
+#        self.graph.connect('add-function', self.on_modified)
+
+
         connectevents(self.plot.canvas(), self.on_canvas_event)
         self.connect(self.plot, SIGNAL('plotMouseMoved(const QMouseEvent&)'), self.on_mouse_moved)
         self.connect(self.plot, SIGNAL('plotMousePressed(const QMouseEvent&)'), self.on_mouse_pressed)
@@ -101,15 +144,29 @@ class GraphView(QTabWidget):
         self.legend.setPalette(pal)
         self.legend.setFrameShape(QFrame.NoFrame)
         self.legend.setSelectionMode(QListBox.Extended)
+        self.connect(self.legend, SIGNAL('selectionChanged()'), self.on_legend_select)
 
         for d in self.graph.datasets:
-            d._curveid = self.plot.insertCurve('')
-            d.connect('data-changed', lambda x,y: self.on_recalc(d, x, y), True)
-            d.recalculate()
-            for s in ['symbol', 'color', 'size', 'linetype', 'linestyle', 'linewidth']:
-                self.on_change_style(d, s, d.get_style(s))
+            self.on_add_dataset(d)
         self.update_legend()
- 
+
+    def on_add_dataset(self, d):
+        d._curveid = self.plot.insertCurve('')
+        d.recalculate()
+        for s in ['symbol', 'color', 'size', 'linetype', 'linestyle', 'linewidth']:
+            self.on_change_style(d, s, d.get_style(s))
+        self.plot.replot()
+     
+    def on_remove_dataset(self, d):
+        self.plot.removeCurve(d._curveid)
+        self.plot.replot()
+
+    def on_legend_select(self):
+        self.datasets = [self.graph.datasets[n] for n in range(self.legend.count())
+                                                if self.legend.isSelected(n)]
+
+        self.graph.emit('selection-changed', self.datasets)
+
     def update_legend(self):
         selected = [self.legend.isSelected(it) for it in range(self.legend.numRows())]
         current = self.legend.currentItem()
@@ -548,7 +605,7 @@ class MainWindow(MainWindowUI):
             return
         message = "<b>Do you want to save the changes you made to the document?</b>" \
                   "<p>Your changes will be lost if you don't save them"
-        resp = QMessageBox.information(self, "Grafit", message, 
+        resp = QMessageBox.information(None, "Grafit", message, 
                                        "&Save",  "&Cancel", "&Don't Save", 0, 1)
         if resp == 0:
             self.on_project_save()
@@ -586,11 +643,11 @@ class MainWindow(MainWindowUI):
     def on_project_saveas(self):
         filesel = QFileDialog(self)
         filesel.setMode(QFileDialog.AnyFile)
-        if qfd.exec_loop() != 1:
+        if filesel.exec_loop() != 1:
             return
-        self.project.saveto(str(qfd.selectedFile()))
+        self.project.saveto(str(filesel.selectedFile()))
         self.close_project()
-        self.open_project(grafity.Project(str(qfd.selectedFile())))
+        self.open_project(grafity.Project(str(filesel.selectedFile())))
 
     def on_project_new(self):
         try:
@@ -647,9 +704,10 @@ class MainWindow(MainWindowUI):
         if isinstance(window, GraphView):
             self.rpanel.show()
             self.graph_toolbar.show()
+            self.graph_data.set_graph(window.graph)
         elif isinstance(window, WorksheetView):
             self.worksheet_toolbar.show()
-    
+
     def clear (self):
         aw = self.workspace.activeWindow()
         if isinstance(aw, WorksheetView):
