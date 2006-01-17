@@ -15,6 +15,8 @@ from grafity.actions import undo, redo
 from grafity.ui.main import MainWindowUI
 from grafity.ui.graph_style import GraphStyleUI
 from grafity.ui.graph_data import GraphDataUI
+from grafity.ui.graph_axes import GraphAxesUI
+from grafity.ui.graph_fit import GraphFitUI
 from grafity.ui_console import Console
 
 class EventHandler(QObject):
@@ -611,8 +613,12 @@ class MainWindow(MainWindowUI):
         self.rpanel = Panel(self, QMainWindow.DockRight)
         self.graph_data = GraphData(self.bpanel, self)
         self.graph_style = GraphStyleUI(self.bpanel)
-        self.rpanel.add('Data', getpixmap('console'), self.graph_data)
-        self.rpanel.add('Axes', getpixmap('console'), self.graph_style)
+        self.graph_axes = GraphAxesUI(self.bpanel)
+        self.graph_fit = GraphFitUI(self.bpanel)
+        self.rpanel.add('Data', getpixmap('worksheet'), self.graph_data)
+        self.rpanel.add('Style', getpixmap('style'), self.graph_style)
+        self.rpanel.add('Axes', getpixmap('axes'), self.graph_axes)
+        self.rpanel.add('fit', getpixmap('function'), self.graph_fit)
 
         self.open_project(grafity.Project('test/pdms.gt'))
 

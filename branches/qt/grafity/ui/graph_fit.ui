@@ -1,0 +1,136 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>GraphFitUI</class>
+<widget class="QWidget">
+    <property name="name">
+        <cstring>GraphFitUI</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>152</width>
+            <height>355</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>Form2</string>
+    </property>
+    <vbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <property name="margin">
+            <number>0</number>
+        </property>
+        <property name="spacing">
+            <number>8</number>
+        </property>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout25</cstring>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <property name="margin">
+                    <number>0</number>
+                </property>
+                <property name="spacing">
+                    <number>0</number>
+                </property>
+                <widget class="QToolButton">
+                    <property name="name">
+                        <cstring>toolButton1</cstring>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                    <property name="iconSet">
+                        <iconset>image0</iconset>
+                    </property>
+                    <property name="autoRaise">
+                        <bool>true</bool>
+                    </property>
+                </widget>
+                <widget class="QToolButton">
+                    <property name="name">
+                        <cstring>toolButton2</cstring>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                    <property name="iconSet">
+                        <iconset>image1</iconset>
+                    </property>
+                    <property name="autoRaise">
+                        <bool>true</bool>
+                    </property>
+                </widget>
+                <widget class="QToolButton">
+                    <property name="name">
+                        <cstring>toolButton3</cstring>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                    <property name="iconSet">
+                        <iconset>image2</iconset>
+                    </property>
+                    <property name="autoRaise">
+                        <bool>true</bool>
+                    </property>
+                </widget>
+                <widget class="QToolButton">
+                    <property name="name">
+                        <cstring>toolButton4</cstring>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                    <property name="iconSet">
+                        <iconset>image3</iconset>
+                    </property>
+                    <property name="autoRaise">
+                        <bool>true</bool>
+                    </property>
+                </widget>
+            </hbox>
+        </widget>
+        <widget class="QFrame">
+            <property name="name">
+                <cstring>frame5</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>5</hsizetype>
+                    <vsizetype>7</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="frameShape">
+                <enum>StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+                <enum>Raised</enum>
+            </property>
+        </widget>
+    </vbox>
+</widget>
+<images>
+    <image name="image0">
+        <data format="PNG" length="389">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff610000014c49444154388db5d2bd4b96611406f09f91a55443f831a5a344d0500461a08321dd8438dcc38d436353e012fd0f8d4135463508c2333c9bf0a03814121881fe0581cbbbd42289190436bc47789057ccc1b39c73df17e73ad7f9e01cec2696d1c11f2c9e9560198798c34b6c9d257904fbd8f9df840bc7def318c497f667c969fa24828badf82786225ec0a392d3037cc6b5206e931ee0595bc130be463c5b72ba816fd8c6951ec53fe075df3135bf30809192d35bcc5475335a72ea84baebf818ad8e62b7ade0562477a29dc77813d8b8ee4a3fe15d5537034178d826b81b7e33fc552c4155377fb181ef55ddac06fe047bbd08d6c3f7e107949c2674573c5f72ba14f82256da33d8c024c6d02939ede33d9eea1ed343ecc69cb6701fc3476becc71dacc50ce0055e557573b955a4bfe4f41bb771afaa9b8323604af77c679c62bd8e6a3b643d3f2df95cec1f60654f14f99c58da0000000049454e44ae426082</data>
+    </image>
+    <image name="image1">
+        <data format="PNG" length="494">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff61000001b549444154388d9593bf6b5a5114c73fe729088e0e1d03854c1d5ceb28bab4b490d57fc10a2d850e9dba7428114a41b790ad7fc0a363c0223cfb884e85d0c50e4a032a2692faf4dda7cfe574085ef242a4c9812ff7707e7ceff79ccb85ddf61c3802f43fe009f01958dc4ebe7bfb5a7b3fbeebf0f799867f47ba98fd5140b7b62578d56eb7d518a3c6188da2485dd7d5972f9ee9d5e897cece7f5a5c0c7b96208e6305540035c6309bcd1011c6e3318542818b618f478f9f727ef62d31d75efe80300cd96c36e472399c6de2aee6d39363f6f207008c26978c2697001863a8d7eb9654a328d26eb7ab8095f9e94355013d3d3956408fbebcb7bb190c06daeff7ed0e348aa24473a3d14890b85f0faf4fd7bdf3152c01a0ad564ba7d3a9369bcd2489ebea7c3ed7200874b95c6a18860a687a3bc7643241442c2a950a8ee350abd5f03c8f7c3e8f88e0388ead01104057ab15411024086e16ee8a65b359ac0211a1d3e92022148b454404cff36cce711ceb974aa5a482f57acd62b1b8f7cddb582693b9562022a452293ccfdba9e026cae57252411cc718631ebc83743a8d037cf47dffc1cdbeef03bc01d807aaf7f8b6b75105f6ff0135a8253b61af3f9a0000000049454e44ae426082</data>
+    </image>
+    <image name="image2">
+        <data format="PNG" length="594">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff610000021949444154388d95d2cf6b13411407f037fb637637d22625e61709a469b75a299a634473123447a17a108a47f12fe9c9ab37e9ad050f127a8ab5a7407a10bd988348abb1c11076b3bb49ba6bd84d27b3335e35294d7db7c7e37df8f26610cca9e3e36f714110a456eba77a76362c00c03d59965b8944f2c3f272c1932e5bee763bb166b3f98a10123d3d6d6b48007da550c84a9234ecf707f74551da43172d56abef30c6ca8bc160f0c0348d4dc771807380db7736a052790800007bbb6f8131d89d497070505b340ce3b16559dba3d1289acbe5200802705d0fbe9ffc8088a601421c2ccb028444244c03aeebde6db7dbdbaaaaf272b95c334d93054140e2f1ebde6432f18f8e3e42a3f10934ed9a572c16ad99049cf395300c97d2e9b493482476745d1f13429c6874e9b361745394d2979224870b0b8baf3399cce10ce0388e4808117c3f609486d6d6d6f327ffbccac9d7378220b035fd9603003003789e0708211045c1e69cbbd3f39b3736acbffb991b1042405130a8aadae19cf7a6e7d33503acafaf4124a201c61864f9d26f7231301a8d95f17882864317280dff0fb0ed9ec0182b31c6b1effbe70068ae20edef579ff5fbfd4d4dd370bd5e576cdbae689a7a1e8bc5de974aa5fe5c8010f2c834cda71863c43907cbea413299fe92cfe71b73f3038094cd660f65598e504a31a514f2f9fc24954ad7cae5f2afab00a8dbeda88cb105ceb91004018461c81545fdbdbaaa075701fe00b1aef4c08e05c5210000000049454e44ae426082</data>
+    </image>
+    <image name="image3">
+        <data format="PNG" length="809">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff61000002f049444154388d8d93cb6f136714c5cff7f08c67c633e3f723496d8343c88364d10ab280aa0b6885da45a5aa522344ff844a2ca12c58205855eab6ff47ba6a854a2812a84949a0b855317990d4210f278ee3c7783c33dfc702256a10a83ddbabf3d3b9bae712fc0f114e0804511542a924088484eb07feebd97f995555358e6573e74632a9f3897024d609bceafac6de0f77179f6e00007f97b14fd5c1d3037c64b4f4d5c4f0e8b72772c9bcbae386d46ed39dffe389f17c67fdbb6a63778bbdcd9cd70ca40612f6f1bc3d7569ea8b5b1f7d7c319f2b0db26aa701d16e72e6774f569bad5a75b7f6f8ad099c90a74e9cd2be1c1dd6afe743e59cf32781881d072211ccee34a034f7348590a8c2283d02e09460f2fd8c313e969a3a3799bede1f0f174d61617f6506ce8b322add24661ecde2345369c37593b952493f02c89a5aa4908d5c3e336edf2866125925e8476b6d09416f178d5613f7661ea3eb3828b7eae15a185fc7d3a93b87005bcdf291a1ec679363a7ae1c3358466e13b4bb5bf0dbbb683b0cd52d862ee5a09c62c9a9c38ee7628491f821c034032b3f38f8f907172e97a2d108592f3f80577b0aa7a9e0e5b6824d2f84978bf3e8747de4860abd58323e277dff2f7a00885a56aad8df37163313cc693711326c4835838d1a07a11a2acb6be8783d240a7db093b1b2046e867868e1750246201479a1e9b6862a953962eb0afc9e8bf6be03e18671bfb282072bab48170b7e349958e4947dd30bc46f96ae7b1c0018639a66c5cf2e3cfb27bcb45cc5a58b67e136eaf8bbbc88f967abb8ff620dc6409f48a55373006e0a2f78f8fb9d5f82c3261210bdbeb737beb95943d071215b2d74da2dac6d37b02f04528305a159f67329c435dff71e122038589d0080aa6926a4b82d0391d74d73423723053d6a2162580137f41d0a2c504abf0fdcee4fb377efc97f9f9e0000e79c4821a3d198ad154787af1245f91484ac3242172865bf4a89b2aaaacb33d3d3de9bad3df28d1f7e729e1246dff324e23dcfabab201b866eb83f4fff28df341ee815485129119732b8850000000049454e44ae426082</data>
+    </image>
+</images>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>
