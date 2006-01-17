@@ -43,11 +43,6 @@ import logging
 
 log = logging.getLogger('signals')
 
-try:
-    import wx
-except ImportError:
-    pass
-
 class Slot(object):
     """
     A Slot wraps a function or method, using a weak reference.
@@ -188,31 +183,31 @@ class HasSignals(object):
                 # then we remove them from the slots list.
                 try:
                     results.append(slot(*args, **kwds))
-                except (ReferenceError, wx.PyDeadObjectError):
+                except ReferenceError:
                     # We can't do self._signals[signal].remove(slot) because that calls slot.__eq__
                     # and raises another ReferenceError. So we might as well remove all expired slots.
                     self._signals[signal] = [s for s in self._signals[signal] if not s.is_expired()]
-                except TypeError, arg:
-                    if '_wxPyDeadObject' in str(arg):
-                        # sometimes wxpython gives an error such as this:
-                        # TypeError: argument number 2: a 'wxWindow *' is expected, 
-                        # '_wxPyDeadObject(wxPython wrapper for DELETED Panel object! (The C++
-                        # object no longer exists.))' is received
-                        self._signals[signal] = [s for s in self._signals[signal] if not s.is_expired()]
-                    else:
-                        raise
+#                except TypeError, arg:
+#                    if '_wxPyDeadObject' in str(arg):
+#                        # sometimes wxpython gives an error such as this:
+#                        # TypeError: argument number 2: a 'wxWindow *' is expected, 
+#                        # '_wxPyDeadObject(wxPython wrapper for DELETED Panel object! (The C++
+#                        # object no longer exists.))' is received
+#                        self._signals[signal] = [s for s in self._signals[signal] if not s.is_expired()]
+#                    else:
+#                        raise
 
         if signal in _global_signals:
             for slot in _global_signals[signal]:
                 try:
                     results.append(slot(self, *args, **kwds))
-                except (ReferenceError, wx.PyDeadObjectError):
+                except ReferenceError:
                     _global_signals[signal] = [s for s in _global_signals[signal] if not s.is_expired()]
-                except TypeError, arg:
-                    if '_wxPyDeadObject' in str(arg):
-                        # see above
-                        _global_signals[signal] = [s for s in _global_signals[signal] if not s.is_expired()]
-                    else:
-                        raise
+#                except TypeError, arg:
+#                    if '_wxPyDeadObject' in str(arg):
+#                        # see above
+#                        _global_signals[signal] = [s for s in _global_signals[signal] if not s.is_expired()]
+#                    else:
+#                        raise
      
         return results

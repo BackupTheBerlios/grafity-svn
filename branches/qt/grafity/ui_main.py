@@ -67,17 +67,25 @@ class GraphData(GraphDataUI):
         self.y_list.insertStrList(colnames)
 
     def on_add(self):
-        xcols = [str(self.x_list.text(a)) for a in range(self.x_list.count()) if self.x_list.isSelected(a)]
-        ycols = [str(self.y_list.text(a)) for a in range(self.y_list.count()) if self.y_list.isSelected(a)]
+        try:
+            self.graph._view.freeze()
+            xcols = [str(self.x_list.text(a)) for a in range(self.x_list.count()) if self.x_list.isSelected(a)]
+            ycols = [str(self.y_list.text(a)) for a in range(self.y_list.count()) if self.y_list.isSelected(a)]
 
-        for w in self.selected:
-            for x in xcols:
-                for y in ycols:
-                    self.graph.add(w[x], w[y])
+            for w in self.selected:
+                for x in xcols:
+                    for y in ycols:
+                        self.graph.add(w[x], w[y])
+        finally:
+            self.graph._view.unfreeze()
 
     def on_remove(self):
-        for d in self.graph._view.datasets:
-            self.graph.remove(d)
+        try:
+            self.graph._view.freeze()
+            for d in self.graph._view.datasets:
+                self.graph.remove(d)
+        finally:
+            self.graph._view.unfreeze()
 
     def set_project(self, project):
         self.project = project
@@ -133,6 +141,9 @@ class GraphView(QTabWidget):
         self.graph.connect('remove-dataset', self.on_remove_dataset)
 #        self.graph.connect('add-function', self.on_modified)
 
+        self.frozen = False
+        self.needs_redraw = False
+        self.needs_legend_update = False
 
         connectevents(self.plot.canvas(), self.on_canvas_event)
         self.connect(self.plot, SIGNAL('plotMouseMoved(const QMouseEvent&)'), self.on_mouse_moved)
@@ -150,21 +161,60 @@ class GraphView(QTabWidget):
         self.legend.setSelectionMode(QListBox.Extended)
         self.connect(self.legend, SIGNAL('selectionChanged()'), self.on_legend_select)
 
+        self.freeze()
         for d in self.graph.datasets:
             self.on_add_dataset(d)
         self.update_legend()
+        self.unfreeze()
+
+
+    def freeze(self):
+        self.frozen = True
+
+    def unfreeze(self):
+        self.frozen = False
+        if self.needs_redraw:
+            self.redraw()
+        if self.needs_legend_update:
+            self.update_legend()
+
+    def redraw(self):
+        if self.frozen:
+            self.needs_redraw = True
+        else:
+            self.plot.replot()
+            self.needs_redraw = False
+
+    def update_legend(self):
+        if self.frozen:
+            self.needs_legend_update = True
+        else:
+            selected = [self.legend.isSelected(it) for it in range(self.legend.numRows())]
+            current = self.legend.currentItem()
+
+            self.legend.clear()
+            self.legend.insertStrList([str(d) for d in self.graph.datasets])
+            for n, dset in enumerate(self.graph.datasets):
+                if hasattr(dset, '_curveid'):
+                    self.legend.changeItem(self.draw_pixmap(dset), self.legend.text(n), n)
+
+            for i,on in enumerate(selected):
+                self.legend.setSelected(i, on)
+            self.legend.setCurrentItem(current)
+            self.needs_legend_update = False
+
 
     def on_add_dataset(self, d):
         d._curveid = self.plot.insertCurve('')
         d.recalculate()
         for s in ['symbol', 'color', 'size', 'linetype', 'linestyle', 'linewidth']:
             self.on_change_style(d, s, d.get_style(s))
-        self.plot.replot()
+        self.redraw()
         self.update_legend()
      
     def on_remove_dataset(self, d):
         self.plot.removeCurve(d._curveid)
-        self.plot.replot()
+        self.redraw()
         self.update_legend()
 
     def on_legend_select(self):
@@ -172,21 +222,6 @@ class GraphView(QTabWidget):
                                                 if self.legend.isSelected(n)]
 
         self.graph.emit('selection-changed', self.datasets)
-
-    def update_legend(self):
-        selected = [self.legend.isSelected(it) for it in range(self.legend.numRows())]
-        current = self.legend.currentItem()
-
-        self.legend.clear()
-        self.legend.insertStrList([str(d) for d in self.graph.datasets])
-        for n, dset in enumerate(self.graph.datasets):
-            if hasattr(dset, '_curveid'):
-                self.legend.changeItem(self.draw_pixmap(dset), self.legend.text(n), n)
-
-        for i,on in enumerate(selected):
-            self.legend.setSelected(i, on)
-        self.legend.setCurrentItem(current)
-
 
     def draw_pixmap(self, dataset):
         p = QPixmap()
@@ -213,7 +248,7 @@ class GraphView(QTabWidget):
     def on_zoom_changed(self, xmin, xmax, ymin, ymax):
         self.plot.setAxisScale(self.plot.xBottom, xmin, xmax)
         self.plot.setAxisScale(self.plot.yLeft, ymin, ymax)
-        self.plot.replot()
+        self.redraw()
 
     def on_mouse_pressed(self, e):
         self.xpos, self.ypos = e.pos().x(), e.pos().y()
@@ -242,7 +277,7 @@ class GraphView(QTabWidget):
 
     def on_recalc(self, d, x, y):
         self.plot.setCurveData(d._curveid, x, y)
-        self.plot.replot()
+        self.redraw()
 
     symbols = {'circle': QwtSymbol.Ellipse,
                'square': QwtSymbol.Rect,
@@ -285,7 +320,7 @@ class GraphView(QTabWidget):
             elif style == 'linewidth':
                 curve.pen().setWidth(value)
 
-            self.plot.replot()
+            self.redraw()
         except:
             pass
 
