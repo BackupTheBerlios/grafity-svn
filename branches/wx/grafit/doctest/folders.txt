@@ -1,0 +1,68 @@
+Nothing
+-------
+
+The following special names are defined:
+
+* `here`: the current folder
+
+* `up`: the parent of the current folder
+
+* `top`: the top-level folder
+
+* `this`: the current object (shown in the main window)
+
+These names are updated in ``project._dict``.
+
+Also in ``project._dict`` are the contents (subfolders and items)
+of the current folder.  Programatically, you can get these object 
+with ``project.top.contents()``.
+
+Importing the grafit module
+
+    >>> from grafit import *
+    >>> from grafit.commands import undo, redo
+
+Creating and initializing a project
+
+    >>> p = Project()
+    >>> p.set_dict(globals())
+
+Creating and deleting folders
+
+    >>> p.mkfolder('ass')
+    >>> ass
+    <Folder ass>
+    >>> p.rmfolder('ass')
+    >>> ass
+    Traceback (most recent call last):
+    ...
+    NameError: name 'ass' is not defined
+    >>> p.rmfolder('hole')
+    Traceback (most recent call last):
+    ...
+    NameError: folder 'hole' does not exist
+
+Creating and deleting worksheets
+
+    >>> w = p.new(Worksheet, 'data1')
+    >>> data1 == w
+    True
+    >>> undo()
+    >>> data1 == w
+    Traceback (most recent call last):
+    ...
+    NameError: name 'data1' is not defined
+
+    >>> redo()
+    >>> data1 == w
+    True
+
+    >>> p.remove(data1.id)
+    >>> data1 == w
+    Traceback (most recent call last):
+    ...
+    NameError: name 'data1' is not defined
+
+    >>> undo()
+    >>> data1 == w
+    True
