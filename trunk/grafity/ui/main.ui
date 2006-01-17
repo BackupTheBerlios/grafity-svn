@@ -1,0 +1,508 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>MainWindowUI</class>
+<widget class="QMainWindow">
+    <property name="name">
+        <cstring>MainWindowUI</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>768</width>
+            <height>503</height>
+        </rect>
+    </property>
+    <property name="sizePolicy">
+        <sizepolicy>
+            <hsizetype>5</hsizetype>
+            <vsizetype>5</vsizetype>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
+    </property>
+    <property name="minimumSize">
+        <size>
+            <width>23</width>
+            <height>141</height>
+        </size>
+    </property>
+    <property name="caption">
+        <string>Grafity</string>
+    </property>
+</widget>
+<menubar>
+    <property name="name">
+        <cstring>menubar</cstring>
+    </property>
+    <item text="&amp;File" name="File">
+        <action name="act_project_new"/>
+        <action name="act_project_open"/>
+        <separator/>
+        <action name="act_project_save"/>
+        <action name="act_project_saveas"/>
+        <separator/>
+        <action name="act_exit"/>
+    </item>
+    <item text="&amp;Edit" name="Edit">
+        <action name="act_undo"/>
+        <action name="act_redo"/>
+        <separator/>
+        <action name="act_cut"/>
+        <action name="act_copy"/>
+        <action name="act_paste"/>
+    </item>
+</menubar>
+<toolbars>
+    <toolbar dock="2">
+        <property name="name">
+            <cstring>Toolbar</cstring>
+        </property>
+        <property name="movingEnabled">
+            <bool>false</bool>
+        </property>
+        <property name="label">
+            <string>Toolbar</string>
+        </property>
+        <action name="act_project_new"/>
+        <action name="act_project_open"/>
+        <action name="act_project_save"/>
+        <action name="act_project_saveas"/>
+        <separator/>
+        <action name="act_new_worksheet"/>
+        <action name="act_new_graph"/>
+        <action name="act_new_folder"/>
+        <separator/>
+        <action name="act_undo"/>
+        <action name="act_redo"/>
+        <separator/>
+        <action name="act_exit"/>
+    </toolbar>
+    <toolbar dock="5">
+        <property name="name">
+            <cstring>graph_toolbar</cstring>
+        </property>
+        <property name="movingEnabled">
+            <bool>false</bool>
+        </property>
+        <property name="verticallyStretchable">
+            <bool>false</bool>
+        </property>
+        <property name="newLine">
+            <bool>true</bool>
+        </property>
+        <property name="label">
+            <string></string>
+        </property>
+        <action name="act_graph_arrow"/>
+        <action name="act_graph_hand"/>
+        <action name="act_graph_zoom"/>
+        <action name="act_graph_range"/>
+        <action name="act_graph_dreader"/>
+        <action name="act_graph_sreader"/>
+    </toolbar>
+    <toolbar dock="5">
+        <property name="name">
+            <cstring>worksheet_toolbar</cstring>
+        </property>
+        <property name="movingEnabled">
+            <bool>false</bool>
+        </property>
+        <property name="label">
+            <string>Toolbar_2</string>
+        </property>
+        <action name="act_exit"/>
+    </toolbar>
+</toolbars>
+<actions>
+    <action>
+        <property name="name">
+            <cstring>act_project_new</cstring>
+        </property>
+        <property name="iconSet">
+            <iconset>image0</iconset>
+        </property>
+        <property name="text">
+            <string>New</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;New</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>act_project_save</cstring>
+        </property>
+        <property name="iconSet">
+            <iconset>image1</iconset>
+        </property>
+        <property name="text">
+            <string>Save</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Save</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>act_project_open</cstring>
+        </property>
+        <property name="iconSet">
+            <iconset>image2</iconset>
+        </property>
+        <property name="text">
+            <string>Open</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Open...</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>act_project_saveas</cstring>
+        </property>
+        <property name="iconSet">
+            <iconset>image3</iconset>
+        </property>
+        <property name="text">
+            <string>Save As</string>
+        </property>
+        <property name="menuText">
+            <string>Save &amp;As...</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>act_new_graph</cstring>
+        </property>
+        <property name="iconSet">
+            <iconset>image4</iconset>
+        </property>
+        <property name="text">
+            <string>Action</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>act_new_folder</cstring>
+        </property>
+        <property name="iconSet">
+            <iconset>image5</iconset>
+        </property>
+        <property name="text">
+            <string>Action</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>act_new_worksheet</cstring>
+        </property>
+        <property name="iconSet">
+            <iconset>image6</iconset>
+        </property>
+        <property name="text">
+            <string>Action</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>act_exit</cstring>
+        </property>
+        <property name="iconSet">
+            <iconset>image7</iconset>
+        </property>
+        <property name="text">
+            <string>Exit</string>
+        </property>
+        <property name="menuText">
+            <string>E&amp;xit</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>act_cut</cstring>
+        </property>
+        <property name="text">
+            <string>Cut</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>act_copy</cstring>
+        </property>
+        <property name="text">
+            <string>Copy</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>act_paste</cstring>
+        </property>
+        <property name="text">
+            <string>Paste</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>act_undo</cstring>
+        </property>
+        <property name="iconSet">
+            <iconset>image8</iconset>
+        </property>
+        <property name="text">
+            <string>Undo</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>act_redo</cstring>
+        </property>
+        <property name="iconSet">
+            <iconset>image9</iconset>
+        </property>
+        <property name="text">
+            <string>Redo</string>
+        </property>
+    </action>
+    <actiongroup>
+        <property name="name">
+            <cstring>act_graph_mode</cstring>
+        </property>
+        <property name="text">
+            <string>ActionGroup</string>
+        </property>
+        <property name="usesDropDown">
+            <bool>false</bool>
+        </property>
+        <action>
+            <property name="name">
+                <cstring>act_graph_hand</cstring>
+            </property>
+            <property name="toggleAction">
+                <bool>true</bool>
+            </property>
+            <property name="iconSet">
+                <iconset>image10</iconset>
+            </property>
+            <property name="text">
+                <string>Action</string>
+            </property>
+        </action>
+        <action>
+            <property name="name">
+                <cstring>act_graph_zoom</cstring>
+            </property>
+            <property name="toggleAction">
+                <bool>true</bool>
+            </property>
+            <property name="iconSet">
+                <iconset>image11</iconset>
+            </property>
+            <property name="text">
+                <string>Action_2</string>
+            </property>
+        </action>
+        <action>
+            <property name="name">
+                <cstring>act_graph_range</cstring>
+            </property>
+            <property name="toggleAction">
+                <bool>true</bool>
+            </property>
+            <property name="iconSet">
+                <iconset>image12</iconset>
+            </property>
+            <property name="text">
+                <string>Action_3</string>
+            </property>
+        </action>
+        <action>
+            <property name="name">
+                <cstring>act_graph_dreader</cstring>
+            </property>
+            <property name="toggleAction">
+                <bool>true</bool>
+            </property>
+            <property name="iconSet">
+                <iconset>image13</iconset>
+            </property>
+            <property name="text">
+                <string>Action_4</string>
+            </property>
+        </action>
+        <action>
+            <property name="name">
+                <cstring>act_graph_sreader</cstring>
+            </property>
+            <property name="toggleAction">
+                <bool>true</bool>
+            </property>
+            <property name="iconSet">
+                <iconset>image14</iconset>
+            </property>
+            <property name="text">
+                <string>Action_5</string>
+            </property>
+        </action>
+        <action>
+            <property name="name">
+                <cstring>act_graph_arrow</cstring>
+            </property>
+            <property name="toggleAction">
+                <bool>true</bool>
+            </property>
+            <property name="on">
+                <bool>true</bool>
+            </property>
+            <property name="iconSet">
+                <iconset>image15</iconset>
+            </property>
+            <property name="text">
+                <string>Action</string>
+            </property>
+        </action>
+    </actiongroup>
+    <actiongroup>
+        <property name="name">
+            <cstring>ActionGroup</cstring>
+        </property>
+        <property name="text">
+            <string>ActionGroup</string>
+        </property>
+        <property name="usesDropDown">
+            <bool>false</bool>
+        </property>
+    </actiongroup>
+</actions>
+<images>
+    <image name="image0">
+        <data format="PNG" length="279">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff61000000de49444154388db593310a83301486ff04774fe3e415ba79856ebd98877050c4c103545741c4a514c43124af4389a4f1455d1a78202ff9fe7c4f11f8ae0c005da81b028b8c316c69ad691806aaaaca8664c1806559d8aaeb9a945294e7f9ce44380158d795d52b8a026ddb629e678ce388b22c37568666dad488902409e238c6fbfd42d7753ffb3b03634c300800fabe479aa61b1bb9875cd802febedf8f5c80837c8b600077c03ebb3d7fc4dd085aeb538b430329257b33d7630d425fc1c2a7064288c39bfff7129ba68152ea100680699a00e0e98ff7c0b5dfd9d6dd821f5d8f05448e1c1c620000000049454e44ae426082</data>
+    </image>
+    <image name="image1">
+        <data format="PNG" length="525">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff61000001d449444154388d9d934f6b134118879fddfc314b7a8869ec36244b8b9788e6ec5941e855911cbc0a9efc08e237f026050fdec5835745901a442b4411a4a5180cb4969884246489bbbabb99cc8e87959a4d130ffe600ec3cbf3f01b9817600b50ff796a1aa03c7fc2fef731f2d936462ac9c26811a2eb3ac36bb701b87a699d2440dbf678f3718f8b32440ddaa0d41cad000d4dd748e5f27cda3fe07d7d072012b8c11480cdebb7a8542a8b1bfc891082174f5e2144f057309b66b3b914564a512a95909380c9542e16cc3708c310dff7f13c6fa1f49f0da4948cc7e3d8bc5aad2e1798a6492e9703c0755d8220c034cd1820a55c2ea87f3ea46ce69181c09f4e17563e1e8c960b0efb63be766d7eb93fd0e740a9142a542413f1494ca0946223ab616d44b50dc3c0b22c86c321ef767779f8f42537ae5c462b9c3f61623adff7b10a19006edebdcf9d7b0f180c068c4623ac729976b7c397aecb5a563f2d0884404ea2cf91c964585b3d4ba57201dbb60148a7d38422404fe8a4677aeb008f1f6dc7e062b188e3fc24659c89de2f258ee3403275aa760238f8f0f6756dbd50e0b8d363d58880cd732b145792b45a2d1a8d06fd7e9f5ec746088f7cd6e0f94e1da7777422aa116dcc1ed062f9fa1e01df66ee5bbf01f26ddab0b6a225fe0000000049454e44ae426082</data>
+    </image>
+    <image name="image2">
+        <data format="PNG" length="435">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff610000017a49444154388dcd924d2f035114869f99b62a914ad8b0b010bfc30f40d722162482b01061232191d8db486c4422f1f11b58b242e2233ea2d3d40cade810cda8aa56676edb190b3abe4a5848bcc9c9bdb937ef734ece39f09fd406381fa2ed57e6b81e7542caaea384779c9595851f41a497d3c93ea6989b9fc6e7f360db0efe4a3f4a48657666a99c2f08acbd03240c95c5c565bc3e1b8fc78b1079aa03014ccbc2efafc0b2048d8d4ddcdfa5e9ee1a72bdde123250d540d136d1c297e8fa35b22cf190ce22cbf273a912146d8742be404b6b33c747a7ced55522e8020e0eb629168a6cac6fb3b7b783913cc7121972e6fda7fa85c873741861b06f6ad5052081aac6e8ededc1489e934aeb5f362e16d5b94ba600904b8f91538dadcd7d0606fab144e6ebb603b99cc9f8d80c40d0055cc42e181d19269335ca96fd567afca6745d730175f5b57474b693b855bf35874e34262766e17994af53889ec511c2c42bd590306265cd67da258aa2b9d9dffe955be3efe2c72bfef77a02d29bb49fc83f79840000000049454e44ae426082</data>
+    </image>
+    <image name="image3">
+        <data format="PNG" length="677">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff610000026c49444154388d9d934f48937118c73fdb5ee7cc25e5dc9c53c12237a7447431242679d1637f6e41109d0b3aac3fa722ea14343c98216144d0c10689d910226a111d720d134d78c5f9b7e56c3374bcd3edddbbf75d87c57449971ef81d7ef03c9fe7f33d3c003d40fe3fdf051d904f67b27cfb91447dd94f4599c0eed2348de3dedb3c7fe42418c8f0646c85a1b7616a1d0d74b5d91100a21b693e86a7695535f28928e4f385e17c9e93bec7e4121e945039ef4c716085d0c4042bc3230005404ace01d074e63c2e97abb8591004e4c50e949089ebfe0d9e0e4f110804985cd7313f3707809ebf6a76761651141104818c7882ed991a2e0dacf2f05998dede5e3c1e0f6a56269b53770c7697d3e9c46030b03dd5ce56b89ccbfe05865ecfe0f7fb71bbddc5befc9f987b0c4451046039d2c9b5d12443a33378bd5eeaebeb999f9f2fc6d3e9747b0d6c361b168b85d35d56dce71e00e0f3f9e8eeeec66eb7e3743a511405bd7e676f092038b900c0ab6082ab376ed176f418cd2dadac67607d2981a669447f6d9618970016e349ee0c8eb01e8b525deb209686d8d742a49caa023a0483fedf008023074c7434360350555585c3e14092243e8f8fd3f7e20d674fb5a3ab395cec2fc1c9b2cca1bafd98cd662edebccf95bb7da4522992c9248d0d0d4463ab88b114b64afd5e80ac28a859190093c984cd721097ab85cdcd4266a3d188a6c8e80d7a8cbbbcf5008303fde4e40c9aa661341ab1dbed48d2166515e500a8aa8a24492094edd13600c2974fc14ebbd5caf7d84f6af6e950559526ab993ab340241221140a118fc7595bdd4051d254575630f6fe03d2da5211748fc2794e0311fe7dbe4bc0f2ae7fcf6f7eab12f76406d8a80000000049454e44ae426082</data>
+    </image>
+    <image name="image4">
+        <data format="XPM.GZ" length="1223">789c55d3c96ee2401804e03b4f61c10d8d1c6cbc6a3487ec2b099090908ce6d08b0d84356c0e44f3eee3aa7690e72f2e5f99f6d286a3bad56fb7acfa5165b516eb91b2d4502cadbade4ca7bbdf7f7e7d55aa4e60e51f3fb49cea8f4ad5b694556b70c01ae8788edb10a0003de935dd08ec807e80807d30f410f0864c426598805112a65e0a4ac3a8e1f34219180b04d4a010b10cb8f6934c4414f32615990a2790e01d281b228e5db0477a08d80695878067a42fb5e0976f49a542e9833b50375533d2e09e0c10f0940cb5af78f4ba60a0b9f69c8c541c37c19921021e93b1f6148fce0be60117a440c07b52ea40f1cc1f05f3806352296df6eaca10011f480eb80413070157a48b8027a4a77dc10b5d92be0e049f775d30557c84274304dc90810e05dfe0331922e00b1921e02b2910b0414a04744885801764fe0082a772490e3821d3fc87c5534dc1d44d84e2da77b299146f7f4406a993f0265b64983a669f07648c80435220e0969439b91b8f05f3806fa442c02ea911302539fc5b7d4f4d48a5cd1ed8e900331c8edec793e99827b507b3d97cf1b15cad37d3ed76a28a2ee37cee4add3cdb638e4f4a6b17a63b3d93e71797e61a832bd35ddfdcdeb5ee6bec860fa66b77f6597766b37b7c62d7b67ba5ee3963d5de97ba976cdfeb77f2aad4bd6636be54eede1ad9610e9de3760ff3ddcdca63ffb757c554fffeacfc036e2938bb</data>
+    </image>
+    <image name="image5">
+        <data format="PNG" length="520">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff61000001cf49444154388d9d914b4f53511446d77df485404b6eacc10407d58171448c1371e840ff823171623af057f89bd4387060340c800e28a1232452025594c6b634bda6eded397b3be8134a93c69d9ce4dcc15afb3bdf759863f4cb5bff3c8802cff1ef382a69a3a2629c663b0a2bfe3c8272b2112ccaf213fcc47337b194d34e9b44c21c799efb6952f018d8bac26e00dba9f8e29aef279f35bad97c10ac7323e352ad149fa61355c79f847ffc2cd3b8f80340a9b4cbcb176fb6800dd7d78548fcbbd9b587a4320f0008aca0aded9c3710545ae1055f37df236a08c3068eab646f2d51d829bdde29565ead665772f7ee3f2296bc0940d4ae725ade8f9c614f67bf8e48a7b3349bd5517e11c1755d4ce737f1de09612b24b8bd8ee7b9542b45de7df8c8a88395cc2adf8ff70045451011442d622d2a1d928eb2e059c2fa1e51d4a556aff379f3602ce876ffcefe8dc4e9b28c31319c5e84d5148767e714f64ec7021c07157b69b3a8226211b1fd27690295182242ad65a935da6381aa626c6f0a14155464d4c9e402602c10b11863a6c021d44f30e844052b57048a624c34054e6e5315ece03e9c91c0445dac3553e075d0b582f2c921bbc5423fae6a3f89ea4cf0dbc1f1a5ef3ca0ff71f23337cc3bff00afff554059245dec0000000049454e44ae426082</data>
+    </image>
+    <image name="image6">
+        <data format="PNG" length="379">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff610000014249444154388dc5934d4b025114869f3b338cf95184b3480ca4da086150ab59b472d7c7be7dfb68d36f10fa3b2505d1c2cd44e4c266d1b2d914a114925ae8a8e3dc1692258ea510f4ecee39f7bce77d2f5cc10438d7870bb1f0dca6a2cd6ca9faec4adb6da12b9ee379ee850064c04c1bf0811ee06f6492627fcfd47776b74346721d5555787e2c719a3f971a8094c31a954a25944824bed4deee797dba226a6408cfaf0260f47c96976ca17d5eaa56ab8301cbb2c866b383b3ef36a8d5ea448d51ab0290e57219cbb2c6be414c6fb2186f108984f81ee1247fd61790520e3928140ac30ebc77ee4a97aca5e328a24bb7d3a1d9ea7170748c16b07004458dd070a3104e23651b45875afd859bdb87c9220461db36b95c6eb2084135c771304d1365aab501fc7f040da0582c8ea8a752a95f6b83085379ff6b04a0d3ff75e3f8a9c7073451a23213561b570000000049454e44ae426082</data>
+    </image>
+    <image name="image7">
+        <data format="PNG" length="495">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff61000001b649444154388da5934f4b5b4114c57f6fe665de1f6ba84abbea2ab48b82a0a0964a41092294822bc1b5f801ecb2b82aeefc0485ee5c282208225a2c144323b873d31ae9a68bf062a41ac7e6252896242f5d0493bcc480e0850bc39d7bce993373071e1846877af5be78b3d38ee7a5f1fd3c5a6bb4be249b3d657efe7d5b5f2bc19dcaaeeb62dbd69d42a2b57032370940b95cae9dd130104220840440d90acbb14204d5a644f63d657b7a8c58ec39954aa54dd17614b6a3c2166e55012afa9cfebf69b6a65e313838c4dede3772b95c83a0cb464a817f590cdfc1e1ce4148c98814f83cfa9289894916163ee07919002cc742ca86f3faeaecfc3a94bfb2797a54cd77b158241e8f03e03e7270bb9d160bbf4fb11f77214c49f6a200406cbc9f99648a6432c1cdcd3f3299931a4049948a84095eef1fd70b4b4de054ea075aeb90b56a50c56c26985d7c5bb7b1fcf16b700bf6bc3485820f40a954c2f7f300c88844598df1699bc499640a802008b8babae6e7d11189ef093637b6188e0f10ed8b62353d63e82f984aaa672f9e94d2c77f82dddd2facaeafb0b2bcc69b7723447bbb51b6c2342586106c7cda06301efc99eed9d739fe03f938966bee1e42680000000049454e44ae426082</data>
+    </image>
+    <image name="image8">
+        <data format="PNG" length="443">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff610000018249444154388d95934b28844100c77f1f6eb49b440929eb20893db88ae4428972d803a2445ac49522459452b48f835c948b226d1e490e42617120ad52f2fa3c37bbde6bbdc6c57ed65a6bfd6a6aa6e9f79f7fd30cfc8e08b0a7101248769ecc0693f15376dded8b7f37d06ab500c2fd7889eb78c8bb89000680fc800180703fc83c1c9801b897c77039d671ca0b187b1aab8169a0c33740fa924f793ab7f0e6bef05bf57877938ce271804e735751abbec5a204885ba78c704cfc2a7bd8b2ae905339e37d306180a48a8c178b234da8ec837e45b52607556226b19a346006403f6cd099cb1a46943b90b2747dd8d5157e036ef6e6395b1e243a2a028b211bc094921c037cbf4429afdcc45564150019f5f7ca58de79e1d575cdcda195b8e474009212a37e040048b9a5fdd8c34b943550576b7273e678e7f95a56c4bff07d487a406c1a2384c3d62e00313f5ae3b781f7c9de98014213f2989ab301742f59f7836ae2a11010476bcd9e66a9ffb201b13a59277adb0a82fe23be68816d60e373aef0019b7893e283f7d06a0000000049454e44ae426082</data>
+    </image>
+    <image name="image9">
+        <data format="PNG" length="425">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff610000017049444154388d8d52c14a0251143de3488bd6da26830a2a9d5a14b40dfc02b72dfc8120a2651406412d83248c304321b07021461b89c24d8b82c40251933009296c6a4673b269087c2d6aa67174740ebcc57df79e7bce7df701c640f41226830d749b186e100aef7574a205f357ac9cd2eb1dd9f66fca714707f30e8723138e04c1f26594b922d86a093591c3e4cc00fc075b4d4e282d1980ef269f427f9f154ffc3d689a82205650972a4a51eeea0d8b734b0040d12af22880f8c95904cc0803b65604d000ff51c6d7b7d0a462b5f5c24cf7e0f63abb6656ddbb5d2e1726ec53a87ebe20910c81e51fda3e5021c3e168270d00947a04124f44611f1fc3e1e9324449684bcea5584477b3caf86a07181c1ac679320851127e55bc6925e709385bc880660b0d531d8fcf29bc73924ca6e4e242866b216b412ef3c7c41370cabb5e57e760e42706fd61d82cd372b8aaa9d55596c10020b10b9fac36db8dd00e6461c54df6631bba96bbc182ff79bd46083f6c2197fbe65ddfa10000000049454e44ae426082</data>
+    </image>
+    <image name="image10">
+        <data format="PNG" length="175">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff610000007649444154388d9d93410e002108035be3ffbfdc3d61080b2af668681911290995480a0024b1aa999581a4cc68e759d8f4e6cc108dbe0e0046c97f90355901869d616666ab7f22f85d81a47c6a2cdabec26978bbee8be0a65394351e1ebb1bb20862483ba02b3fb7740f9e096e428eabdc2579fe0ba60f2a50691f5cbd48240000000049454e44ae426082</data>
+    </image>
+    <image name="image11">
+        <data format="PNG" length="727">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff610000029e49444154388d9592c16b634500c67f336f631a1bd2f2769fad4d2a2c14b3f6104a9005b1b4a7785885b2074f255ebd78285efc0b044f8281a5fd17d6e32a7b92b250cab6941e3492620a22b5694931f491f27c6fdecc9bf1b0af4b773d881f7c30a76fe69bdf27c8d56eb7dfe8f57a8bd3d3d35ff8bebf2aa5bc6b8cb91a0e87cfcecece1e0741f0c3fefe7ec46bf2ae0f8542a11d04c1776b6b6bad56abe5afacacc866b339313b3b7b4f29f551b7dbadcccccc1c5c5e5e2637036e012e0882cdb9b9b9cfd7d7d7e5e2e222954a056b2d4208e6e7e7595a5aaa1863bedcdbdb9b019e00df0302c09b9898389f9a9afa646363a3b6b0b040ad56a35c2e0320a56472729252a9441004a2dbed36c2307ca4b57e0af400f07dff61bbddd6fd7edf8561e8b4d6ce5aebacb5ce18e3e238766118ba939313d7e9745ca15078027c705d413ae7a8d7eb944a253ccfc35a8b73ee5f0668341a38e7eaaffc81d6dacbb2cc9352a2b5464a89730e2104d65ab4d668ad514a91a629ceb953e0cf9701d6dad1d1d1d1482975474af9028df702ce75401cc72449c2e1e121d6dadf5ec168adadf5fbfd56b3d9bce3fb3e599691a6294a29945244514414451c1f1fd3e974c61717175b80054e013ce7dc3bc0d5603058add7eba2582c92a629499210c7315114311e8fd9dada720707078f8d313fe5979f5e0fc93ae77e3f3f3fff756767e75d21c4ed2ccb504a311c0ed9dddd65737373bcbdbdfd8b31e643e02fe067e0827c0cb53c31144234cbe5f267d56a75b55c2edf4dd3f46a30183c1b8d463bc073dff7bf31c6bc3f1e8ffbc0c7c01939d3975c812210bce662eeaf969797d36ab59a00bbc07b1ef02db0077c9a0765800f3c001ac0dfc0dbc043e05692247f4829ef0b21de524af5c8777df305ffa507c08fc0d737eaff2f79c09b7925fe0132144fc6de4b16030000000049454e44ae426082</data>
+    </image>
+    <image name="image12">
+        <data format="PNG" length="246">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff61000000bd49444154388db5d0b16a02411440d1e34602b10d1810029222609fde2fd2bf4aea606d611b6cd228c44ac4947e80a868b30bc330bb4ea1af7a0cdcc3cc70a779c033dad19e1d0ff0853ebaf8c4470e52c533acf18e1e16985f43c2788fff00f8c3a10989e3730238d721a9b80e48225d4ca3b809a8901ff40bb4d04151f7398969e10945811dc6f8c531233e618511b6d561bb7cd3bcbc5edd138e586288c7588e9118688c53c826009639718c4cf086177ce7c621f25a06e17efbb9003084444e64e5c3140000000049454e44ae426082</data>
+    </image>
+    <image name="image13">
+        <data format="PNG" length="118">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff610000003d49444154388d636018f280118dff9f02bd380dc02bc644828d58015d0cc0ea571860c12286ec67461ce23801b1b1405220e23574e06381ea2991fe00003ada0a0d6ccd074e0000000049454e44ae426082</data>
+    </image>
+    <image name="image14">
+        <data format="PNG" length="123">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff610000004249444154388d6360180ae03f3e49264a4d1f780318f1c861f33b867abc2eb871e1040a4d8c0bf0863821d7a083ff372e9cf88f4c936a0a5161400c18ee0989620000277113cbff770c6c0000000049454e44ae426082</data>
+    </image>
+    <image name="image15">
+        <data format="PNG" length="160">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff610000006749444154388d9dd3510ac0200c03d06478ff2b771f5318b6b6a9057f843ca320e0c7e692e68936cd6c4177400739022a92020a52021522011922032764284192ce02c0b2c116e4b69002334c92fd475ce1ac5d36d149665f0df98f847084746afe83d7d773f3027dcb31006fbaaaae0000000049454e44ae426082</data>
+    </image>
+</images>
+<connections>
+    <connection>
+        <sender>act_new_folder</sender>
+        <signal>activated()</signal>
+        <receiver>MainWindowUI</receiver>
+        <slot>on_new_folder()</slot>
+    </connection>
+    <connection>
+        <sender>act_new_graph</sender>
+        <signal>activated()</signal>
+        <receiver>MainWindowUI</receiver>
+        <slot>on_new_graph()</slot>
+    </connection>
+    <connection>
+        <sender>act_new_worksheet</sender>
+        <signal>activated()</signal>
+        <receiver>MainWindowUI</receiver>
+        <slot>on_new_worksheet()</slot>
+    </connection>
+    <connection>
+        <sender>act_project_new</sender>
+        <signal>activated()</signal>
+        <receiver>MainWindowUI</receiver>
+        <slot>on_project_new()</slot>
+    </connection>
+    <connection>
+        <sender>act_project_open</sender>
+        <signal>activated()</signal>
+        <receiver>MainWindowUI</receiver>
+        <slot>on_project_open()</slot>
+    </connection>
+    <connection>
+        <sender>act_project_save</sender>
+        <signal>activated()</signal>
+        <receiver>MainWindowUI</receiver>
+        <slot>on_project_save()</slot>
+    </connection>
+    <connection>
+        <sender>act_project_saveas</sender>
+        <signal>activated()</signal>
+        <receiver>MainWindowUI</receiver>
+        <slot>on_project_saveas()</slot>
+    </connection>
+    <connection>
+        <sender>act_undo</sender>
+        <signal>activated()</signal>
+        <receiver>MainWindowUI</receiver>
+        <slot>on_undo()</slot>
+    </connection>
+    <connection>
+        <sender>act_redo</sender>
+        <signal>activated()</signal>
+        <receiver>MainWindowUI</receiver>
+        <slot>on_redo()</slot>
+    </connection>
+    <connection>
+        <sender>act_exit</sender>
+        <signal>activated()</signal>
+        <receiver>MainWindowUI</receiver>
+        <slot>exit()</slot>
+    </connection>
+    <connection>
+        <sender>act_graph_mode</sender>
+        <signal>selected(QAction*)</signal>
+        <receiver>MainWindowUI</receiver>
+        <slot>on_graph_mode()</slot>
+    </connection>
+</connections>
+<slots>
+    <slot>on_new_graph()</slot>
+    <slot>on_new_folder()</slot>
+    <slot>on_new_worksheet()</slot>
+    <slot>on_project_open()</slot>
+    <slot>on_project_new()</slot>
+    <slot>on_project_save()</slot>
+    <slot>on_project_saveas()</slot>
+    <slot>on_redo()</slot>
+    <slot>on_undo()</slot>
+    <slot>on_graph_mode()</slot>
+    <slot>exit()</slot>
+</slots>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

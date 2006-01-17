@@ -1,0 +1,136 @@
+<html>
+	<head>
+		<title>grafit</title>
+		<style type="text/css">
+		<!--
+			body{margin:0px;padding:0px;background:#f6f6f6;color:#000000;font-family:"Trebuchet MS",Trebuchet,Verdana,Sans-Serif;}
+			a{color:#DE7008;}
+			a:hover{color:#E0AD12;}
+			#logo{padding:0px;margin:0px;}
+			div#mainClm{float:right;width:66%;padding:30px 7% 10px 3%;border-left:dotted 1px #E0AD12;background:#FFFFFF}
+			div#sideBar{margin:20px 0px 0px 1em;padding:0px;text-align:left;}
+			#header{padding:0px 0px 0px 0px;margin:0px 0px 0px 0px;border-top:1px solid #eeeeee;border-bottom:dotted 1px #E0AD12;background:#F5E39E;color:white;}
+			h1,h2,h3,h4,h5,h6{padding:0px;margin:0px;}
+			h1{padding:25px 0px 10px 5%;border-top:double 3px #BF5C00;border-bottom:solid 1px #E89E47;color:#F5DEB3;background:#DE7008;font:bold 300% Verdana,Sans-Serif;letter-spacing:-2px;}
+			h2{color:#9E5205;font-weight:bold;font-family:Verdana,Sans-Serif;letter-spacing:-1px;}
+			h3{margin:10px 0px 0px 0px;color:#777777;font-size:105%;}
+			h4{color:#aa0033;}
+			h6{color:#B8A80D;font-size:140%;}
+			#sideBar ul{margin:0px 0px 33px 0px;padding:0px 0px 0px 0px;list-style-type:none;font-size:95%;}
+			#sideBar li{margin:0px 0px 0px 0px;padding:0px 0px 0px 0px;list-style-type:none;font-size:95%;}
+			#description{padding:0px;margin:7px 12% 7px 5%;color:#9E5205;background:transparent;font:bold 85% Verdana,Sans-Serif;}
+			.blogPost{margin:0px 0px 30px 0px;font-size:100%;}
+			.blogPost strong{color:#000000;font-weight:bold;}
+			#sideBar ul a{padding:2px;margin:1px;width:100%;border:none;color:#999999;text-decoration:none;}
+			#sideBar ul a:link{color:#999999;}
+			#sideBar ul a:visited{color:#999999;}
+			#sideBar ul a:active{color:#ff0000;}
+			#sideBar ul a:hover{color:#DE7008;text-decoration:none;}
+			pre,code{color:#999999;}
+			strike{color:#999999;}
+			.bug{padding:5px;border:0px;}
+			.byline{padding:0px;margin:0px;color:#444444;font-size:80%;}
+			.byline a{border:none;color:#968A0A;text-decoration:none;}
+			.byline a:hover{text-decoration:underline;}
+		-->
+		</style>
+		
+		<!-- RSS Autodiscovery -->
+		<link rel="alternate" type="application/rss+xml" title="RSS" href="http://xdelta.blogspot.com/atom.xml" />
+		
+		<!-- Meta Information -->
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta name="MSSmartTagsPreventParsing" content="true" />
+	</head>
+
+<body>
+
+
+<div id="header">
+	<h1>grafit</h1>
+	<p id="description">data graphing and analysis</p>
+</div>
+
+
+<!-- Main Column -->
+<div id="mainClm">
+
+	<!-- Blog Posts -->
+		 
+			  <h3>Wednesday, July 21, 2004</h3>
+		 
+			<div class="blogPost">
+			  I admit, the teasers were mean. Here's what you need to know: the first public <a href="http://xdelta.org/xdelta30b.tar.gz">xdelta3</a> release. Phew, glad that's out of the way. <a href="http://xdelta.org/xdelta3.html">Here's</a> some more information. <a href="http://www.gzip.org/zlib.html">Here's</a> an obligatory link to zlib, the inspiration behind the new API.<br /> <br />I was in Bruxelles 6 years ago today, following a <a href="http://www.cs.colorado.edu/users/andre/scm8-cfp.html">conference</a> <a href="http://www.cs.colorado.edu/users/andre/scm8/macdonald.html">talk</a> <a href="http://www.ulb.ac.be/">here</a>. I remember there were lots of bunnys hopping around the university. Happy Independence Day, Belgium.<br /> <br />A word on licensing. After much deliberation over the merits of this license and that license, I have chosen to apply the GNU Public License version 2 to my code.<br /><br />
+			  <div class="byline"><a href="http://xdelta.org/2004/07/i-admit-teasers-were-mean.html" title="permanent link">#</a> posted by jmacd @ 10:20 PM</div>
+			</div>
+	
+
+			<div class="blogPost">
+			  Re: Licensing<br /> <br />You're still reading, I see. I am not a lawyer, nor are you. As of this point in time, I wrote every single line of xdelta3 code, except a few snippets of graciously copied from the public domain, as noted in the code, such as adler32(). Read my <a href="http://xdelta.org/xdelta3.c">acknowledgements</a>. If the terms of the GPL are not to your liking, please contact <a class="emailaddr" href="mailto:josh.macdonald@gmail&#x40;gmail.com">me</a>.<br /><br />
+			  <div class="byline"><a href="http://xdelta.org/2004/07/re-licensing-youre-still-reading-i-see.html" title="permanent link">#</a> posted by jmacd @ 10:10 PM</div>
+			</div>
+	
+
+		 
+		 
+		 
+			<div class="blogPost">
+			  Re: Does it work?<br /><br />Yes, and there are tests to prove it. However, I decided to release the code as-is and see what comes of it.  I imagine there are correctness bugs remaining, but it's more likely you'll find a performance bug.  There are a lot of knobs in the string-matching implementation, which is relatively untuned.<br /><br />If you find a bug, I'll fix it. If you're working for an open-source project and you want help, let me know!<br /><br />
+			  <div class="byline"><a href="http://xdelta.org/2004/07/re-does-it-work-yes-and-there-are.html" title="permanent link">#</a> posted by jmacd @ 10:00 PM</div>
+			</div>
+	
+
+		 
+			  <h3>Sunday, May 30, 2004</h3>
+		 
+		 
+		 
+			<div class="blogPost">
+			  <a href="http://xdelta.org/xdelta3-api-guide.html">Teaser1</a>.  <br /><a href="http://xdelta.org/xdelta3-cmdline.html">Teaser2</a>.  <br />The regression test has more bugs than it turns up, all I really need is a license.  Hmm.  Happy Memorial Day.<br />
+			  <div class="byline"><a href="http://xdelta.org/2004/05/teaser1.html" title="permanent link">#</a> posted by jmacd @ 11:51 AM</div>
+			</div>
+	
+
+		 
+			  <h3>Sunday, May 09, 2004</h3>
+		 
+		 
+		 
+			<div class="blogPost">
+			  Xdelta release 3 is moving so, so slowly but these days I am working a bit. My old Linux machine died and it took a while to repair my data and re-install. I could not compile <a href="http://prcs.xdelta.org">PRCS</a> with g++-3.2, so I spent the afternoon fixing it (<a href="http://prdownloads.sourceforge.net/prcs/prcs-1.3.3.tar.gz">prcs-1.3.3</a>).<br /><br />Getting back to Xdelta, I built Python-2.3 because SuSe-8.1's Python-2.2 installation could not compile modules.  Prior to losing that hard drive, nine months ago, I had been working on a regression test.  Sadly, there's not much more weekend.<br /><br />Happy Mothers Day. Happy Victory Day, Russia.<br />
+			  <div class="byline"><a href="http://xdelta.org/2004/05/xdelta-release-3-is-moving-so-so.html" title="permanent link">#</a> posted by jmacd @ 6:21 PM</div>
+			</div>
+	
+
+
+<!-- 	In accordance to the Blogger terms of service, please leave this button somewhere on your blogger-powered page. Thanks! -->
+<p><a href="http://www.blogger.com"><img width="88" height="31" src="http://buttons.blogger.com/bloggerbutton1.gif" border="0" alt="This page is powered by Blogger. Isn't yours?" /></a></p>
+
+</div>
+
+<!-- Sidebar -->
+<div id="sideBar">
+		<!-- 
+			+++++++++++++++++++++++++++++++++++++++++++++++++
+		-->
+		<h6>links</h6>
+		<ul>
+			<li><a href="http://xdelta.org/xdelta3.html">documentation</a></li>
+			<li><a href="http://sourceforge.net/projects/xdelta">sourceforge</a></li>
+			<li><a href="http://projectcontrolsystem.blogspot.com">prcs</a></li>
+		</ul>
+
+		<h6>contact</h6>
+		<ul>
+			<li><a class="emailaddr" href="mailto:josh.macdonald@gmail&#x40;gmail.com">me</a></li>
+		</ul>
+		
+		<h6>archives</h6>
+		<ul>
+			<li><a href='http://xdelta.org/archives/2004_03_01_xdelta_archive.html'>03/01/2004 - 03/31/2004</a></li><li><a href='http://xdelta.org/archives/2004_05_01_xdelta_archive.html'>05/01/2004 - 05/31/2004</a></li><li><a href='http://xdelta.org/archives/2004_07_01_xdelta_archive.html'>07/01/2004 - 07/31/2004</a></li>
+			<!-- Link to the front page, from your archives -->
+			<script type="text/javascript">if (location.href.indexOf("archive")!=-1) document.write("<li><strong><a href=\"http://xdelta.org\">Current Posts</a></strong></li>");</script> 
+		</ul>
+</div>
+</body>
+</html>
