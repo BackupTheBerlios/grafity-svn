@@ -38,6 +38,41 @@ def getpixmap(name, pixmaps={}):
 class WorksheetView:
     pass
 
+class GraphStyle(GraphStyleUI):
+    def __init__(self, parent, mainwin):
+        GraphStyleUI.__init__(self, parent)
+        self.mainwin = mainwin
+
+        for c in GraphView.colors:
+            p = QPixmap()
+            p.resize(30, 10)
+            p.fill(c)
+            self.color.insertItem(p)
+
+        for l in GraphView.line_styles:
+            p = QPixmap()
+            p.resize(50, 10)
+            paint = QPainter()
+            pen = QPen(Qt.black)
+            pen.setStyle(l)
+            p.fill(Qt.white)
+            paint.begin(p)
+            paint.setPen(pen)
+            paint.drawLine(0,5, 30,5)
+            paint.end()
+            self.lstyle.insertItem(p)
+
+        for l in GraphView.symbol_names:
+            p = QPixmap()
+            p.resize(12,12)
+            paint = QPainter()
+            p.fill(Qt.white)
+            paint.begin(p)
+            QwtSymbol(GraphView.symbols[l], QBrush(Qt.black), QPen(), QSize(10, 10)).draw(paint, 6, 6)
+            paint.end()
+            self.shape.insertItem(p)
+
+
 class GraphData(GraphDataUI):
     def __init__(self, parent, mainwin):
         GraphDataUI.__init__(self, parent)
@@ -246,7 +281,6 @@ class GraphView(QTabWidget):
         p.setMask(p.createHeuristicMask())
         return p
 
-
     def on_zoom_changed(self, xmin, xmax, ymin, ymax):
         self.plot.setAxisScale(self.plot.xBottom, xmin, xmax)
         self.plot.setAxisScale(self.plot.yLeft, ymin, ymax)
@@ -287,6 +321,8 @@ class GraphView(QTabWidget):
                'triangleup': QwtSymbol.UTriangle,
               }
 
+    symbol_names = ['circle', 'square', 'diamond', 'triangleup']
+
 
     colors = [Qt.black, Qt.red, Qt.darkRed, Qt.green, Qt.darkGreen,
               Qt.blue, Qt.darkBlue, Qt.cyan, Qt.darkCyan, Qt.magenta, Qt.darkMagenta,
@@ -299,6 +335,10 @@ class GraphView(QTabWidget):
                         'LightGreen', 'MediumPurple4', 'MediumViloetRed' ]
 
     colors += [QColor(s) for s in extracolornames]
+
+    line_types = [QwtCurve.NoCurve, QwtCurve.Lines, QwtCurve.Spline]
+    line_styles = [Qt.SolidLine, Qt.DashLine, Qt.DotLine, Qt.DashDotLine, Qt.DashDotDotLine]
+
 
     def on_change_style(self, d, style, value):
         curve = self.plot.curve(d._curveid)
@@ -612,7 +652,7 @@ class MainWindow(MainWindowUI):
         
         self.rpanel = Panel(self, QMainWindow.DockRight)
         self.graph_data = GraphData(self.bpanel, self)
-        self.graph_style = GraphStyleUI(self.bpanel)
+        self.graph_style = GraphStyle(self.bpanel, self)
         self.graph_axes = GraphAxesUI(self.bpanel)
         self.graph_fit = GraphFitUI(self.bpanel)
         self.rpanel.add('Data', getpixmap('worksheet'), self.graph_data)
@@ -643,6 +683,11 @@ class MainWindow(MainWindowUI):
         self.explorer.set_project(None)
         # and close all pages
         self.project = None
+
+    def on_undo(self):
+        undo()
+    def on_redo(self):
+        redo()
 
     def ask_save(self):
         """Prepare to close the project. Ask the user whether to
