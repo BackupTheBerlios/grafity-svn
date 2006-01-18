@@ -60,17 +60,24 @@ class GraphStyle(GraphStyleUI):
             paint.setPen(pen)
             paint.drawLine(0,5, 30,5)
             paint.end()
+            p.setMask(p.createHeuristicMask())
             self.lstyle.insertItem(p)
 
-        for l in GraphView.symbol_names:
-            p = QPixmap()
-            p.resize(12,12)
-            paint = QPainter()
-            p.fill(Qt.white)
-            paint.begin(p)
-            QwtSymbol(GraphView.symbols[l], QBrush(Qt.black), QPen(), QSize(10, 10)).draw(paint, 6, 6)
-            paint.end()
-            self.shape.insertItem(p)
+        brushes = {'o': QBrush(), 'f': QBrush(Qt.black) }
+
+        for fill in "of":
+            for l in GraphView.symbol_names:
+                p = QPixmap()
+                p.resize(12,12)
+                paint = QPainter()
+                p.fill(Qt.white)
+                paint.begin(p)
+                brush = brushes[fill]
+                pen = QPen()
+                QwtSymbol(GraphView.symbols[l], brush, pen, QSize(10, 10)).draw(paint, 6, 6)
+                paint.end()
+                p.setMask(p.createHeuristicMask())
+                self.shape.insertItem(p)
 
 
 class GraphData(GraphDataUI):
