@@ -8,16 +8,12 @@ try:
 except:
     pass
 
-
 from grafity.arrays import *
-#from OpenGL.GL import *
 
 from grafity.signals import HasSignals
 from grafity.project import Item, wrap_attribute, register_class, create_id
 from grafity.actions import action_from_methods, action_from_methods2, StopAction
 from grafity.settings import DATADIR
-
-#import wx
 
 from grafity.arrays import *
 from grafity.signals import HasSignals
@@ -39,6 +35,8 @@ class Dataset(HasSignals):
         self.y.connect('rename', self.on_y_rename)
 
         self.xfrom, self.xto = -inf, inf
+
+        self.style = Style(self)
 
     def on_x_rename(self, oldname, name):
         self.data.x = name.encode('utf-8')
@@ -112,11 +110,13 @@ class Dataset(HasSignals):
 
     def get_style(self, style):
         if style == 'color':
-            return self.data.color
+            return "#%06x"%self.data.color
         elif style == 'symbol':
             return self.data.symbol
         elif style == 'size':
             return self.data.size
+        elif style == 'fill':
+            return self.data.fill
         elif style == 'linestyle':
             return self.data.linestyle
         elif style == 'linewidth':
@@ -126,11 +126,13 @@ class Dataset(HasSignals):
 
     def set_style(self, style, value):
         if style == 'color':
-            self.data.color = value
+            self.data.color = int(value.replace('#', ''), 16)
         elif style == 'symbol':
             self.data.symbol = value
         elif style == 'size':
             self.data.size = value
+        elif style == 'fill':
+            self.data.fill = value
         elif style == 'linestyle':
             self.data.linestyle = value
         elif style == 'linewidth':
@@ -139,6 +141,23 @@ class Dataset(HasSignals):
             self.data.linetype = value
 
         self.graph.emit('style-changed', self, style, value)
+
+class Style(object):
+    def __init__(self, dataset):
+        self.dataset = dataset
+    attrs = ['color', 'symbol', 'size', 'fill', 'linestyle', 'linewidth', 'linetype']
+
+    def __getattr__(self, key):
+        if key in self.attrs:
+            return self.dataset.get_style(key)
+        else:
+            raise AttributeError, key
+
+    def __setattr__(self, key, value):
+        if key in self.attrs:
+            self.dataset.set_style(key, value)
+        else:
+            object.__setattr__(self, key, value)
 
 class Nop:
     pass

@@ -586,5 +586,102 @@
         </spacer>
     </vbox>
 </widget>
+<connections>
+    <connection>
+        <sender>shape</sender>
+        <signal>activated(int)</signal>
+        <receiver>GraphStyleUI</receiver>
+        <slot>on_ui_changed()</slot>
+    </connection>
+    <connection>
+        <sender>fill</sender>
+        <signal>activated(int)</signal>
+        <receiver>GraphStyleUI</receiver>
+        <slot>on_ui_changed()</slot>
+    </connection>
+    <connection>
+        <sender>size</sender>
+        <signal>valueChanged(int)</signal>
+        <receiver>GraphStyleUI</receiver>
+        <slot>on_ui_changed()</slot>
+    </connection>
+    <connection>
+        <sender>color</sender>
+        <signal>activated(int)</signal>
+        <receiver>GraphStyleUI</receiver>
+        <slot>on_ui_changed()</slot>
+    </connection>
+    <connection>
+        <sender>ltype</sender>
+        <signal>activated(int)</signal>
+        <receiver>GraphStyleUI</receiver>
+        <slot>on_ui_changed()</slot>
+    </connection>
+    <connection>
+        <sender>lstyle</sender>
+        <signal>activated(int)</signal>
+        <receiver>GraphStyleUI</receiver>
+        <slot>on_ui_changed()</slot>
+    </connection>
+    <connection>
+        <sender>lwidth</sender>
+        <signal>valueChanged(int)</signal>
+        <receiver>GraphStyleUI</receiver>
+        <slot>on_ui_changed()</slot>
+    </connection>
+    <connection>
+        <sender>shape_ch</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>GraphStyleUI</receiver>
+        <slot>on_checks_changed()</slot>
+    </connection>
+    <connection>
+        <sender>size_ch</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>GraphStyleUI</receiver>
+        <slot>on_checks_changed()</slot>
+    </connection>
+    <connection>
+        <sender>fill_ch</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>GraphStyleUI</receiver>
+        <slot>on_checks_changed()</slot>
+    </connection>
+    <connection>
+        <sender>color_ch</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>GraphStyleUI</receiver>
+        <slot>on_checks_changed()</slot>
+    </connection>
+    <connection>
+        <sender>lstyle_ch</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>GraphStyleUI</receiver>
+        <slot>on_checks_changed()</slot>
+    </connection>
+    <connection>
+        <sender>ltype_ch</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>GraphStyleUI</receiver>
+        <slot>on_checks_changed()</slot>
+    </connection>
+    <connection>
+        <sender>lwidth_ch</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>GraphStyleUI</receiver>
+        <slot>on_checks_changed()</slot>
+    </connection>
+    <connection>
+        <sender>group</sender>
+        <signal>activated(int)</signal>
+        <receiver>GraphStyleUI</receiver>
+        <slot>on_group_changed()</slot>
+    </connection>
+</connections>
+<slots>
+    <slot>on_ui_changed()</slot>
+    <slot>on_checks_changed()</slot>
+    <slot>on_group_changed()</slot>
+</slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>
