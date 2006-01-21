@@ -752,7 +752,7 @@ graphs [
     xtype:S, ytype:S, xtitle:S, ytitle:S,
     datasets [
         id:S, worksheet:S, x:S, y:S,
-        symbol:S, color:I, size:I, linetype:S,
+        symbol:S, fill:S, color:I, size:I, linetype:S,
         linestyle:S, linewidth:I,
         xfrom:D, xto:D 
     ],
