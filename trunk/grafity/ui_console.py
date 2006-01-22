@@ -125,7 +125,7 @@ class Console (QextScintilla):
             self.run()
 
     def get_input(self, line=-2):
-        return unicode(self.text(self.lines()+line)).split('\n')[0][4:self.lineLength(self.lines()+line)]
+        return unicode(self.text(self.lines()+line)).split('\n')[0][len(sys.ps1):self.lineLength(self.lines()+line)]
             
     def run(self):
         """

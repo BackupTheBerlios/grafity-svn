@@ -46,12 +46,16 @@ class GraphFit(GraphFitUI):
             self.function.disconnect('add-term', self.on_add_term)
             self.function.disconnect('remove-term', self.on_remove_term)
             self.function.disconnect('modified', self.on_modified)
+            for term in self.function.terms:
+                term._box.close()
         self.graph = graph
         if self.graph is not None:
             self.function = self.graph.function
             self.function.connect('add-term', self.on_add_term)
             self.function.connect('remove-term', self.on_remove_term)
             self.function.connect('modified', self.on_modified)
+            for term in self.function.terms:
+                self.on_add_term(term)
 
     def on_add_term(self, term):
         print >>sys.stderr, 'on-add-term', term
