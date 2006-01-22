@@ -31,17 +31,82 @@ class GraphFit(GraphFitUI):
         self.mainwin = mainwin
         self.graph = None
 
-    def set_graph(self, graph):
-#        if self.graph is not None:
-#            self.graph.disconnect('set-title', self.on_set_title)
-#            self.graph.disconnect('set-scale', self.on_set_scale)
-        self.graph = graph
-#        if self.graph is not None:
-#            self.graph.connect('set-title', self.on_set_title)
-#            self.graph.connect('set-scale', self.on_set_scale)
+        self.scrolled = QScrollView(self)
+        self.layout().add(self.scrolled)
+        self.scrolled.setVScrollBarMode(QScrollView.AlwaysOn)
+        self.scrolled.setHScrollBarMode(QScrollView.AlwaysOff)
+        self.box = QVBox(self.scrolled)
+        self.scrolled.addChild(self.box)
 
     def on_add_function(self):
         FunctionsWindow(self.mainwin, self).exec_loop()
+
+    def set_graph(self, graph):
+        if self.graph is not None:
+            self.function.disconnect('add-term', self.on_add_term)
+            self.function.disconnect('remove-term', self.on_remove_term)
+            self.function.disconnect('modified', self.on_modified)
+        self.graph = graph
+        if self.graph is not None:
+            self.function = self.graph.function
+            self.function.connect('add-term', self.on_add_term)
+            self.function.connect('remove-term', self.on_remove_term)
+            self.function.connect('modified', self.on_modified)
+
+    def on_add_term(self, term):
+        print >>sys.stderr, 'on-add-term', term
+        term._box = box = QVBox(self.box)
+        box.setMaximumSize(QSize(120,3000))
+        buttons = QHBox(box)
+        term._butt = QPushButton('function', buttons)
+        term._butt.setSizePolicy(QSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed))
+        term._butt.setToggleButton(True)
+        hidebtn = QToolButton(buttons)
+        hidebtn.setText('^')
+        hidebtn.setMinimumSize(QSize(20,0))
+        hidebtn.setToggleButton(True)
+        hidebtn.setOn(False)
+        hidebtn.setAutoRaise(True)
+        closebtn = QToolButton(buttons)
+        self.connect(closebtn, SIGNAL("clicked()"), self.on_close(term))
+        closebtn.setText('x')
+        closebtn.setMinimumSize(QSize(20,0))
+        closebtn.setAutoRaise(True)
+
+        term._grid = grid = QGrid(3, box)
+
+        term._text = []
+        term._lock = []
+        for n, par in enumerate(term.function.parameters):
+            label = QLabel(par, grid)
+            edit = QLineEdit(grid)
+            edit.setMinimumSize(QSize(20, 0))
+            lock = QCheckBox(grid)
+            term._text.append(edit)
+            term._lock.append(lock)
+        box.show()
+
+    def on_close(self, term):
+        import new
+        def close():
+            self.function.remove(self.function.terms.index(term))
+        term._close = close
+        return close
+
+    def on_remove_term(self, term):
+        term._box.close()
+
+    def on_modified(self, term):
+        for term in self.function.terms:
+            for i, txt in enumerate(term._text):
+                txt.setText(str(term.parameters[i]))
+
+    def add_function(self, f):
+        print >>sys.stderr, 'add-function'
+        n = 0
+        while 'f%d'%n in [t.name for t in self.function.terms]:
+            n+= 1
+        self.function.add(f.name, 'f%d'%n)
 
 
 class EventHandler(QObject):
@@ -667,3 +732,6 @@ class FunctionsWindow(FunctionsWindowUI):
         registry.rescan()
         self.fill()
         self.functions.setSelected(self.functions.findItem(self.func.name, 0), True)
+
+    def on_add_function_clicked(self):
+        self.fitwin.add_function(self.func)

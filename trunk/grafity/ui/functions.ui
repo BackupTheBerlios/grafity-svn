@@ -13,7 +13,7 @@
         </rect>
     </property>
     <property name="caption">
-        <string>Form1</string>
+        <string>Fit Functions</string>
     </property>
     <vbox>
         <property name="name">
@@ -240,7 +240,7 @@
                 </widget>
                 <widget class="QPushButton">
                     <property name="name">
-                        <cstring>pushButton2</cstring>
+                        <cstring>add_btn</cstring>
                     </property>
                     <property name="text">
                         <string>Add to fit function</string>
@@ -322,16 +322,20 @@
         <receiver>FunctionsWindowUI</receiver>
         <slot>on_delete()</slot>
     </connection>
+    <connection>
+        <sender>add_btn</sender>
+        <signal>clicked()</signal>
+        <receiver>FunctionsWindowUI</receiver>
+        <slot>on_add_function_clicked()</slot>
+    </connection>
 </connections>
-<includes>
-    <include location="local" impldecl="in implementation">functions.ui.h</include>
-</includes>
 <slots>
     <slot>on_selection_changed()</slot>
     <slot>on_ui_changed()</slot>
     <slot>equation_returnPressed()</slot>
     <slot>on_new()</slot>
     <slot>on_delete()</slot>
+    <slot>on_add_function_clicked()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

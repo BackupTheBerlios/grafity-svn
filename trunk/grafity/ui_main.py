@@ -315,7 +315,7 @@ class MainWindow(MainWindowUI):
         self.rpanel.add('Axes', getpixmap('axes'), self.graph_axes)
         self.rpanel.add('fit', getpixmap('function'), self.graph_fit)
 
-        self.open_project(grafity.Project('test/pdms.gt'))
+        self.open_project(grafity.Project('../test/pdms.gt'))
 
     def on_activated(self, obj):
         if isinstance(obj, grafity.Graph):

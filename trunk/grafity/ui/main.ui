@@ -29,6 +29,18 @@
     <property name="caption">
         <string>Grafity</string>
     </property>
+    <property name="iconText">
+        <string>ass</string>
+    </property>
+    <property name="usesBigPixmaps">
+        <bool>false</bool>
+    </property>
+    <property name="usesTextLabel">
+        <bool>false</bool>
+    </property>
+    <property name="opaqueMoving">
+        <bool>true</bool>
+    </property>
 </widget>
 <menubar>
     <property name="name">
@@ -55,7 +67,7 @@
 <toolbars>
     <toolbar dock="2">
         <property name="name">
-            <cstring>Toolbar</cstring>
+            <cstring>toolbar</cstring>
         </property>
         <property name="movingEnabled">
             <bool>false</bool>

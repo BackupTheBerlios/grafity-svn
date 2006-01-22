@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>163</width>
+            <width>166</width>
             <height>498</height>
         </rect>
     </property>
@@ -43,6 +43,18 @@
                     <property name="iconSet">
                         <iconset>image0</iconset>
                     </property>
+                    <property name="usesTextLabel">
+                        <bool>true</bool>
+                    </property>
+                    <property name="textLabel">
+                        <string>Add</string>
+                    </property>
+                    <property name="autoRaise">
+                        <bool>true</bool>
+                    </property>
+                    <property name="textPosition">
+                        <enum>BesideIcon</enum>
+                    </property>
                 </widget>
                 <widget class="QToolButton">
                     <property name="name">
@@ -53,6 +65,18 @@
                     </property>
                     <property name="iconSet">
                         <iconset>image1</iconset>
+                    </property>
+                    <property name="usesTextLabel">
+                        <bool>true</bool>
+                    </property>
+                    <property name="textLabel">
+                        <string>Remove</string>
+                    </property>
+                    <property name="autoRaise">
+                        <bool>true</bool>
+                    </property>
+                    <property name="textPosition">
+                        <enum>BesideIcon</enum>
                     </property>
                 </widget>
                 <spacer>

@@ -291,6 +291,8 @@ class FunctionSum(HasSignals):
 from grafity.project import create_id
 
 class MFunctionSum(FunctionSum):
+    signals = {'add-term(term)': 'A term has been added to the function',
+               'remove-term(term)': 'A term has been removed to the function' }
     def __init__(self, data):
         FunctionSum.__init__(self)
         self.data = data

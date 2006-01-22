@@ -174,10 +174,10 @@ class Function(HasSignals):
 #self.graph.data.functions[ind]
 
 #        DrawWithStyle.__init__(self, graph, self.data)
-        self.style._line_style = 'solid'
-        self.style._line_type = 'straight'
+#        self.style._line_style = 'solid'
+#        self.style._line_type = 'straight'
 
-        self.totalcolor, self.termcolor = totalcolor, termcolor
+#        self.totalcolor, self.termcolor = totalcolor, termcolor
 
         self.func = MFunctionSum(self.graph.data.functions)
 
@@ -226,6 +226,7 @@ class Graph(Item, HasSignals):
                     self.datasets[-1].connect('modified', self.on_dataset_modified)
 
         self.functions = []
+        self.function = MFunctionSum(self.data.functions)
 
     default_name_prefix = 'graph'
 
@@ -258,6 +259,7 @@ class Graph(Item, HasSignals):
     xmax = property(get_xmax, set_xmax)
     ymin = property(get_ymin, set_ymin)
     ymax = property(get_ymax, set_ymax)
+
 
 
     # axis scales
