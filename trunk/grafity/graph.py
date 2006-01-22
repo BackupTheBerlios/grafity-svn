@@ -67,6 +67,7 @@ class Dataset(HasSignals):
         length = min(len(self.x), len(self.y))
         x = asarray(self.x)[:length]
         y = asarray(self.y)[:length]
+        self.minx, self.maxx = min(x), max(x)
         ind = isfinite(x) & isfinite(y) & (self.xfrom <= x) & (x <= self.xto)
         xx = x[ind]
         yy = y[ind]
@@ -77,14 +78,10 @@ class Dataset(HasSignals):
     def set_range(self, _state, range):
         _state['old'] = self.xfrom, self.xto
         self.xfrom, self.xto = range
-#        self.recalculate(s)
         self.recalculate()
-#        self.emit('modified', self)
 
     def undo_set_range(self, _state):
         self.xfrom, self.xto = _state['old']
-#        self.recalculate()
-#        self.emit('modified', self)
         self.recalculate()
 
     def get_range(self):
@@ -266,28 +263,32 @@ class Graph(Item, HasSignals):
     # axis scales
 
     def set_xtype(self, _state, tp):
-        if tp == 'log' and (self.xmin <= 0 or self.xmax <= 0):
-            raise StopAction
+#        if tp == 'log' and (self.xmin <= 0 or self.xmax <= 0):
+#            raise StopAction
         _state['old'] = self._xtype
         self._xtype = tp
         self.redraw(True)
+        self.emit('set-scale', 'x', self.xtype)
     def undo_set_xtype(self, _state):
         self._xtype = _state['old']
         self.redraw(True)
+        self.emit('set-scale', 'x', self.xtype)
     set_xtype = action_from_methods2('graph-set-xaxis-scale', set_xtype, undo_set_xtype)
     def get_xtype(self):
         return self._xtype
     xtype = property(get_xtype, set_xtype)
 
     def set_ytype(self, _state, tp):
-        if tp == 'log' and (self.xmin <= 0 or self.xmax <= 0):
-            raise StopAction
+#        if tp == 'log' and (self.xmin <= 0 or self.xmax <= 0):
+#            raise StopAction
         _state['old'] = self._ytype
         self._ytype = tp
         self.redraw(True)
+        self.emit('set-scale', 'y', self.ytype)
     def undo_set_ytype(self, _state):
         self._ytype = _state['old']
         self.redraw(True)
+        self.emit('set-scale', 'y', self.ytype)
     set_ytype = action_from_methods2('graph-set-xaxis-scale', set_ytype, undo_set_ytype)
     def get_ytype(self):
         return self._ytype
@@ -300,13 +301,16 @@ class Graph(Item, HasSignals):
         state['old'], state['new'] = self._xtitle, title
         self._xtitle = title
         self.reshape()
+        self.emit('set-title', 'x', self.xtitle)
         self.redraw()
     def undo_set_xtitle(self, state):
         self._xtitle = state['old']
+        self.emit('set-title', 'x', self.xtitle)
         self.reshape()
         self.redraw()
     def redo_set_xtitle(self, state):
         self._xtitle = state['new']
+        self.emit('set-title', 'x', self.xtitle)
         self.reshape()
         self.redraw()
     def get_xtitle(self):
@@ -320,15 +324,18 @@ class Graph(Item, HasSignals):
     def set_ytitle(self, state, title):
         state['old'], state['new'] = self._ytitle, title
         self._ytitle = title
+        self.emit('set-title', 'y', self.ytitle)
         self.reshape()
         self.redraw()
     def undo_set_ytitle(self, state):
         self._ytitle = state['old']
         self.reshape()
+        self.emit('set-title', 'y', self.ytitle)
         self.redraw()
     def redo_set_ytitle(self, state):
         self._ytitle = state['new']
         self.reshape()
+        self.emit('set-title', 'y', self.ytitle)
         self.redraw()
     def get_ytitle(self):
         return self._ytitle

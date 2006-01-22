@@ -3,11 +3,18 @@ import sys
 
 from qt import *
 from qwt import *
+import qwt.qplt
+
+from grafity.arrays import clip
+import grafity.actions
+action_list = grafity.actions.action_list
+from grafity.actions import CompositeAction
 
 from grafity.ui.graph_style import GraphStyleUI
 from grafity.ui.graph_data import GraphDataUI
 from grafity.ui.graph_axes import GraphAxesUI
 from grafity.ui.graph_fit import GraphFitUI
+from grafity.ui.functions import FunctionsWindowUI
 
 from grafity import Graph, Worksheet, Folder, DATADIR
 
@@ -16,6 +23,23 @@ def getpixmap(name, pixmaps={}):
         pixmaps[name] = QPixmap(os.path.join(DATADIR, 'data', 'images', '16', name+'.png'))
     return pixmaps[name]
 
+class GraphFit(GraphFitUI):
+    def __init__(self, parent, mainwin):
+        GraphFitUI.__init__(self, parent)
+        self.mainwin = mainwin
+        self.graph = None
+
+    def set_graph(self, graph):
+#        if self.graph is not None:
+#            self.graph.disconnect('set-title', self.on_set_title)
+#            self.graph.disconnect('set-scale', self.on_set_scale)
+        self.graph = graph
+#        if self.graph is not None:
+#            self.graph.connect('set-title', self.on_set_title)
+#            self.graph.connect('set-scale', self.on_set_scale)
+
+    def on_add_function(self):
+        FunctionsWindow(self.mainwin, self).exec_loop()
 
 
 class EventHandler(QObject):
@@ -29,6 +53,44 @@ class EventHandler(QObject):
 def connectevents(object, callback):
     object.installEventFilter(EventHandler (object, callback))
 
+class GraphAxes(GraphAxesUI):
+    def __init__(self, parent, mainwin):
+        GraphAxesUI.__init__(self, parent)
+        self.mainwin = mainwin
+        self.graph = None
+        self.updating = False
+
+    def set_graph(self, graph):
+        if self.graph is not None:
+            self.graph.disconnect('set-title', self.on_set_title)
+            self.graph.disconnect('set-scale', self.on_set_scale)
+        self.graph = graph
+        if self.graph is not None:
+            self.graph.connect('set-title', self.on_set_title)
+            self.graph.connect('set-scale', self.on_set_scale)
+
+        self.on_set_title('x', self.graph.xtitle)
+        self.on_set_title('y', self.graph.ytitle)
+        self.on_set_scale('x', self.graph.xtype)
+        self.on_set_scale('y', self.graph.ytype)
+
+    def on_set_title(self, axis, title):
+        self.updating = True
+        {'x':self.xtitle,'y':self.ytitle}[axis].setText(title)
+        self.updating = False
+
+    def on_set_scale(self, axis, scale):
+        self.updating = True
+        {'x':self.xscale,'y':self.yscale}[axis].setCurrentItem(['linear','log'].index(scale))
+        self.updating = False
+
+    def on_ui_changed(self):
+        if self.updating:
+            return
+        self.graph.xtype = ['linear','log'][self.xscale.currentItem()]
+        self.graph.ytype = ['linear','log'][self.yscale.currentItem()]
+        self.graph.xtitle = unicode(self.xtitle.text())
+        self.graph.ytitle = unicode(self.ytitle.text())
 
 class GraphStyle(GraphStyleUI):
     def __init__(self, parent, mainwin):
@@ -79,13 +141,14 @@ class GraphStyle(GraphStyleUI):
         self.props = ['symbol', 'fill', 'size', 'color', 'linetype', 'linestyle', 'linewidth']
 
         self.updating = False
+        self.datasets = []
 
     def set_graph(self, graph):
-            if self.graph is not None:
-                self.graph.disconnect('selection-changed', self.on_selection_changed)
-            self.graph = graph
-            if self.graph is not None:
-                self.graph.connect('selection-changed', self.on_selection_changed)
+        if self.graph is not None:
+            self.graph.disconnect('selection-changed', self.on_selection_changed)
+        self.graph = graph
+        if self.graph is not None:
+            self.graph.connect('selection-changed', self.on_selection_changed)
 
     def set_from_dataset(self, dataset):
         """Updates the gui to reflect the style of a dataset"""
@@ -123,8 +186,13 @@ class GraphStyle(GraphStyleUI):
     def on_group_changed(self):
         self.on_selection_changed(self.datasets)
 
-    def on_selection_changed(self, datasets):
-        self.datasets = datasets
+    def on_selection_changed(self, datasets=None):
+        if datasets == None:
+            datasets = self.datasets
+        else:
+            self.datasets = datasets
+        if not hasattr(self.graph, '_view'):
+            return
         self.updating = True
         try:
             if self.graph._view.frozen or len(datasets) == 0:
@@ -256,9 +324,10 @@ class GraphData(GraphDataUI):
 
 
 class GraphView(QTabWidget):
-    def __init__(self, parent, graph):
+    def __init__(self, parent, mainwin, graph):
         QTabWidget.__init__(self, parent)
         self.graph = graph
+        self.mainwin = mainwin
         self.setTabShape(self.Triangular)
         self.setTabPosition(self.Bottom)
         self.setIcon(getpixmap('graph'))
@@ -275,6 +344,11 @@ class GraphView(QTabWidget):
         self.plot.setOutlineStyle (Qwt.Rect)
         self.plot.setAutoReplot(False)
         self.plot.canvas().setLineWidth(0)
+        self.plot.axis(self.plot.xBottom).setBaselineDist(0)
+        self.plot.axis(self.plot.xBottom).setBorderDist(0,0)
+        self.plot.axis(self.plot.yLeft).setBaselineDist(0)
+        self.plot.axis(self.plot.yLeft).setBorderDist(0,0)
+
         
         self.graph.connect('style-changed', self.on_change_style)
         self.graph.connect('zoom-changed', self.on_zoom_changed)
@@ -282,8 +356,10 @@ class GraphView(QTabWidget):
 
         self.graph.connect('add-dataset', self.on_add_dataset)
         self.graph.connect('remove-dataset', self.on_remove_dataset)
-#        self.graph.connect('add-function', self.on_modified)
+        self.graph.connect('set-title', self.on_set_title)
+        self.graph.connect('set-scale', self.on_set_scale)
 
+#        self.graph.connect('add-function', self.on_modified)
         self.frozen = False
         self.needs_redraw = False
         self.needs_legend_update = False
@@ -308,8 +384,34 @@ class GraphView(QTabWidget):
         for d in self.graph.datasets:
             self.on_add_dataset(d)
         self.update_legend()
+        self.on_set_scale('x', self.graph.xtype)
+        self.on_set_scale('y', self.graph.xtype)
+        self.on_set_title('x', self.graph.xtitle)
+        self.on_set_title('y', self.graph.ytitle)
+        self.on_zoom_changed(self.graph.xmin, self.graph.xmax, self.graph.ymin, self.graph.ymax)
         self.unfreeze()
 
+        self.rangemin = self.plot.insertLineMarker(None, QwtPlot.xBottom)
+        self.rangemax = self.plot.insertLineMarker(None, QwtPlot.xBottom)
+        self.reader = self.plot.insertLineMarker(None, QwtPlot.xBottom)
+        self.plot.setMarkerLineStyle(self.rangemin, QwtMarker.VLine)
+        self.plot.setMarkerLineStyle(self.rangemax, QwtMarker.VLine)
+        self.plot.setMarkerLineStyle(self.reader, QwtMarker.NoLine)
+        self.moving_rangemin = self.moving_rangemax = False
+
+        self.mode = 'arrow'
+
+
+    def on_set_title(self, axis, title):
+        self.plot
+
+
+    def on_set_scale(self, axis, scale):
+        if axis == 'x':
+            self.plot.changeAxisOptions(self.plot.xBottom, qwt.qplt.Logarithmic, scale=='log')
+        else:
+            self.plot.changeAxisOptions(self.plot.yLeft, qwt.qplt.Logarithmic, scale=='log')
+        self.redraw()
 
     def freeze(self):
         self.frozen = True
@@ -345,7 +447,6 @@ class GraphView(QTabWidget):
                 self.legend.setSelected(i, on)
             self.legend.setCurrentItem(current)
             self.needs_legend_update = False
-
 
     def on_add_dataset(self, d):
         d._curveid = self.plot.insertCurve('')
@@ -392,26 +493,58 @@ class GraphView(QTabWidget):
         self.redraw()
 
     def on_mouse_pressed(self, e):
-        self.xpos, self.ypos = e.pos().x(), e.pos().y()
-        self.plot.enableOutline(True)
-        self.plot.setOutlinePen(QPen(Qt.blue, 0, Qt.DotLine))
-        self.plot.setOutlineStyle(Qwt.Rect)
-        self.zooming = True
-        self.on_mouse_moved(e)
+        x = self.plot.invTransform(self.plot.xBottom, e.pos().x())
+        y = self.plot.invTransform(self.plot.yLeft, e.pos().y())
+        if self.mode == 'zoom':
+            self.xpos, self.ypos = x, y
+            self.plot.enableOutline(True)
+            self.plot.setOutlinePen(QPen(Qt.blue, 0, Qt.DotLine))
+            self.plot.setOutlineStyle(Qwt.Rect)
+            self.zooming = True
+            self.on_mouse_moved(e)
+        elif self.mode == 'range':
+            if e.button() == Qt.LeftButton:
+                self.moving_rangemin = True
+            elif e.button() == Qt.RightButton:
+                self.moving_rangemax = True
+            self.range_l = min(d.minx for d in self.datasets)
+            self.range_r = max(d.maxx for d in self.datasets)
+            self.on_mouse_moved(e)
 
     def on_mouse_released(self, e):
-        x1 = self.plot.invTransform(self.plot.xBottom, self.xpos) 
-        x2 = self.plot.invTransform(self.plot.xBottom, e.pos().x())
-        y1 = self.plot.invTransform(self.plot.yLeft, self.ypos) 
-        y2 = self.plot.invTransform(self.plot.yLeft, e.pos().y())
-        exmin, exmax, eymin, eymax = min(x1, x2), max(x1, x2), min(y1, y2), max(y1, y2)
-        if e.button() == Qt.LeftButton:
-            self.graph.zoom(exmin, exmax, eymin, eymax)
-        elif e.button() == Qt.RightButton:
-            self.graph.zoom_out(exmin, exmax, eymin, eymax)
+        x = self.plot.invTransform(self.plot.xBottom, e.pos().x())
+        y = self.plot.invTransform(self.plot.yLeft, e.pos().y())
+        if self.mode == 'zoom':
+            xmin, xmax, ymin, ymax = min(self.xpos, x), max(self.xpos, x), min(self.ypos, y), max(self.ypos, y)
+            if e.button() == Qt.LeftButton:
+                self.graph.zoom(xmin, xmax, ymin, ymax)
+            elif e.button() == Qt.RightButton:
+                self.graph.zoom_out(xmin, xmax, ymin, ymax)
+        elif self.mode == 'range':
+            self.moving_rangemin = self.moving_rangemax = False
+            if e.button() == Qt.MidButton:
+                for d in self.datasets:
+                    d.range = (self.range_l, self.range_r)
+                    self.plot.setMarkerXPos(self.rangemin, min(d.range[0] for d in self.datasets))
+                    self.plot.setMarkerXPos(self.rangemax, max(d.range[1] for d in self.datasets))
 
     def on_mouse_moved(self, e):
-        pass
+        x = self.plot.invTransform(self.plot.xBottom, e.pos().x())
+        y = self.plot.invTransform(self.plot.yLeft, e.pos().y())
+        if self.mode == 'range':
+            xpos = clip(x, self.range_l, self.range_r)
+            self.freeze()
+            action_list.begin_composite(CompositeAction())
+            if self.moving_rangemin:
+                self.plot.setMarkerXPos(self.rangemin, xpos)
+                for d in self.datasets:
+                    d.range = (xpos, d.range[1])
+            elif self.moving_rangemax:
+                self.plot.setMarkerXPos(self.rangemax, xpos)
+                for d in self.datasets:
+                    d.range = (d.range[0], xpos)
+            action_list.end_composite().register()
+            self.unfreeze()
 
     def on_canvas_event(self, event):
         return False
@@ -449,30 +582,33 @@ class GraphView(QTabWidget):
 
     def on_change_style(self, d, style, value):
         curve = self.plot.curve(d._curveid)
-        try:
-            if style == 'symbol':
-                curve.symbol().setStyle(self.symbols[value.split('-')[0]])
-#            try:
-#                curve.symbol().brush().setStyle(self.symbol_brushes[value.split('-')[1]])
-#            except IndexError:
-#                pass
-            elif style == 'color':
-                color = self.qcolors[self.colors.index(value)]
-                curve.symbol().brush().setColor(color)
-                curve.symbol().pen().setColor(color)
-                curve.pen().setColor(color)
-            elif style == 'size':
-                curve.symbol().setSize(value)
-            elif style == 'linetype':
-                curve.setStyle(self.linetypes[value])
-            elif style == 'linestyle':
-                curve.pen().setStyle(self.linestyles[value])
-            elif style == 'linewidth':
-                curve.pen().setWidth(value)
+        if style == 'symbol':
+            curve.symbol().setStyle(self.symbols[value])
+        elif style == 'fill':
+            if value == 'open':
+                brush = self.fills['open']
+            elif value == 'filled':
+                brush = QBrush(self.qcolors[self.colors.index(d.style.color)])
+            curve.symbol().setBrush(brush)
+        elif style == 'color':
+            color = self.qcolors[self.colors.index(value)]
+            curve.symbol().brush().setColor(color)
+            curve.symbol().pen().setColor(color)
+            curve.pen().setColor(color)
+        elif style == 'size':
+            curve.symbol().setSize(value)
+        elif style == 'linetype':
+            curve.setStyle(self.line_types[self.line_type_names.index(value)])
+        elif style == 'linestyle':
+            curve.pen().setStyle(self.line_styles[self.line_style_names.index(value)])
+        elif style == 'linewidth':
+            curve.pen().setWidth(value)
 
-            self.redraw()
-        except:
-            pass
+        self.redraw()
+        self.mainwin.graph_style.on_selection_changed()
 
-
+class FunctionsWindow(FunctionsWindowUI):
+    def __init__(self, parent, fitwin):
+        FunctionsWindowUI.__init__(self, parent)
+        self.fitwin = fitwin
 

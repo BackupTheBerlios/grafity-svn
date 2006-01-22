@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>152</width>
-            <height>355</height>
+            <width>220</width>
+            <height>359</height>
         </rect>
     </property>
     <property name="caption">
@@ -27,17 +27,11 @@
         </property>
         <widget class="QLayoutWidget">
             <property name="name">
-                <cstring>layout25</cstring>
+                <cstring>layout12</cstring>
             </property>
             <hbox>
                 <property name="name">
                     <cstring>unnamed</cstring>
-                </property>
-                <property name="margin">
-                    <number>0</number>
-                </property>
-                <property name="spacing">
-                    <number>0</number>
                 </property>
                 <widget class="QToolButton">
                     <property name="name">
@@ -95,6 +89,23 @@
                         <bool>true</bool>
                     </property>
                 </widget>
+                <spacer>
+                    <property name="name">
+                        <cstring>spacer5</cstring>
+                    </property>
+                    <property name="orientation">
+                        <enum>Horizontal</enum>
+                    </property>
+                    <property name="sizeType">
+                        <enum>Expanding</enum>
+                    </property>
+                    <property name="sizeHint">
+                        <size>
+                            <width>40</width>
+                            <height>20</height>
+                        </size>
+                    </property>
+                </spacer>
             </hbox>
         </widget>
         <widget class="QFrame">
@@ -132,5 +143,16 @@
         <data format="PNG" length="809">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff61000002f049444154388d8d93cb6f136714c5cff7f08c67c633e3f723496d8343c88364d10ab280aa0b6885da45a5aa522344ff844a2ca12c58205855eab6ff47ba6a854a2812a84949a0b855317990d4210f278ee3c7783c33dfc702256a10a83ddbabf3d3b9bae712fc0f114e0804511542a924088484eb07feebd97f995555358e6573e74632a9f3897024d609bceafac6de0f77179f6e00007f97b14fd5c1d3037c64b4f4d5c4f0e8b72772c9bcbae386d46ed39dffe389f17c67fdbb6a63778bbdcd9cd70ca40612f6f1bc3d7569ea8b5b1f7d7c319f2b0db26aa701d16e72e6774f569bad5a75b7f6f8ad099c90a74e9cd2be1c1dd6afe743e59cf32781881d072211ccee34a034f7348590a8c2283d02e09460f2fd8c313e969a3a3799bede1f0f174d61617f6506ce8b322add24661ecde2345369c37593b952493f02c89a5aa4908d5c3e336edf2866125925e8476b6d09416f178d5613f7661ea3eb3828b7eae15a185fc7d3a93b87005bcdf291a1ec679363a7ae1c3358466e13b4bb5bf0dbbb683b0cd52d862ee5a09c62c9a9c38ee7628491f821c034032b3f38f8f907172e97a2d108592f3f80577b0aa7a9e0e5b6824d2f84978bf3e8747de4860abd58323e277dff2f7a00885a56aad8df37163313cc693711326c4835838d1a07a11a2acb6be8783d240a7db093b1b2046e867868e1750246201479a1e9b6862a953962eb0afc9e8bf6be03e18671bfb282072bab48170b7e349958e4947dd30bc46f96ae7b1c0018639a66c5cf2e3cfb27bcb45cc5a58b67e136eaf8bbbc88f967abb8ff620dc6409f48a55373006e0a2f78f8fb9d5f82c3261210bdbeb737beb95943d071215b2d74da2dac6d37b02f04528305a159f67329c435dff71e122038589d0080aa6926a4b82d0391d74d73423723053d6a2162580137f41d0a2c504abf0fdcee4fb377efc97f9f9e0000e79c4821a3d198ad154787af1245f91484ac3242172865bf4a89b2aaaacb33d3d3de9bad3df28d1f7e729e1246dff324e23dcfabab201b866eb83f4fff28df341ee815485129119732b8850000000049454e44ae426082</data>
     </image>
 </images>
+<connections>
+    <connection>
+        <sender>toolButton1</sender>
+        <signal>clicked()</signal>
+        <receiver>GraphFitUI</receiver>
+        <slot>on_add_function()</slot>
+    </connection>
+</connections>
+<slots>
+    <slot>on_add_function()</slot>
+</slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

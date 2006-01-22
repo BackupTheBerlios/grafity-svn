@@ -87,13 +87,23 @@
                                     <number>0</number>
                                 </property>
                                 <widget class="QComboBox" row="3" column="1">
+                                    <item>
+                                        <property name="text">
+                                            <string>linear</string>
+                                        </property>
+                                    </item>
+                                    <item>
+                                        <property name="text">
+                                            <string>log</string>
+                                        </property>
+                                    </item>
                                     <property name="name">
-                                        <cstring>comboBox3</cstring>
+                                        <cstring>xscale</cstring>
                                     </property>
                                 </widget>
                                 <widget class="QLineEdit" row="0" column="1">
                                     <property name="name">
-                                        <cstring>lineEdit1</cstring>
+                                        <cstring>xtitle</cstring>
                                     </property>
                                 </widget>
                                 <widget class="QLabel" row="1" column="0">
@@ -146,12 +156,12 @@
                                 </widget>
                                 <widget class="QLineEdit" row="1" column="1">
                                     <property name="name">
-                                        <cstring>lineEdit2</cstring>
+                                        <cstring>xfrom</cstring>
                                     </property>
                                 </widget>
                                 <widget class="QLineEdit" row="2" column="1">
                                     <property name="name">
-                                        <cstring>lineEdit3</cstring>
+                                        <cstring>xto</cstring>
                                     </property>
                                 </widget>
                                 <widget class="QLabel" row="2" column="0">
@@ -238,13 +248,23 @@
                                     <number>0</number>
                                 </property>
                                 <widget class="QComboBox" row="3" column="1">
+                                    <item>
+                                        <property name="text">
+                                            <string>linear</string>
+                                        </property>
+                                    </item>
+                                    <item>
+                                        <property name="text">
+                                            <string>log</string>
+                                        </property>
+                                    </item>
                                     <property name="name">
-                                        <cstring>comboBox3_2</cstring>
+                                        <cstring>yscale</cstring>
                                     </property>
                                 </widget>
                                 <widget class="QLineEdit" row="0" column="1">
                                     <property name="name">
-                                        <cstring>lineEdit1_2</cstring>
+                                        <cstring>ytitle</cstring>
                                     </property>
                                 </widget>
                                 <widget class="QLabel" row="1" column="0">
@@ -297,12 +317,12 @@
                                 </widget>
                                 <widget class="QLineEdit" row="1" column="1">
                                     <property name="name">
-                                        <cstring>lineEdit2_2</cstring>
+                                        <cstring>yfrom</cstring>
                                     </property>
                                 </widget>
                                 <widget class="QLineEdit" row="2" column="1">
                                     <property name="name">
-                                        <cstring>lineEdit3_2</cstring>
+                                        <cstring>yto</cstring>
                                     </property>
                                 </widget>
                                 <widget class="QLabel" row="2" column="0">
@@ -346,5 +366,22 @@
         </spacer>
     </vbox>
 </widget>
+<connections>
+    <connection>
+        <sender>xscale</sender>
+        <signal>activated(int)</signal>
+        <receiver>GraphAxesUI</receiver>
+        <slot>on_ui_changed()</slot>
+    </connection>
+    <connection>
+        <sender>yscale</sender>
+        <signal>activated(int)</signal>
+        <receiver>GraphAxesUI</receiver>
+        <slot>on_ui_changed()</slot>
+    </connection>
+</connections>
+<slots>
+    <slot>on_ui_changed()</slot>
+</slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

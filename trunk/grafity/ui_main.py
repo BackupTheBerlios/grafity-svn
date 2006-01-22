@@ -10,7 +10,7 @@ from qt import *
 import grafity
 from grafity.signals import HasSignals
 from grafity.actions import undo, redo
-from grafity.ui_graph_view import GraphView, GraphStyle, GraphData, GraphAxesUI, GraphFitUI
+from grafity.ui_graph_view import GraphView, GraphStyle, GraphData, GraphAxes, GraphFit
 from grafity.ui_console import Console
 
 from grafity.ui.main import MainWindowUI
@@ -308,8 +308,8 @@ class MainWindow(MainWindowUI):
         self.rpanel = Panel(self, QMainWindow.DockRight)
         self.graph_data = GraphData(self.bpanel, self)
         self.graph_style = GraphStyle(self.bpanel, self)
-        self.graph_axes = GraphAxesUI(self.bpanel)
-        self.graph_fit = GraphFitUI(self.bpanel)
+        self.graph_axes = GraphAxes(self.bpanel, self)
+        self.graph_fit = GraphFit(self.bpanel, self)
         self.rpanel.add('Data', getpixmap('worksheet'), self.graph_data)
         self.rpanel.add('Style', getpixmap('style'), self.graph_style)
         self.rpanel.add('Axes', getpixmap('axes'), self.graph_axes)
@@ -319,7 +319,7 @@ class MainWindow(MainWindowUI):
 
     def on_activated(self, obj):
         if isinstance(obj, grafity.Graph):
-            obj._view = GraphView(self.workspace, obj)
+            obj._view = GraphView(self.workspace, self, obj)
             obj._view.show()
 
     def open_project(self, project):
@@ -366,8 +366,7 @@ class MainWindow(MainWindowUI):
 
     def on_graph_mode(self):
         modes = ['arrow', 'hand', 'zoom', 'range', 'dreader', 'sreader']
-        mode = modes[[getattr(self, 'act_graph_%s'%a).isOn() for a in modes].index(True)]
- 
+        self.active.mode = modes[[getattr(self, 'act_graph_%s'%a).isOn() for a in modes].index(True)]
 
     def on_project_open(self):
         """File/Open"""
@@ -453,7 +452,11 @@ class MainWindow(MainWindowUI):
             self.rpanel.show()
             self.graph_toolbar.show()
             self.graph_data.set_graph(window.graph)
+            self.graph_axes.set_graph(window.graph)
             self.graph_style.set_graph(window.graph)
+            self.graph_fit.set_graph(window.graph)
+            getattr(self, 'act_graph_%s'%window.mode).setOn(True)
+ 
         elif isinstance(window, WorksheetView):
             self.worksheet_toolbar.show()
 

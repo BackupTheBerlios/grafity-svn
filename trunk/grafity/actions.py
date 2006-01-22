@@ -52,6 +52,7 @@ class Action(signals.HasSignals):
 
     def register(self):
         """Add the action to the global action list."""
+        self.done = True
         action_list.add(self)
 
     def _do_wrapper(self):
@@ -83,6 +84,7 @@ class CompositeAction(Action):
     def __init__(self):
         Action.__init__(self)
         self.actionlist = []
+        self.state = None
 
     def add(self, action):
         """Add a action to the list."""
