@@ -9,6 +9,7 @@ from grafity.arrays import clip
 import grafity.actions
 action_list = grafity.actions.action_list
 from grafity.actions import CompositeAction
+from grafity.functions import registry, Function
 
 from grafity.ui.graph_style import GraphStyleUI
 from grafity.ui.graph_data import GraphDataUI
@@ -16,7 +17,8 @@ from grafity.ui.graph_axes import GraphAxesUI
 from grafity.ui.graph_fit import GraphFitUI
 from grafity.ui.functions import FunctionsWindowUI
 
-from grafity import Graph, Worksheet, Folder, DATADIR
+from grafity import Graph, Worksheet, Folder
+from grafity.settings import DATADIR, USERDATADIR
 
 def getpixmap(name, pixmaps={}):
     if name not in pixmaps:
@@ -611,4 +613,57 @@ class FunctionsWindow(FunctionsWindowUI):
     def __init__(self, parent, fitwin):
         FunctionsWindowUI.__init__(self, parent)
         self.fitwin = fitwin
+        self.fill()
+        self.functions.header().hide()
+        self.updating = False
+        self.func = None
 
+    def fill(self):
+        self.functions.clear()
+        for function in registry:
+            item = QListViewItem(self.functions, function.name)
+
+    def on_selection_changed(self):#, item=None):
+        item = self.functions.selectedItem()
+        if item is None:
+            self.func = None
+            self.tabs.setEnabled(False)
+        else:
+            self.updating = True
+            self.tabs.setEnabled(True)
+            func = registry[unicode(item.text(0))]
+            if self.func is None or func.name != self.func.name:
+                self.name.setText(func.name)
+                self.parameters.setText(', '.join(func.parameters))
+                self.equation.setText(func.text)
+#            self.extra.setText(func.extra)
+            self.func = func
+            self.updating = False
+
+    def on_delete(self):
+        os.remove(self.func.filename)
+        registry.rescan()
+        self.fill()
+
+    def on_new(self):
+        num = 0
+        while 'function%d.function'%num in (f.filename.split('/')[-1] for f in registry):
+            num += 1
+        self.function = Function('function%d'%num, [], 'y=f(x)', '')
+        open(USERDATADIR+'/functions/function%d.function'%num, 'wb').write(self.function.tostring())
+#        self.scan('functions')
+        registry.rescan()
+        self.fill()
+        self.functions.setSelected(self.functions.findItem('function%d'%num, 0), True)
+
+    def on_ui_changed(self):
+        if self.func is None or self.updating:
+            return
+        self.func.name = unicode(self.name.text())
+        self.func.parameters = [p.strip() for p in unicode(self.parameters.text()).split(',')]
+        self.func.text = unicode(self.equation.text())
+#        self.func.extra = unicode(self.extra.text())
+        self.func.save()
+        registry.rescan()
+        self.fill()
+        self.functions.setSelected(self.functions.findItem(self.func.name, 0), True)

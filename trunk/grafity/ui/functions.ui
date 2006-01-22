@@ -33,9 +33,12 @@
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
+                <property name="margin">
+                    <number>5</number>
+                </property>
                 <widget class="QToolButton">
                     <property name="name">
-                        <cstring>toolButton1</cstring>
+                        <cstring>new_btn</cstring>
                     </property>
                     <property name="text">
                         <string></string>
@@ -46,13 +49,22 @@
                     <property name="usesBigPixmap">
                         <bool>false</bool>
                     </property>
+                    <property name="usesTextLabel">
+                        <bool>true</bool>
+                    </property>
+                    <property name="textLabel">
+                        <string>New</string>
+                    </property>
                     <property name="autoRaise">
                         <bool>true</bool>
+                    </property>
+                    <property name="textPosition">
+                        <enum>BesideIcon</enum>
                     </property>
                 </widget>
                 <widget class="QToolButton">
                     <property name="name">
-                        <cstring>toolButton2</cstring>
+                        <cstring>delete_btn</cstring>
                     </property>
                     <property name="text">
                         <string></string>
@@ -63,8 +75,17 @@
                     <property name="usesBigPixmap">
                         <bool>false</bool>
                     </property>
+                    <property name="usesTextLabel">
+                        <bool>true</bool>
+                    </property>
+                    <property name="textLabel">
+                        <string>Delete</string>
+                    </property>
                     <property name="autoRaise">
                         <bool>true</bool>
+                    </property>
+                    <property name="textPosition">
+                        <enum>BesideIcon</enum>
                     </property>
                 </widget>
                 <spacer>
@@ -113,21 +134,16 @@
                         <bool>true</bool>
                     </property>
                 </column>
-            <item>
-                <property name="text">
-                    <string>New Item</string>
-                </property>
-                <property name="pixmap">
-                    <pixmap></pixmap>
-                </property>
-            </item>
                 <property name="name">
-                    <cstring>listView1</cstring>
+                    <cstring>functions</cstring>
+                </property>
+                <property name="selectionMode">
+                    <enum>Single</enum>
                 </property>
             </widget>
             <widget class="QTabWidget">
                 <property name="name">
-                    <cstring>tabWidget2</cstring>
+                    <cstring>tabs</cstring>
                 </property>
                 <widget class="QWidget">
                     <property name="name">
@@ -166,12 +182,12 @@
                                 </widget>
                                 <widget class="QLineEdit" row="1" column="1">
                                     <property name="name">
-                                        <cstring>lineEdit8</cstring>
+                                        <cstring>parameters</cstring>
                                     </property>
                                 </widget>
                                 <widget class="QLineEdit" row="0" column="1">
                                     <property name="name">
-                                        <cstring>lineEdit9</cstring>
+                                        <cstring>name</cstring>
                                     </property>
                                 </widget>
                             </grid>
@@ -194,7 +210,7 @@
                                 </widget>
                                 <widget class="QTextEdit">
                                     <property name="name">
-                                        <cstring>textEdit1</cstring>
+                                        <cstring>equation</cstring>
                                     </property>
                                 </widget>
                             </vbox>
@@ -213,7 +229,7 @@
                 </property>
                 <widget class="QPushButton">
                     <property name="name">
-                        <cstring>pushButton1</cstring>
+                        <cstring>close_button</cstring>
                     </property>
                     <property name="text">
                         <string>Close</string>
@@ -251,5 +267,71 @@
         <data format="PNG" length="491">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff61000001b249444154388da592bf6b54511085bfbbae4b94f54740ac626191ce26dbf92fa4b0f2bf5011b4d1c6c6c67482adb1b31445041bedc5622b3b0b618b8564d94db2d9ecdbf7eecc198b178dc85b0864cacbdc33df9c3970c64a4d8fd75f5fecdf585ddb080592908bc168f86dff6179fbffde76934028f164f31e339b5079c1706fc0cb0fef1b099a0522f030a67987d2e61c961322a251a0d54c102884872119114178e3ff9ae0daf6853e4a840204ad68dd8c10ee86c948095aadb47e69abd30f3f1ea0a07866bd04d07bb71e4f37efd713434488b91d305afc225b45990bbae757e9a42e9515ccab23de7cfcc2f0f1416a0348c1ccc64cf32e1e86bb9155629631cfb88cc97c07f721ee4ece86999fac1012952f286d8e5463bb1cf34cf6b23ea51c4944d4f8a138119082c96c976939ae0d2338d74eb81b92c8d9288a8c24dc1d33475e0b2480abaf567ea4a8cd094122ad3dba7be7ca74314172a6870bde7efe3e963108fde90bec45f4da00fb0f16b7fe3d4d77abd35f695dded8f3d1f154e1397e56cf75ba244a41650bdcbdded99d25395a9ec4a23a2267430accf5d7b4d31178b0fde92b6e5e87c683f0250867addf9b0f60cd038611e30000000049454e44ae426082</data>
     </image>
 </images>
+<connections>
+    <connection>
+        <sender>close_button</sender>
+        <signal>clicked()</signal>
+        <receiver>FunctionsWindowUI</receiver>
+        <slot>close()</slot>
+    </connection>
+    <connection>
+        <sender>functions</sender>
+        <signal>selectionChanged()</signal>
+        <receiver>FunctionsWindowUI</receiver>
+        <slot>on_selection_changed()</slot>
+    </connection>
+    <connection>
+        <sender>name</sender>
+        <signal>lostFocus()</signal>
+        <receiver>FunctionsWindowUI</receiver>
+        <slot>on_ui_changed()</slot>
+    </connection>
+    <connection>
+        <sender>name</sender>
+        <signal>returnPressed()</signal>
+        <receiver>FunctionsWindowUI</receiver>
+        <slot>on_ui_changed()</slot>
+    </connection>
+    <connection>
+        <sender>parameters</sender>
+        <signal>lostFocus()</signal>
+        <receiver>FunctionsWindowUI</receiver>
+        <slot>on_ui_changed()</slot>
+    </connection>
+    <connection>
+        <sender>parameters</sender>
+        <signal>returnPressed()</signal>
+        <receiver>FunctionsWindowUI</receiver>
+        <slot>on_ui_changed()</slot>
+    </connection>
+    <connection>
+        <sender>equation</sender>
+        <signal>textChanged()</signal>
+        <receiver>FunctionsWindowUI</receiver>
+        <slot>on_ui_changed()</slot>
+    </connection>
+    <connection>
+        <sender>new_btn</sender>
+        <signal>clicked()</signal>
+        <receiver>FunctionsWindowUI</receiver>
+        <slot>on_new()</slot>
+    </connection>
+    <connection>
+        <sender>delete_btn</sender>
+        <signal>clicked()</signal>
+        <receiver>FunctionsWindowUI</receiver>
+        <slot>on_delete()</slot>
+    </connection>
+</connections>
+<includes>
+    <include location="local" impldecl="in implementation">functions.ui.h</include>
+</includes>
+<slots>
+    <slot>on_selection_changed()</slot>
+    <slot>on_ui_changed()</slot>
+    <slot>equation_returnPressed()</slot>
+    <slot>on_new()</slot>
+    <slot>on_delete()</slot>
+</slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>
