@@ -108,6 +108,7 @@ class GraphView(QTabWidget):
             self.on_add_function_term(t)
         self.graph.function._curveid = self.plot.insertCurve('')
         self.plot.curve(self.graph.function._curveid).pen().setColor(Qt.blue)
+        self.on_function_modified()
         self.update_legend()
         self.on_set_scale('x', self.graph.xtype)
         self.on_set_scale('y', self.graph.xtype)
@@ -137,9 +138,11 @@ class GraphView(QTabWidget):
         self.redraw()
 
     def freeze(self):
+        print >>sys.stderr, 'freeze!'
         self.frozen = True
 
     def unfreeze(self):
+        print >>sys.stderr, 'unfreeze!'
         self.frozen = False
         if self.needs_redraw:
             self.redraw()
@@ -175,7 +178,7 @@ class GraphView(QTabWidget):
         term._curveid = self.plot.insertCurve('')
 
     def on_remove_function_term(self, term):
-        self.plot.removeCurve(d._curveid)
+        self.plot.removeCurve(term._curveid)
 
     def on_add_dataset(self, d):
         d._curveid = self.plot.insertCurve('')
@@ -476,6 +479,7 @@ class GraphFit(GraphFitUI):
             term._text.append(edit)
             term._lock.append(lock)
         box.show()
+        self.on_modified()
 
     def on_close(self, term):
         def close():
@@ -488,8 +492,16 @@ class GraphFit(GraphFitUI):
 
     def on_modified(self):
         for term in self.function.terms:
-            for i, txt in enumerate(term._text):
-                txt.setText(str(term.parameters[i]))
+            if hasattr(term, '_text'):
+                for i, txt in enumerate(term._text):
+                    txt.setText(str(term.parameters[i]))
+
+    def on_fit_clicked(self):
+        data = self.graph._view.datasets[0]
+        lock = [check.isOn() for term in self.function.terms for check in term._lock]
+        ind = data.active_data()
+        self.function.fit(data.x[ind], data.y[ind], lock, 50)
+        self.function.emit('modified')
 
     def add_function(self, f):
         print >>sys.stderr, 'add-function'

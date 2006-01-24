@@ -8,7 +8,7 @@ import sys
 from qt import *
 
 import grafity
-from grafity.signals import HasSignals
+from grafity.signals import HasSignals, global_connect
 from grafity.actions import undo, redo
 from grafity.ui_graph_view import GraphView, GraphStyle, GraphData, GraphAxes, GraphFit
 from grafity.ui_console import Console
@@ -274,12 +274,12 @@ class MainWindow(MainWindowUI):
 ### status bar #################################################################################
 
         self.statusBar().show()
-        self.statusBar().message ("Welcome to Grafity", 1000)
-        self.statuslabel = QLabel (self, 'Pikou')
-        self.statusBar().addWidget (self.statuslabel, 0, True)
-        self.statuslabel.setText ("")
+        self.statusBar().message("Welcome to Grafity", 1000)
+        self.statuslabel = QLabel(self, 'Pikou')
+        self.statusBar().addWidget(self.statuslabel, 0, True)
+        self.statuslabel.setText("")
         self.progressbar = QProgressBar(100, self)
-        self.statusBar().addWidget (self.progressbar, 0, True)
+        self.statusBar().addWidget(self.progressbar, 0, True)
         self.progressbar.hide()
 
 ### bottom panel ###############################################################################
@@ -316,6 +316,8 @@ class MainWindow(MainWindowUI):
         self.rpanel.add('fit', getpixmap('function'), self.graph_fit)
 
         self.open_project(grafity.Project('../test/pdms.gt'))
+
+        global_connect('status-message', self.status_message)
 
     def on_activated(self, obj):
         if isinstance(obj, grafity.Graph):
@@ -489,8 +491,9 @@ class MainWindow(MainWindowUI):
         else:
             QApplication.exit(0)
         
-    def status_message(self, msg, time = 1000):
+    def status_message(self, obj, msg, time=1000):
         self.statusBar().message(msg, time)
+        self.app.processEvents()
 
     def about(self):
         a = AboutWindow(self)  
@@ -500,6 +503,7 @@ class MainWindow(MainWindowUI):
         from grafit.help import HelpWidget
         h = HelpWidget(self)
         h.show()
+
 def splash_message(text):
     if __name__ == '__main__':
         splash.message (text, Qt.AlignLeft, Qt.gray)

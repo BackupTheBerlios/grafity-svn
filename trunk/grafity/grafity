@@ -40,6 +40,7 @@ splash.message('')
 
 from ui_main import MainWindow
 mainwin = MainWindow()
+mainwin.app = app
 splash.finish(mainwin)
 app.setMainWidget(mainwin)
 mainwin.show()

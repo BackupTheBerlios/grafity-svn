@@ -131,9 +131,16 @@
         <receiver>GraphFitUI</receiver>
         <slot>on_add_function()</slot>
     </connection>
+    <connection>
+        <sender>toolButton3</sender>
+        <signal>clicked()</signal>
+        <receiver>GraphFitUI</receiver>
+        <slot>on_fit_clicked()</slot>
+    </connection>
 </connections>
 <slots>
     <slot>on_add_function()</slot>
+    <slot>on_fit_clicked()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>
