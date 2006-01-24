@@ -225,7 +225,7 @@ class Graph(Item, HasSignals):
                     self.datasets.append(Dataset(self, i))
                     self.datasets[-1].connect('modified', self.on_dataset_modified)
 
-        self.functions = []
+#        self.functions = []
         self.function = MFunctionSum(self.data.functions)
 
     default_name_prefix = 'graph'

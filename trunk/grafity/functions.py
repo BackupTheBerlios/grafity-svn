@@ -321,7 +321,8 @@ class MFunctionSum(FunctionSum):
         self.terms.append(term)
         self.emit('add-term', term)
         term.data.id = term.data.id[1:]
-    on_add_term = action_from_methods2('graph/add-function-term', on_add_term, undo_add_term, redo=redo_add_term)
+    on_add_term = action_from_methods2('graph/add-function-term', on_add_term, 
+                                       undo_add_term, redo=redo_add_term)
 
     def on_remove_term(self, state, term):
         if hasattr(term, 'data') and term.data.id.startswith('-'):
@@ -330,7 +331,9 @@ class MFunctionSum(FunctionSum):
         state['term'] = term
     undo_remove_term = redo_add_term
     redo_remove_term = undo_add_term
-    on_remove_term = action_from_methods2('graph/remove-function-term', on_remove_term, undo_remove_term, redo=redo_remove_term)
+    on_remove_term = action_from_methods2('graph/remove-function-term', on_remove_term, 
+                                          undo_remove_term, redo=redo_remove_term)
+
     
 class Function(HasSignals):
     def __init__(self, name='', parameters=[], text='', extra=''):
