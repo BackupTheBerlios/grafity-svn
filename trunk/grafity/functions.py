@@ -334,6 +334,7 @@ class MFunctionSum(FunctionSum):
     on_remove_term = action_from_methods2('graph/remove-function-term', on_remove_term, 
                                           undo_remove_term, redo=redo_remove_term)
 
+
     
 class Function(HasSignals):
     def __init__(self, name='', parameters=[], text='', extra=''):

@@ -14,6 +14,7 @@ from grafity.ui.graph_data import GraphDataUI
 from grafity.ui.graph_axes import GraphAxesUI
 from grafity.ui.graph_fit import GraphFitUI
 from grafity.ui.functions import FunctionsWindowUI
+from grafity.ui.fitoptions import FitOptionsUI
 
 from grafity import Graph, Worksheet, Folder
 from grafity.settings import DATADIR, USERDATADIR
@@ -138,11 +139,9 @@ class GraphView(QTabWidget):
         self.redraw()
 
     def freeze(self):
-        print >>sys.stderr, 'freeze!'
         self.frozen = True
 
     def unfreeze(self):
-        print >>sys.stderr, 'unfreeze!'
         self.frozen = False
         if self.needs_redraw:
             self.redraw()
@@ -278,6 +277,8 @@ class GraphView(QTabWidget):
                     d.range = (d.range[0], xpos)
             action_list.end_composite().register()
             self.unfreeze()
+        elif self.mode == 'hand':
+            self.mainwin.graph_fit.active_term.move(x, y)
 
     def on_canvas_event(self, event):
         return False
@@ -351,6 +352,9 @@ class GraphView(QTabWidget):
 
         self.redraw()
         self.mainwin.graph_style.on_selection_changed()
+
+class FitOptions(FitOptionsUI):
+    pass
 
 class FunctionsWindow(FunctionsWindowUI):
     def __init__(self, parent, fitwin):
@@ -427,8 +431,14 @@ class GraphFit(GraphFitUI):
         self.box = QVBox(self.scrolled)
         self.scrolled.addChild(self.box)
 
-    def on_add_function(self):
+        self.toggling = False
+        self.active_term = None
+
+    def on_function_clicked(self):
         FunctionsWindow(self.mainwin, self).exec_loop()
+
+    def on_fitoptions_clicked(self):
+        FitOptions(self.mainwin).exec_loop()
 
     def set_graph(self, graph):
         if self.graph is not None:
@@ -453,7 +463,9 @@ class GraphFit(GraphFitUI):
         term._butt = QPushButton('function', buttons)
         term._butt.setSizePolicy(QSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed))
         term._butt.setToggleButton(True)
+        self.connect(term._butt, SIGNAL("toggled(bool)"), self.on_toggle(term))
         hidebtn = QToolButton(buttons)
+        self.connect(hidebtn, SIGNAL("toggled(bool)"), self.on_hide(term))
         hidebtn.setText('^')
         hidebtn.setMinimumSize(QSize(20,0))
         hidebtn.setToggleButton(True)
@@ -487,6 +499,26 @@ class GraphFit(GraphFitUI):
         term._close = close
         return close
 
+    def on_toggle(self, term):
+        def toggle(on):
+            if on and not self.toggling:
+                self.toggling = True
+                for t in self.function.terms:
+                    t._butt.setOn(t==term)
+                self.toggling = False
+                self.active_term = term
+        term._toggle = toggle
+        return toggle
+
+    def on_hide(self, term):
+        def hide(on):
+            if on:
+                term._grid.hide()
+            else:
+                term._grid.show()
+        term._hide = hide
+        return hide
+
     def on_remove_term(self, term):
         term._box.close()
 
@@ -502,6 +534,7 @@ class GraphFit(GraphFitUI):
         ind = data.active_data()
         self.function.fit(data.x[ind], data.y[ind], lock, 50)
         self.function.emit('modified')
+
 
     def add_function(self, f):
         print >>sys.stderr, 'add-function'

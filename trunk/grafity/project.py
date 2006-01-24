@@ -37,6 +37,57 @@ def create_id(*args):
 # register_class(class, metakit_desc)
 storage_desc = {}
 
+def wrap(value, type):
+    if type == 'V':
+        return view_to_list(value)
+    else:
+        return value
+
+def row_to_dict(view, row):
+    return dict((prop.name, wrap(getattr(row, prop.name), prop.type)) for prop in view.structure())
+
+def view_to_list(view):
+    return list(row_to_dict(view, row) for row in view)
+
+def fill(view, data):
+    for row in data:
+        addrow(view, row)
+
+def addrow(view, row):
+    attrs = dict((k, v) for k, v in row.iteritems() if not isinstance(v, list))
+    subviews = dict((k, v) for k, v in row.iteritems() if isinstance(v, list))
+    ind = view.append(**attrs)
+    for name, value in subviews.iteritems():
+        fill(getattr(view[ind], name), value)
+    return ind
+
+def metakit_to_dict(db):
+    views = []
+    sofar = []
+    depth = 0
+    for c in db.description():
+        if c == '[': depth += 1
+        elif c == ']': depth -= 1
+        if depth == 0 and c == ',':
+            views.append("".join(sofar))
+            sofar[:] = []
+        else:
+            sofar.append(c)
+    views.append("".join(sofar))
+
+    di = dict(zip(views, [view_to_list(db.getas(v)) for v in views]))
+    return di
+
+def dict_to_metakit(di):
+    db = metakit.storage()
+
+    for viewdesc, data in di.iteritems():
+        view = db.getas(viewdesc)
+        fill(view, data)
+
+    return db
+
+
 def register_class(cls, desc):
     for w in string.whitespace:
         desc = desc.replace(w, '')
@@ -401,7 +452,6 @@ class Project(HasSignals):
             raise TypeError, "project cannot create an item of type '%s'" % cls
 
         id = create_id()
-        from mk import addrow
         if location is None:
             row = view.append(id=id)
         else:

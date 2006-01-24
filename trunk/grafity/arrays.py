@@ -8,6 +8,7 @@ except:
 import metakit
 from numarray import *
 from numarray.ieeespecial import nan, inf, isfinite
+#from numpy.core import *
 
 Error.setMode(all='ignore')
 
@@ -43,8 +44,8 @@ class VarOperation(object):
         return repr(self.oper).replace('UFunc', 'vUFunc')
 
 # wrap all ufuncs with VarOperations
-mod_ufuncs = dict([(k, VarOperation(v)) for k, v in ufunc._UFuncs.iteritems() if v.arity in (1,2)])
-globals().update(mod_ufuncs)
+#mod_ufuncs = dict([(k, VarOperation(v)) for k, v in ufunc._UFuncs.iteritems() if v.arity in (1,2)])
+#globals().update(mod_ufuncs)
 
 def asvarray(*args, **kwds):
     arr = asarray(*args, **kwds)
@@ -74,6 +75,8 @@ class with_new_opers(object):
     def __le__(self,other): return less_equal(self,asvarray(other)) 
     def __gt__(self,other): return greater(self,asvarray(other)) 
     def __ge__(self,other): return greater_equal(self,asvarray(other))
+        
+NumArray = type(array([0.]))
 
 class VArray(with_new_opers, NumArray):
     pass

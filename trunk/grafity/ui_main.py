@@ -11,6 +11,7 @@ import grafity
 from grafity.signals import HasSignals, global_connect
 from grafity.actions import undo, redo
 from grafity.ui_graph_view import GraphView, GraphStyle, GraphData, GraphAxes, GraphFit
+from grafity.ui_worksheet_view import WorksheetView
 from grafity.ui_console import Console
 
 from grafity.ui.main import MainWindowUI
@@ -20,8 +21,6 @@ def getpixmap(name, pixmaps={}):
         pixmaps[name] = QPixmap(os.path.join(grafity.DATADIR, 'data', 'images', '16', name+'.png'))
     return pixmaps[name]
 
-class WorksheetView:
-    pass
 class Panel(QDockWindow):
     """A panel in the main window similar to IDEAl mode"""
     def __init__(self, mainwin, position):
@@ -322,6 +321,9 @@ class MainWindow(MainWindowUI):
     def on_activated(self, obj):
         if isinstance(obj, grafity.Graph):
             obj._view = GraphView(self.workspace, self, obj)
+            obj._view.show()
+        elif isinstance(obj, grafity.Worksheet):
+            obj._view = WorksheetView(self.workspace, self, obj)
             obj._view.show()
 
     def open_project(self, project):

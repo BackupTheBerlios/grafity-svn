@@ -119,6 +119,9 @@
         <property name="movingEnabled">
             <bool>false</bool>
         </property>
+        <property name="newLine">
+            <bool>true</bool>
+        </property>
         <property name="label">
             <string>Toolbar_2</string>
         </property>
