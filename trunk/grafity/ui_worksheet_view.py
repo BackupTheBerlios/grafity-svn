@@ -26,6 +26,12 @@ class WorksheetView(QTabWidget):
         self.worksheet.connect('data-changed', self.on_data_changed)
         self.worksheet.connect('rename-column', self.update_column_names)
 
+        self.worksheet.connect('rename', self.on_rename)
+        self.setCaption(self.worksheet.name)
+
+    def on_rename(self, *args, **kwds):
+        self.setCaption(self.worksheet.name)
+
     def on_data_changed(self):
         self.update_size()
         self.update_column_names()
@@ -160,7 +166,11 @@ class GTable(QTable):
     def createEditor(self, row, col, initFromCell):
         editor = QTable.createEditor(self, row, col, initFromCell)
         if initFromCell:
-            editor.setText(self.text(row, col))
+            if self.worksheet[col].expr == '':
+                editor.setText(self.text(row, col))
+            else:
+                editor.setText("'%s'"%self.worksheet[col].expr)
+
         return editor
 #    
 #    def cellWidget(self, row, col):
@@ -200,7 +210,10 @@ class GTable(QTable):
             brush = cg.brush(QColorGroup.Highlight)
             painter.setPen(cg.highlightedText())
         else:
-            brush = cg.brush(QColorGroup.Base)
+            if self.worksheet[col].expr != '':
+                brush = QBrush(QColor(230, 230, 255))
+            else:
+                brush = cg.brush(QColorGroup.Base)
             painter.setPen(cg.text())
 
         painter.fillRect(0, 0, w, h, brush)
@@ -227,9 +240,12 @@ class GTable(QTable):
         try:
             f = float(text)
         except ValueError:
-            try:
-                self.worksheet[col] = self.worksheet.evaluate(text)
-            except ValueError:
-                print >>sys.stderr, "error"
+            if text[0]==text[-1]=="'" or text[0]==text[-1]=='"':
+                self.worksheet[col].expr = text[1:-1]
+            else:
+                try:
+                    self.worksheet[col] = self.worksheet.evaluate(text)
+                except ValueError:
+                    print >>sys.stderr, "error"
         else:
             self.worksheet[col][row] = f

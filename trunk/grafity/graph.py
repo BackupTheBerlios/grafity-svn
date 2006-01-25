@@ -14,13 +14,7 @@ from grafity.signals import HasSignals
 from grafity.project import Item, wrap_attribute, register_class, create_id
 from grafity.actions import action_from_methods, action_from_methods2, StopAction
 from grafity.settings import DATADIR
-
-from grafity.arrays import *
-from grafity.signals import HasSignals
-from grafity.actions import action_from_methods2, action_from_methods
 from grafity.functions import MFunctionSum
-from grafity.project import wrap_attribute
-from numarray.ieeespecial import isfinite
 
 class Dataset(HasSignals):
     """Handles storing the description of a dataset in the database."""

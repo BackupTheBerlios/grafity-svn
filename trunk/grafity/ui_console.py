@@ -10,8 +10,6 @@ from qt import *
 from qtext import QextScintilla,QextScintillaLexerPython, QextScintillaAPIs
 from grafity.settings import settings
 
-#from grafit.project import project
-
 import compiler
 class mydict(dict):
     def __init__(self, *args, **kwds):
@@ -21,8 +19,8 @@ class mydict(dict):
     def __getitem__(self, item):
         if item in self:
             return dict.__getitem__(self, item)
-        elif item == 'self':
-            return self.lookup_object
+        elif item in self.special:
+            return self.special[item]
         elif hasattr(self.lookup_object, "__items__"):
             return self.lookup_object.__items__()[item]
         else:
@@ -30,6 +28,12 @@ class mydict(dict):
 
     def set_lookup_object(self, obj):
         self.lookup_object = obj
+        if self.lookup_object is not None:
+            self.special = {'self': self.lookup_object,
+                            'up': self.lookup_object.parent,
+                            'top': self.lookup_object.project.top }
+        else:
+            special = {}
 
 
 class Interpreter (code.InteractiveInterpreter):

@@ -159,7 +159,7 @@ class ActionList(signals.HasSignals):
             finally:
                 if e:
                     self.enable()
-            self.emit('modified')
+            self.emit('done', com)
         else:
             raise NoMoreActionsError
 
@@ -191,7 +191,7 @@ class ActionList(signals.HasSignals):
             finally:
                 if e:
                     self.enable()
-            self.emit('modified')
+            self.emit('undone', com)
         else:
             raise NoMoreActionsError
 

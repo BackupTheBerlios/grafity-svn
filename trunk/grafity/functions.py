@@ -5,13 +5,13 @@ try:
 except:
     pass
 
-#from grafity.thirdparty import odr
 import odr
 
 from grafity.signals import HasSignals
 from grafity.arrays import zeros, nan
 from grafity.actions import action_from_methods, StopAction, action_from_methods2
 from grafity.settings import DATADIR, USERDATADIR
+from grafity.project import create_id
 
 def gen_flatten(s):
     try:
@@ -256,7 +256,6 @@ class FunctionSum(HasSignals):
         model = odr.Model(__fitfunction)
         data = odr.RealData(x, y)
         initial = flatten(t.parameters for t in self.terms)
-        f = file('foo.out', 'w')
 
         odrobj = odr.ODR(data, model, beta0=initial,  ifixb=[not k for k in lock], 
                          partol=1e-100, sstol=1e-100, maxit=maxiter)
@@ -275,19 +274,6 @@ class FunctionSum(HasSignals):
 #            print >>sys.stderr, 'Fit den Vogel (but no problem)'
             
 
-"""
-    functions [
-        id:S,
-        func:S,
-        name:S,
-        params:S,
-        lock:S,
-        use:I
-    ]
-]
-"""
-
-from grafity.project import create_id
 
 class MFunctionSum(FunctionSum):
     signals = {'add-term(term)': 'A term has been added to the function',

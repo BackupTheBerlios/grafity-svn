@@ -73,6 +73,7 @@ class GraphView(QTabWidget):
         self.graph.connect('style-changed', self.on_change_style)
         self.graph.connect('zoom-changed', self.on_zoom_changed)
         self.graph.connect('data-changed', self.on_recalc)
+        self.graph.connect('rename', self.on_rename)
 
         self.graph.connect('add-dataset', self.on_add_dataset)
         self.graph.connect('remove-dataset', self.on_remove_dataset)
@@ -128,6 +129,10 @@ class GraphView(QTabWidget):
         self.moving_rangemin = self.moving_rangemax = False
 
         self.mode = 'arrow'
+        self.setCaption(self.graph.name)
+
+    def on_rename(self, *args, **kwds):
+        self.setCaption(self.graph.name)
 
     def on_set_title(self, axis, title):
         self.plot

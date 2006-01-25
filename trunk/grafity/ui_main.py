@@ -9,7 +9,7 @@ from qt import *
 
 import grafity
 from grafity.signals import HasSignals, global_connect
-from grafity.actions import undo, redo
+from grafity.actions import undo, redo, action_list
 from grafity.ui_graph_view import GraphView, GraphStyle, GraphData, GraphAxes, GraphFit
 from grafity.ui_worksheet_view import WorksheetView
 from grafity.ui_console import Console
@@ -127,6 +127,112 @@ class Panel(QDockWindow):
         btn2.setPixmap(p)
 
         return btn2
+
+class ActionList(HasSignals, QListView):
+    def __init__(self, parent):
+        QListView.__init__(self, parent)
+        self.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Expanding)
+        self.setMinimumSize(QSize(150,0))
+        self.header().hide()
+        self.addColumn ('Object', 145)
+        self.setSelectionMode(QListView.Extended)
+        self.setSorting(-1)
+
+#        QObject.connect(self, SIGNAL("doubleClicked(QListViewItem *, const QPoint &, int)"), self.on_doubleclick)
+#        QObject.connect(self, SIGNAL("itemRenamed (QListViewItem *, int, const QString &)"), self.on_rename)
+#        QObject.connect(self, SIGNAL("contextMenuRequested (QListViewItem *, const QPoint &, int)"),
+#                      self.on_context_menu_requested)
+
+        action_list.connect('added', self.on_added)
+        action_list.connect('removed', self.on_removed)
+        action_list.connect('done', self.on_done)
+        action_list.connect('undone', self.on_undone)
+
+    def on_added(self, action):
+        action._item = QListViewItem(self, str(action))
+#        action._item.setMultiLinesEnabled(True)
+
+    def on_removed(self, action):
+        self.takeItem(action._item)
+        del action._item
+
+    def on_done(self, action):
+        print >>sys.stderr, "done", action
+        action._item.setText(0, str(action)+'\ndescription')
+
+    def on_undone(self, action):
+        print >>sys.stderr, "undone", action
+        action._item.setText(0, "(%s)"%str(action))
+
+    def on_add_item(self, obj, recursive=False):
+        try:
+            parent = obj.parent._tree_item
+        except AttributeError:
+            parent = self
+        item = obj._tree_item = QListViewItem(parent, obj.name)
+        pixmap = getpixmap({grafity.Worksheet: 'worksheet', 
+                            grafity.Graph: 'graph', 
+                            grafity.Folder: 'folder'}[type(obj)])
+        item.setPixmap (0, pixmap)
+#        item.setOpen (True)
+        item._object = obj
+        if recursive and isinstance(obj, grafity.Folder):
+            for child in obj:
+                self.on_add_item(child, recursive=True)
+
+    def on_remove_item(self, obj):
+        obj.parent._tree_item.takeItem(obj._tree_item)
+        del obj._tree_item
+
+    def on_rename (self, item, column, text):
+        if item.parent() == self.wsitem:
+            item.obj.name = str(text)
+        elif item.parent() == self.gritem:
+            item.obj.name = str(text)
+
+    def on_doubleclick(self, item, point, column):
+        HasSignals.emit(self, 'activated', item._object)
+
+    def dragObject(self):
+        selected_worksheets = [w.name for w in project.worksheets if self.isSelected(w._explorer_item)]
+        selected_graphs = [g.name for g in project.graphs if self.isSelected(g._explorer_item)]
+        drag = QTextDrag('(' + ', '.join(selected_worksheets) + ' ,' + ', '.join(selected_graphs) + ')', self)
+        return drag
+
+    def on_context_menu_requested(self, item, point, column):
+        if item is None:
+            return
+        if isinstance(item._object, grafity.Worksheet):
+            self.wscontextitem = item._object
+            self.wsheet_context_menu.popup(point)
+        elif isinstance(item._object, grafity.Graph):
+            self.grcontextitem = item._object
+            self.graph_context_menu.popup(point)
+            
+    def graph_context_menu_show (self):
+        self.grcontextitem.show()
+
+    def graph_context_menu_del (self):
+        project.remove(self.grcontextitem)
+
+    def graph_context_menu_properties (self):
+        self.grcontextitem.properties()
+
+    def graph_context_menu_startfit (self):
+        self.grcontextitem.start_fit()
+ 
+    def wsheet_context_menu_show (self):
+        v = WorksheetView (self.wscontextitem)
+        v.show()
+        v._table.horizontalHeader()
+
+    def wsheet_context_menu_del (self):
+        project.remove(self.wscontextitem)
+
+    def wsheet_context_menu_importascii (self):
+        # do something
+        pass
+
 
 class ProjectExplorer(HasSignals, QListView):
     def __init__(self, parent):
@@ -301,6 +407,10 @@ class MainWindow(MainWindowUI):
         self.explorer.connect('activated', self.on_activated)
         self.lpanel.add('Explorer', getpixmap('folder'), self.explorer)
         self.lpanel._Explorer_callback(True)
+
+        self.actionlist = ActionList(self.lpanel)
+        self.lpanel.add('Actions', getpixmap('undo'), self.actionlist)
+
 
 ### right panel ################################################################################
         
