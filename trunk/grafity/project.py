@@ -178,6 +178,13 @@ class Item(HasSignals):
             if self.check_name(name, parent):
                 return name
 
+    def ancestors(self):
+        if self == self.project.top:
+            return
+        yield self.parent
+        for f in self.parent.ancestors():
+            yield f
+
     def set_parent(self, state, parent):
         state['new'], state['old'] = parent, self._parent
         oldparent = self._parent
@@ -245,18 +252,14 @@ class Folder(Item, HasSignals):
         self.project = project
         Item.__init__(self, project, name, parent, location)
 
+    def __items__(self):
+        return dict((f.name, f) for f in self.contents())
+
     def contents(self):
         for desc in storage_desc.values():
             for row in self.project.db.getas(desc):
                 if row.parent == self.id and row.id in self.project.items and row.id != self.id:
                     yield self.project.items[row.id]
-
-    def ancestors(self):
-        if self == self.project.top:
-            return
-        yield self.parent
-        for f in self.parent.ancestors():
-            yield f
 
     def all_subfolders(self):
         for item in self.subfolders():

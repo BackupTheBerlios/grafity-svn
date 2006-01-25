@@ -16,6 +16,7 @@ from grafity.ui_console import Console
 
 from grafity.ui.main import MainWindowUI
 
+
 def getpixmap(name, pixmaps={}):
     if name not in pixmaps:
         pixmaps[name] = QPixmap(os.path.join(grafity.DATADIR, 'data', 'images', '16', name+'.png'))
@@ -282,7 +283,6 @@ class MainWindow(MainWindowUI):
         self.progressbar.hide()
 
 ### bottom panel ###############################################################################
-
         locals = {}
         self.bpanel = Panel(self, QMainWindow.DockBottom)
         self.script = Console(self.bpanel, locals=locals)
@@ -335,6 +335,7 @@ class MainWindow(MainWindowUI):
 
 #        self.project.connect('change-current-folder', self.on_change_folder)
         self.script.locals['project'] = self.project
+        self.script.set_current_object(self.project.top)
 
     def close_project(self):
         """Disconnect the current project form the gui"""
@@ -505,6 +506,20 @@ class MainWindow(MainWindowUI):
         from grafit.help import HelpWidget
         h = HelpWidget(self)
         h.show()
+
+    def on_worksheet_newcolumn(self):
+        self.active.on_newcolumn_clicked()
+    def on_worksheet_delcolumn(self):
+        self.active.on_delcolumn_clicked()
+    def on_worksheet_left(self):
+        self.active.on_left_clicked()
+    def on_worksheet_right(self):
+        self.active.on_right_clicked()
+    def on_worksheet_first(self):
+        self.active.on_first_clicked()
+    def on_worksheet_last(self):
+        self.active.on_last_clicked()
+
 
 def splash_message(text):
     if __name__ == '__main__':

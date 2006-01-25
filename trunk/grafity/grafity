@@ -1,17 +1,21 @@
 #!/usr/bin/env python
 
 import os, sys
-from qt import QSplashScreen, QPixmap, QApplication
 
 DATADIR = os.path.normpath(os.path.abspath(os.path.dirname(sys.argv[0]))+'/../') + '/'
 sys.path.append(DATADIR)
-sys.path.append(DATADIR+'/grafity/thirdparty/')
-sys.path.append("/usr/local/lib/python2.4/site-packages/numpy-0.9.4-py2.4-linux-i686.egg")
+#sys.path.append(DATADIR+'/grafity/thirdparty/')
 
 import logging
-logging.basicConfig(format="%(asctime)s [%(name)s] %(message)s")
-
 from optparse import OptionParser
+
+from pkg_resources import require
+from qt import QSplashScreen, QPixmap, QApplication
+
+require("odr")
+
+
+
 parser = OptionParser()
 parser.add_option('-l', '--log', dest='log', help='Log program events')
 options, args = parser.parse_args()
@@ -20,7 +24,7 @@ if options.log is not None:
     for l in options.log.split(','):
         logging.getLogger(l).setLevel(logging.DEBUG)
 
-
+logging.basicConfig(format="%(asctime)s [%(name)s] %(message)s")
 
 class GrafitSplash(QSplashScreen):
     def __init__(self, pixmap):
@@ -40,6 +44,9 @@ splash.show()
 splash.message('')
 
 from ui_main import MainWindow
+
+sys.modules['__main__'].splash.message('building user interface')
+
 mainwin = MainWindow()
 mainwin.app = app
 splash.finish(mainwin)

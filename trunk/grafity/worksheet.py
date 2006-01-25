@@ -29,6 +29,7 @@ class Column(MkArray, HasSignals):
         prevname = self.data.name
         self.data.name = name.encode('utf-8')
         self.emit('rename', prevname, name)
+        self.worksheet.emit('rename-column', self, prevname, name)
     def get_name(self):
         return self.data.name.decode('utf-8')
     name = property(get_name, set_name)
@@ -123,6 +124,9 @@ class Worksheet(Item, HasSignals):
         self.__attr = True
 
     record = None
+
+    def __items__(self):
+        return dict((c.name, c) for c in self.columns)
 
     def move_column(self, state, src=None, dest=None):
 

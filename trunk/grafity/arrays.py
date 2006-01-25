@@ -7,7 +7,7 @@ except:
 
 import metakit
 from numarray import *
-from numarray.ieeespecial import nan, inf, isfinite
+from numarray.ieeespecial import nan, inf, isfinite, isnan
 #from numpy.core import *
 
 Error.setMode(all='ignore')

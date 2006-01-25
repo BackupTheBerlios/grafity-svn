@@ -1,5 +1,6 @@
 import os
 import sys
+sys.modules['__main__'].splash.message('loading ui_graph_view')
 
 from qt import *
 from qwt import *
@@ -242,6 +243,8 @@ class GraphView(QTabWidget):
             self.range_l = min(d.minx for d in self.datasets)
             self.range_r = max(d.maxx for d in self.datasets)
             self.on_mouse_moved(e)
+        elif self.mode == 'hand':
+            pass
 
     def on_mouse_released(self, e):
         x = self.plot.invTransform(self.plot.xBottom, e.pos().x())
@@ -259,6 +262,8 @@ class GraphView(QTabWidget):
                     d.range = (self.range_l, self.range_r)
                     self.plot.setMarkerXPos(self.rangemin, min(d.range[0] for d in self.datasets))
                     self.plot.setMarkerXPos(self.rangemax, max(d.range[1] for d in self.datasets))
+        elif self.mode == 'hand':
+            self.mainwin.graph_fit.active_term.move(x, y)
 
     def on_mouse_moved(self, e):
         x = self.plot.invTransform(self.plot.xBottom, e.pos().x())

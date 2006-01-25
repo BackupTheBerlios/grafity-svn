@@ -1,0 +1,233 @@
+diff -ur odr-0.6.1/lib/d_odr.f odr-0.6.1.g/lib/d_odr.f
+--- odr-0.6.1/lib/d_odr.f	2004-08-11 19:38:15.000000000 +0300
++++ odr-0.6.1.g/lib/d_odr.f	2006-01-25 12:35:31.000000000 +0200
+@@ -5343,7 +5343,8 @@
+ C...EXTERNAL SUBROUTINES
+       EXTERNAL
+      +   DACCES,DCOPY,DEVJAC,DFLAGS,
+-     +   DODLM,DODPCR,DODVCV,DUNPAC,DWGHT,DXMY,DXPY
++     +   DODLM,DODPCR,DODVCV,DUNPAC,DWGHT,DXMY,DXPY,
++     +   ITERCALL
+ 
+ C...INTRINSIC FUNCTIONS
+       INTRINSIC
+@@ -5907,7 +5908,10 @@
+                END IF
+                LUNR = LUNRPT
+                DO 140 I=1,NPR
+-                  CALL DODPCR(IPR,LUNR,
++                  IF (IPR2.GE.7) THEN
++                    CALL ITERCALL(NITER, WSS, ACTRED)
++                  ELSE
++                    CALL DODPCR(IPR,LUNR,
+      +                        HEAD,PRTPEN,FSTITR,DIDVCV,IFLAG,
+      +                        N,M,NP,NQ,NPP,NNZW,
+      +                        MSGB,MSGD, BETA,Y,LDY,X,LDX,DELTA,
+@@ -5918,6 +5922,7 @@
+      +                        WSS,RVAR,IDF,WORK(SD),
+      +                        NITER,NFEV,NJEV,ACTRED,PRERED,
+      +                        TAU,PNORM,ALPHA,F,RCOND,IRANK,INFO,ISTOP)
++                  END IF
+                   IF (IPR2.GE.5) THEN
+                      IPR = 2
+                   ELSE
+diff -ur odr-0.6.1/odrpack.py odr-0.6.1.g/odrpack.py
+--- odr-0.6.1/odrpack.py	2002-11-19 06:55:54.000000000 +0200
++++ odr-0.6.1.g/odrpack.py	2006-01-25 12:36:00.000000000 +0200
+@@ -944,7 +944,7 @@
+ 
+     def set_iprint(self, init=None, so_init=None, 
+                    iter=None, so_iter=None, iter_step=None,
+-                   final=None, so_final=None):
++                   final=None, so_final=None, itercall=None):
+         """Set the iprint parameter for the printing of computation reports.
+   
+ If any of the arguments are specified here, then they are set in the iprint
+@@ -960,6 +960,11 @@
+ The permissible values are 0, 1, and 2 representing "no report", "short 
+ report", and "long report" respectively.
+ 
++Additionaly, a value of 3 for iter specifies that instead of printing an
++iteration report, the callable itercall will be called as follows:
++
++    itercall(iteration_no, beta, xsqr, reduced_xsqr)
++
+ The argument iter_step (0 <= iter_step <= 9) specifies how often to make the
+ iteration report; the report will be made for every iter_step'th iteration
+ starting with iteration one. If iter_step == 0, then no iteration report
+@@ -970,7 +975,7 @@
+ 
+   set_iprint(init=None, so_init=None, 
+              iter=None, so_iter=None, iter_step=None,
+-             final=None, so_final=None)
++             final=None, so_final=None, itercall=None)
+ """
+         if self.iprint is None:
+             self.iprint = 0
+@@ -988,7 +993,8 @@
+                   [1, 1], # short, short
+                   [2, 1], # long,  short
+                   [1, 2], # short, long
+-                  [2, 2]] # long,  long
++                  [2, 2], # long,  long
++                  [3, 0]] # function, none
+ 
+         if self.rptfile is None and \
+            (so_init is not None or
+@@ -997,6 +1003,9 @@
+             raise odr_error, \
+                 "no rptfile specified, cannot output to stdout twice"
+ 
++        if iter == 3 and itercall == None:
++            raise odr_error, "no itercall callable specified"
++
+         iprint_l = ip2arg[ip[0]] + ip2arg[ip[1]] + ip2arg[ip[3]]
+ 
+         if init is not None:
+@@ -1021,6 +1030,7 @@
+         ip[3] = ip2arg.index(iprint_l[4:6])
+ 
+         self.iprint = ip[0]*1000 + ip[1]*100 + ip[2]*10 + ip[3]
++        self.itercall = itercall
+         
+     def run(self):
+         """Run the fitting routine with all of the information given.
+@@ -1032,7 +1042,7 @@
+         kwds = {'full_output': 1}
+         kwd_l = ['ifixx', 'ifixb', 'job', 'iprint', 'errfile', 'rptfile', 
+                  'ndigit', 'taufac', 'sstol', 'partol', 'maxit', 'stpb', 
+-                 'stpd', 'sclb', 'scld', 'work', 'iwork']
++                 'stpd', 'sclb', 'scld', 'work', 'iwork', 'itercall']
+ 
+         if self.delta0 is not None and self.job % 1000 / 10 == 1:
+             # delta0 provided and fit is not a restart
+@@ -1054,7 +1064,8 @@
+             kwds['wd'] = self.data.wd
+         if self.model.extra_args is not None:
+             kwds['extra_args'] = self.model.extra_args
+-
++        if self.itercall is not None:
++            kwds['itercall'] = self.itercall
+ 
+         # implicitly set kwds from self's members
+ 
+diff -ur odr-0.6.1/src/__odrpack.c odr-0.6.1.g/src/__odrpack.c
+--- odr-0.6.1/src/__odrpack.c	2004-11-01 04:28:14.000000000 +0200
++++ odr-0.6.1.g/src/__odrpack.c	2006-01-25 12:38:40.000000000 +0200
+@@ -522,7 +522,7 @@
+ 
+ PyObject *odr(PyObject * self, PyObject * args, PyObject * kwds)
+ {
+-  PyObject *fcn, *initbeta, *py, *px, *pwe = NULL, *pwd = NULL, *fjacb = NULL;
++  PyObject *fcn, *initbeta, *py, *px, *pwe = NULL, *pwd = NULL, *fjacb = NULL, *itercall = NULL;
+   PyObject *fjacd = NULL, *pifixb = NULL, *pifixx = NULL;
+   PyObject *pstpb = NULL, *pstpd = NULL, *psclb = NULL, *pscld = NULL;
+   PyObject *pwork = NULL, *piwork = NULL, *extra_args = NULL;
+@@ -541,7 +541,7 @@
+     "fjacd", "extra_args", "ifixb", "ifixx", "job", "iprint", "errfile",
+     "rptfile", "ndigit", "taufac", "sstol", "partol",
+     "maxit", "stpb", "stpd", "sclb", "scld", "work",
+-    "iwork", "full_output", NULL
++    "iwork", "full_output", "itercall", NULL
+   };
+   int isodr = 1;
+   PyObject *result;
+@@ -551,13 +551,13 @@
+ 
+   if (kwds == NULL)
+     {
+-      if (!PyArg_ParseTuple(args, "OOOO|OOOOOOOllz#z#ldddlOOOOOOi:odr",
++      if (!PyArg_ParseTuple(args, "OOOO|OOOOOOOllz#z#ldddlOOOOOOiO:odr",
+                             &fcn, &initbeta, &py, &px, &pwe, &pwd,
+                             &fjacb, &fjacd, &extra_args, &pifixb, &pifixx,
+                             &job, &iprint, &errfile, &lerrfile, &rptfile,
+                             &lrptfile, &ndigit, &taufac, &sstol, &partol,
+                             &maxit, &pstpb, &pstpd, &psclb, &pscld, &pwork,
+-                            &piwork, &full_output))
++                            &piwork, &full_output, &itercall))
+         {
+           return NULL;
+         }
+@@ -565,7 +565,7 @@
+   else
+     {
+       if (!PyArg_ParseTupleAndKeywords(args, kwds,
+-                                       "OOOO|OOOOOOOllz#z#ldddlOOOOOOi:odr",
++                                       "OOOO|OOOOOOOllz#z#ldddlOOOOOOiO:odr",
+                                        kw_list, &fcn, &initbeta, &py, &px,
+                                        &pwe, &pwd, &fjacb, &fjacd,
+                                        &extra_args, &pifixb, &pifixx, &job,
+@@ -573,7 +573,7 @@
+                                        &lrptfile, &ndigit, &taufac, &sstol,
+                                        &partol, &maxit, &pstpb, &pstpd,
+                                        &psclb, &pscld, &pwork, &piwork,
+-                                       &full_output))
++                                       &full_output, &itercall))
+         {
+           return NULL;
+         }
+@@ -650,7 +650,11 @@
+     {
+       PYERR(PyExc_TypeError, "iwork must be an array");
+     }
+-
++  if (itercall != NULL && !PyCallable_Check(itercall))
++    {
++      PYERR(PyExc_TypeError, "itercall must be callable");
++    }
++ 
+   /* start processing the arguments and check for errors on the way */
+ 
+   /* check for implicit model */
+@@ -1213,6 +1217,8 @@
+   Py_INCREF(beta);
+   odr_global.extra_args = extra_args;
+   Py_XINCREF(extra_args);
++  odr_global.itercall = itercall;
++  Py_INCREF(itercall);
+ 
+   /* now call DODRC */
+   F_FUNC(dodrc,DODRC)(fcn_callback, &n, &m, &np, &nq, (double *)(beta->data),
+@@ -1247,6 +1253,7 @@
+   Py_XDECREF(odr_global.fjacd);
+   Py_DECREF(odr_global.pyBeta);
+   Py_XDECREF(odr_global.extra_args);
++  Py_DECREF(odr_global.itercall);
+ 
+   odr_global.fcn = odr_global.fjacb = odr_global.fjacd = odr_global.pyBeta =
+     odr_global.extra_args = NULL;
+@@ -1338,13 +1345,22 @@
+ }
+ 
+ static char odr__doc__[] =
+-  "odr(fcn, beta0, y, x,\nwe=None, wd=None, fjacb=None, fjacd=None,\nextra_args=None, ifixx=None, ifixb=None, job=0, iprint=0,\nerrfile=None, rptfile=None, ndigit=0,\ntaufac=0.0, sstol=-1.0, partol=-1.0,\nmaxit=-1, stpb=None, stpd=None,\nsclb=None, scld=None, work=None, iwork=None,\nfull_output=0)";
++  "odr(fcn, beta0, y, x,\nwe=None, wd=None, fjacb=None, fjacd=None,\nextra_args=None, ifixx=None, ifixb=None, job=0, iprint=0,\nerrfile=None, rptfile=None, ndigit=0,\ntaufac=0.0, sstol=-1.0, partol=-1.0,\nmaxit=-1, stpb=None, stpd=None,\nsclb=None, scld=None, work=None, iwork=None,\nfull_output=0, itercall=None)";
+ 
+ static PyMethodDef methods[] = {
+   {"odr", (PyCFunction) odr, METH_VARARGS | METH_KEYWORDS, odr__doc__},
+   {NULL, NULL},
+ };
+ 
++void itercall_(int *niter, double *wss, double *actred)
++{
++    PyObject *arg01;
++
++    arg01 = Py_BuildValue("(iOdd)", *niter, odr_global.pyBeta, *wss, *actred);
++    PyEval_CallObject(odr_global.itercall, arg01);
++    Py_XDECREF(arg01);
++}
++
+ void init__odrpack()
+ {
+   PyObject *m, *d;
+diff -ur odr-0.6.1/src/odrpack.h odr-0.6.1.g/src/odrpack.h
+--- odr-0.6.1/src/odrpack.h	2002-11-20 11:08:57.000000000 +0200
++++ odr-0.6.1.g/src/odrpack.h	2006-01-25 12:08:20.000000000 +0200
+@@ -28,6 +28,7 @@
+   PyObject* fjacd;
+   PyObject* pyBeta;
+   PyObject* extra_args;
++  PyObject* itercall;
+ };
+ 
+ typedef struct ODR_info_ ODR_info;

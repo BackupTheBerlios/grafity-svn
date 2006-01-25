@@ -5,7 +5,8 @@ try:
 except:
     pass
 
-from grafity.thirdparty import odr
+#from grafity.thirdparty import odr
+import odr
 
 from grafity.signals import HasSignals
 from grafity.arrays import zeros, nan
@@ -239,30 +240,28 @@ class FunctionSum(HasSignals):
         return res
 
     def fit(self, x, y, lock, maxiter):
-        def __fitfunction(*args):
-            if len(args) == 3:
-                niter, actred, wss = args
-                message  = 'Fitting: Iteration %d, xsqr=%g, reduced xsqr=%g' % (niter, wss, actred)
-                self.emit('status-message', message)
-                return
-            else:
-                params, x = args
-
+        def __fitfunction(params, x):
             params = splitlist(params, [len(t.parameters) for t in self.terms])
 
             for p, t in zip(params, self.terms):
                 t.parameters = p
 
             return self(x)
+
+        def __itercall(niter, beta, wss, actred):
+            message  = 'Fitting: Iteration %d, xsqr=%g, reduced xsqr=%g' % (niter, wss, actred)
+            print >>sys.stderr, beta
+            self.emit('status-message', message)
                 
         model = odr.Model(__fitfunction)
         data = odr.RealData(x, y)
         initial = flatten(t.parameters for t in self.terms)
+        f = file('foo.out', 'w')
 
         odrobj = odr.ODR(data, model, beta0=initial,  ifixb=[not k for k in lock], 
                          partol=1e-100, sstol=1e-100, maxit=maxiter)
-        odrobj.set_job (fit_type=2)
-        odrobj.set_iprint (iter=3, iter_step=1)
+        odrobj.set_job(fit_type=2)
+        odrobj.set_iprint(iter=3, iter_step=1, itercall=__itercall)
         for term in self.terms:
             term.set_reg(False)
         try:

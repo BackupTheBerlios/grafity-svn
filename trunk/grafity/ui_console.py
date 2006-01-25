@@ -4,7 +4,7 @@ import rlcompleter
 import operator
 import sets
 
-#sys.modules['__main__'].splash_message('loading Console')
+sys.modules['__main__'].splash.message('loading ui_console')
 
 from qt import *
 from qtext import QextScintilla,QextScintillaLexerPython, QextScintillaAPIs
@@ -13,6 +13,24 @@ from grafity.settings import settings
 #from grafit.project import project
 
 import compiler
+class mydict(dict):
+    def __init__(self, *args, **kwds):
+        dict.__init__(self, *args, **kwds)
+        self.lookup_object = None
+        
+    def __getitem__(self, item):
+        if item in self:
+            return dict.__getitem__(self, item)
+        elif item == 'self':
+            return self.lookup_object
+        elif hasattr(self.lookup_object, "__items__"):
+            return self.lookup_object.__items__()[item]
+        else:
+            raise NameError, "name '%s' is not defined"% item
+
+    def set_lookup_object(self, obj):
+        self.lookup_object = obj
+
 
 class Interpreter (code.InteractiveInterpreter):
     def _showtraceback (self, type=None, exc=None, traceback=None):
@@ -47,24 +65,25 @@ class Interpreter (code.InteractiveInterpreter):
 class Console (QextScintilla):
     def __init__(self, parent, locals={}, log=''):
         QextScintilla.__init__(self, parent, 'Console')
-        self.interpreter = Interpreter(locals)
-        self.locals = locals
+
+        self.locals = mydict(locals)
+        self.interpreter = Interpreter(self.locals)
 
         self.resize (500, 300)
 
         lex = QextScintillaLexerPython()
-        lex.setDefaultFont (QApplication.font())
-        lex.setFont (QApplication.font(), -1)
-        self.setLexer (lex)
+        lex.setDefaultFont(QApplication.font())
+        lex.setFont(QApplication.font(), -2)
+        self.setLexer(lex)
 
 #        self.SendScintilla(self.SCI_SETHSCROLLBAR, False)
         self.SendScintilla(self.SCI_SETSCROLLWIDTH, 100)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
-        sys.stdout   = self
-        sys.stdin    = self
+        sys.stdout = self
+        sys.stdin = self
 
-        self.last_lines   = []
+        self.last_lines = []
 
         self.more = False
         self.reading = False
@@ -81,10 +100,25 @@ class Console (QextScintilla):
         sys.ps1 = '>>> '
         sys.ps2 = '... '
 
-        self.clear ()
-        self.write ('# Welcome to Grafity\n>>> ')
+        self.clear()
+        self.write('# Welcome to Grafity\n>>> ')
 
         self.completer = rlcompleter.Completer()
+
+        self.current_object = None
+        self.set_current_object(None)
+        self.locals['go'] = self.set_current_object
+
+    def set_current_object(self, obj):
+        if obj is None:
+            sys.ps1 = '>>> '
+            sys.ps2 = '... '
+        else:
+            sys.ps1 = '%s >> ' % obj.name
+            sys.ps2 = '%s .. ' % obj.name
+
+        self.locals.set_lookup_object(obj)
+            
 
     # Simulate stdin, stdout, and stderr.
     def flush(self): pass
@@ -94,7 +128,7 @@ class Console (QextScintilla):
     def readline(self):
         self.reading = True
         self.__clearLine()
-        self.moveCursorToEnd ()
+        self.moveCursorToEnd()
         while self.reading:
             qApp.processOneEvent()
         if self.line.length() == 0:
@@ -103,8 +137,8 @@ class Console (QextScintilla):
             return str(self.line) 
 
     def write(self, text):
-        self.append (text)
-        self.moveCursorToEnd ()
+        self.append(text)
+        self.moveCursorToEnd()
 
     def writelines(self, text):
         self.write (text)
@@ -153,7 +187,7 @@ class Console (QextScintilla):
         class Walker:
             def visitAssign(self, node):
                 var = node.asList()[0]
-                if len(var)==2 and isinstance (var[0], str) and var[0] in protected:
+                if len(var)==2 and isinstance(var[0], str) and var[0] in protected:
                      print "# Assignment to %s not allowed" % var[0]
                      raise ForbiddenAssignmentError
                     
@@ -197,7 +231,7 @@ class Console (QextScintilla):
             self.completer.matches = list(sets.Set(self.completer.matches))
             self.completer.matches = [w for w in self.completer.matches if not w.startswith('_')]
             self.completer.matches.sort()
-            if len(line) >= 4 and len(self.completer.matches) > 0:
+            if len(line) >= len(sys.ps1) and len(self.completer.matches) > 0:
                 self.SendScintilla(self.SCI_AUTOCSHOW, len(line), str(' '.join(self.completer.matches)))
 
     def autoCompletionActive(self):
@@ -226,7 +260,7 @@ class Console (QextScintilla):
             return
 
         if key == Qt.Key_Backspace:
-            if x > 4:
+            if x > len(sys.ps1):
                 QextScintilla.keyPressEvent (self, e)
         elif key == Qt.Key_Delete:
             QextScintilla.keyPressEvent (self, e)
@@ -243,12 +277,12 @@ class Console (QextScintilla):
             self.complete()
 #            self.__insertText(text)
         elif key == Qt.Key_Left:
-            if x > 4:
+            if x > len(sys.ps1):
                 QextScintilla.keyPressEvent (self, e)
         elif key == Qt.Key_Right:
             QextScintilla.keyPressEvent (self, e)
         elif key == Qt.Key_Home:
-            self.setCursorPosition(y, 4)
+            self.setCursorPosition(y, len(sys.ps1))
         elif key == Qt.Key_End:
             QextScintilla.keyPressEvent (self, e)
         elif key == Qt.Key_Up:
@@ -271,8 +305,8 @@ class Console (QextScintilla):
         Display the current item from the command history.
         """
         y, x = self.getCursorPosition()
-        self.setCursorPosition(y, 4)
-        self.setSelection(y, 4, y, self.lineLength(y))
+        self.setCursorPosition(y, len(sys.ps1))
+        self.setSelection(y, len(sys.ps1), y, self.lineLength(y))
         self.removeSelectedText()
         self.__insertText(self.history[self.pointer])
 
