@@ -30,6 +30,7 @@ log.info('User data directory is %s', USERDATADIR)
 DATADIR = os.path.normpath(os.path.abspath(os.path.dirname(sys.argv[0]))+'/../') + '/'
 
 log.info('Data directory is %s', DATADIR)
+print >>sys.stderr, DATADIR
 
 class Settings(object):
     def __init__(self, filename):
