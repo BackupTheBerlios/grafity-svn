@@ -23,7 +23,7 @@
     <property name="minimumSize">
         <size>
             <width>23</width>
-            <height>164</height>
+            <height>233</height>
         </size>
     </property>
     <property name="caption">
@@ -60,6 +60,22 @@
         <action name="act_cut"/>
         <action name="act_copy"/>
         <action name="act_paste"/>
+    </item>
+    <item text="Work&amp;sheet" name="Worksheet">
+        <action name="act_worksheet_newcolumn"/>
+        <action name="act_worksheet_delcolumn"/>
+        <separator/>
+        <action name="act_worksheet_transpose"/>
+    </item>
+    <item text="&amp;Column" name="Column">
+        <action name="act_worksheet_rename_column"/>
+        <separator/>
+        <action name="act_worksheet_left"/>
+        <action name="act_worksheet_right"/>
+        <action name="act_worksheet_first"/>
+        <action name="act_worksheet_last"/>
+    </item>
+    <item text="&amp;Window" name="Window">
     </item>
     <item text="&amp;Help" name="Help">
         <action name="helpAboutAction_2"/>
@@ -471,6 +487,38 @@
                 <string>Action_6</string>
             </property>
         </action>
+        <action>
+            <property name="name">
+                <cstring>act_worksheet_rename_column</cstring>
+            </property>
+            <property name="text">
+                <string>Action_3</string>
+            </property>
+        </action>
+        <action>
+            <property name="name">
+                <cstring>act_worksheet_transpose</cstring>
+            </property>
+            <property name="text">
+                <string>Action_3</string>
+            </property>
+        </action>
+        <action>
+            <property name="name">
+                <cstring>act_worksheet_sort_column</cstring>
+            </property>
+            <property name="text">
+                <string>Action_3</string>
+            </property>
+        </action>
+        <action>
+            <property name="name">
+                <cstring>act_worksheet_sort_worksheet</cstring>
+            </property>
+            <property name="text">
+                <string>Action_3</string>
+            </property>
+        </action>
     </actiongroup>
     <action>
         <property name="name">
@@ -508,6 +556,17 @@
         </property>
         <property name="text">
             <string>Unnamed</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>columnnew_itemAction</cstring>
+        </property>
+        <property name="text">
+            <string>new item</string>
+        </property>
+        <property name="menuText">
+            <string>new item</string>
         </property>
     </action>
 </actions>
