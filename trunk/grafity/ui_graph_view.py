@@ -129,12 +129,12 @@ class GraphView(QTabWidget):
         self.moving_rangemin = self.moving_rangemax = False
 
         self.mode = 'arrow'
-        self.setCaption(self.graph.name)
+        self.setCaption(self.graph.fullname)
         self.setWFlags(Qt.WDestructiveClose)
 
 
     def on_rename(self, *args, **kwds):
-        self.setCaption(self.graph.name)
+        self.setCaption(self.graph.fullname)
 
     def on_set_title(self, axis, title):
         self.plot

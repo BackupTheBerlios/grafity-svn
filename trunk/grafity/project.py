@@ -401,6 +401,12 @@ class Project(HasSignals):
     def on_action_added(self, action=None):
         self.modified = True
 
+    def __repr__(self):
+        if self.filename is not None:
+            return "<grafity.Project '%s'>"% self.filename
+        else:
+            return "<grafity.Project (untitled)>"
+
     def cd(self, folder):
         # restore dictionary
         for o in self.here.contents():

@@ -16,6 +16,25 @@ from grafity.ui_console import Console
 
 from grafity.ui.main import MainWindowUI
 
+class ListViewItem(QListViewItem):
+    def __init__(self, parent, obj):
+        QListViewItem.__init__(self, parent, obj.name)
+        obj._tree_item = obj
+        self._object = obj
+
+        pixmap = getpixmap({grafity.Worksheet: 'worksheet', 
+                            grafity.Graph: 'graph', 
+                            grafity.Folder: 'folder'}[type(obj)])
+        self.setPixmap (0, pixmap)
+#        self.setDragEnabled(obj!=obj.project.top)
+#        self.setDropEnabled(isinstance(obj, grafity.Folder))
+#        print >>sys.stderr, self.dragEnabled(), self.dropEnabled()
+#
+#    def acceptDrop(self, mimesrc):
+#        print >>sys.stderr, mimesrc
+#
+#    def dragEntered(self, *args, **kwds):
+#        print >>sys.stderr, 'ent', self, args, kwds
 
 def getpixmap(name, pixmaps={}):
     if name not in pixmaps:
@@ -164,51 +183,9 @@ class ActionList(HasSignals, QListView):
         print >>sys.stderr, "undone", action
         action._item.setText(0, "(%s)"%str(action))
 
-    def on_add_item(self, obj, recursive=False):
-        try:
-            parent = obj.parent._tree_item
-        except AttributeError:
-            parent = self
-        item = obj._tree_item = QListViewItem(parent, obj.name)
-        pixmap = getpixmap({grafity.Worksheet: 'worksheet', 
-                            grafity.Graph: 'graph', 
-                            grafity.Folder: 'folder'}[type(obj)])
-        item.setPixmap (0, pixmap)
-#        item.setOpen (True)
-        item._object = obj
-        if recursive and isinstance(obj, grafity.Folder):
-            for child in obj:
-                self.on_add_item(child, recursive=True)
-
-    def on_remove_item(self, obj):
-        obj.parent._tree_item.takeItem(obj._tree_item)
-        del obj._tree_item
-
-    def on_rename (self, item, column, text):
-        if item.parent() == self.wsitem:
-            item.obj.name = str(text)
-        elif item.parent() == self.gritem:
-            item.obj.name = str(text)
-
     def on_doubleclick(self, item, point, column):
         HasSignals.emit(self, 'activated', item._object)
 
-    def dragObject(self):
-        selected_worksheets = [w.name for w in project.worksheets if self.isSelected(w._explorer_item)]
-        selected_graphs = [g.name for g in project.graphs if self.isSelected(g._explorer_item)]
-        drag = QTextDrag('(' + ', '.join(selected_worksheets) + ' ,' + ', '.join(selected_graphs) + ')', self)
-        return drag
-
-    def on_context_menu_requested(self, item, point, column):
-        if item is None:
-            return
-        if isinstance(item._object, grafity.Worksheet):
-            self.wscontextitem = item._object
-            self.wsheet_context_menu.popup(point)
-        elif isinstance(item._object, grafity.Graph):
-            self.grcontextitem = item._object
-            self.graph_context_menu.popup(point)
-            
     def graph_context_menu_show (self):
         self.grcontextitem.show()
 
@@ -232,6 +209,10 @@ class ActionList(HasSignals, QListView):
     def wsheet_context_menu_importascii (self):
         # do something
         pass
+
+class ObjDrag(QTextDrag):
+    def __init__(self, objects, widget):
+        QTextDrag.__init__(self, str(objects), widget)
 
 
 class ProjectExplorer(HasSignals, QListView):
@@ -264,6 +245,10 @@ class ProjectExplorer(HasSignals, QListView):
 
         self.project = None
 
+        self.mousePressed = False
+        self.setAcceptDrops(True)
+        self.viewport().setAcceptDrops(True)
+
     def set_project(self, project):
         if self.project is not None:
             self.project.disconnect('add-item', self.on_add_item)
@@ -274,25 +259,16 @@ class ProjectExplorer(HasSignals, QListView):
             self.project.connect('add-item', self.on_add_item)
             self.project.connect('remove-item', self.on_remove_item)
 
-#        project.top._tree_item = QListViewItem(self, 'top')
             self.on_add_item(self.project.top, recursive=True)
             project.top._tree_item.setOpen (True)
-#        for folder in self.project.top.all_subfolders():
-#            self.on_add_item(folder)
-            
 
     def on_add_item(self, obj, recursive=False):
         try:
             parent = obj.parent._tree_item
         except AttributeError:
             parent = self
-        item = obj._tree_item = QListViewItem(parent, obj.name)
-        pixmap = getpixmap({grafity.Worksheet: 'worksheet', 
-                            grafity.Graph: 'graph', 
-                            grafity.Folder: 'folder'}[type(obj)])
-        item.setPixmap (0, pixmap)
-#        item.setOpen (True)
-        item._object = obj
+        obj._tree_item = ListViewItem(parent, obj)
+
         if recursive and isinstance(obj, grafity.Folder):
             for child in obj:
                 self.on_add_item(child, recursive=True)
@@ -310,10 +286,11 @@ class ProjectExplorer(HasSignals, QListView):
     def on_doubleclick(self, item, point, column):
         HasSignals.emit(self, 'activated', item._object)
 
-    def dragObject(self):
-        selected_worksheets = [w.name for w in project.worksheets if self.isSelected(w._explorer_item)]
-        selected_graphs = [g.name for g in project.graphs if self.isSelected(g._explorer_item)]
-        drag = QTextDrag('(' + ', '.join(selected_worksheets) + ' ,' + ', '.join(selected_graphs) + ')', self)
+    def dragObject(self, *args, **kwds):
+        items = [i for i in self.project.items.values() 
+                   if isinstance(i, (grafity.Worksheet, grafity.Graph))
+                      and self.isSelected(i._tree_item)]
+        drag = ObjDrag(items, self)
         return drag
 
     def on_context_menu_requested(self, item, point, column):
@@ -350,6 +327,94 @@ class ProjectExplorer(HasSignals, QListView):
         # do something
         pass
 
+    def contentsDragEnterEvent(self, event):
+        if not QTextDrag.canDecode(event):
+            event.ignore()
+            return
+
+        self.oldCurrent = self.currentItem()
+
+        item = self.itemAt(self.contentsToViewport(event.pos()))
+        if item:
+            self.dropItem = item
+
+    def contentsDragMoveEvent(self, event):
+        if not QTextDrag.canDecode(event):
+            event.ignore()
+            return
+
+        item = self.itemAt(self.contentsToViewport(event.pos()))
+        if item:
+#            self.setSelected(item, True)
+            event.accept()
+            if item != self.dropItem:
+                self.dropItem = item
+
+            if event.action() == QDropEvent.Copy:
+                pass
+            elif event.action() == QDropEvent.Move:
+                event.acceptAction()
+            elif event.action() == QDropEvent.Link:
+                event.acceptAction()
+        else:
+            event.ignore()
+            self.dropItem = None
+
+    def contentsDragLeaveEvent(self, event):
+        self.dropItem = None
+        self.setCurrentItem(self.oldCurrent)
+        self.setSelected(self.oldCurrent, True)
+
+    def contentsDropEvent(self, event):
+        if not QTextDrag.canDecode(event):
+            event.ignore()
+            return
+
+        item = self.itemAt(self.contentsToViewport(event.pos()))
+        if item:
+            s = QString()
+            QTextDrag.decode(event, s)
+            event.accept()
+            print >>sys.stderr, unicode(s)
+        else:
+            event.ignore()
+
+    def contentsMousePressEvent(self, event):
+        QListView.contentsMousePressEvent(self, event)
+
+        p = self.contentsToViewport(event.pos())
+        item = self.itemAt(p)
+        if item:
+            if ((p.x() > self.header().sectionPos(self.header().mapToIndex(0)) +
+                 self.treeStepSize()*(item.depth() + int(self.rootIsDecorated())) + self.itemMargin()) or
+                 (p.x() < self.header().sectionPos(self.header().mapToIndex(0)))):
+                self.presspos = QPoint(event.pos())
+                self.mousePressed = True
+
+    def contentsMouseMoveEvent(self, event):
+        if self.mousePressed:
+            length = (self.presspos-event.pos()).manhattanLength()
+            if length > QApplication.startDragDistance():
+                self.mousePressed = False
+                item = self.itemAt(self.contentsToViewport(self.presspos))
+                if item:
+                    self.dragObject().drag()
+#                source = fullPath(item);
+#                if ( QFile::exists(source) ) {
+#                    QUriDrag* ud = new QUriDrag(viewport());
+#                    ud->setFileNames( source );
+#                    if ( ud->drag() )
+#                        QMessageBox::information( this, "Drag source",
+#                        QString("Delete ") + QDir::convertSeparators(source), "Not implemented" );
+#                }
+#            }
+#        }
+#    }
+#
+    def contentsMouseReleaseEvent(self, event):
+        self.mousePressed = False
+
+
 class Cancel(Exception):
     pass
 
@@ -373,12 +438,6 @@ class MainWindow(MainWindowUI):
 
         self.connect(self.File, SIGNAL('aboutToShow()'), self.fileMenuAboutToShow)
 
-#        self.history = QListBox(self.workspace)
-#        self.connect(self.history, SIGNAL("doubleClicked(QListBoxItem*)"), self.history_select)
-#        self.history.setIcon(QPixmap(project.datadir + 'pixmaps/undo_history.png'))
-#        self.history.setCaption('History')
-#        self.history.hide()
-
 ### status bar #################################################################################
 
         self.statusBar().show()
@@ -394,12 +453,12 @@ class MainWindow(MainWindowUI):
         locals = {}
         self.bpanel = Panel(self, QMainWindow.DockBottom)
         self.script = Console(self.bpanel, locals=locals)
-        self.script.cmd(['from grafity import *'])
-        self.script.cmd(['from grafity.arrays import *'])
+        self.script.runsource('from grafity import *')
+        self.script.runsource('from grafity.arrays import *')
         locals['mw'] = self
         locals['undo'] = undo
         locals['redo'] = redo
-        self.script.clear()
+#        self.script.clear()
 
         self.bpanel.add('Script', getpixmap('console'), self.script)
 
@@ -507,15 +566,21 @@ class MainWindow(MainWindowUI):
         filesel = QFileDialog(self)
         if filesel.exec_loop() != 1:
             return
+
+        filename = unicode(filesel.selectedFile())
+
+        if filename in self.recent:
+            self.recent.remove(filename)
+        self.recent = ([filename]+self.recent)[:5]
+
         self.close_project()
-        self.recent = ([unicode(filesel.selectedFile())]+self.recent)[:5]
-        self.open_project(grafity.Project(str(filesel.selectedFile())))
+        self.open_project(grafity.Project(filename))
 
     def on_project_save(self):
         if self.project.filename is not None:
             self.project.commit()
         else:
-            self.on_project_saveas(item)
+            self.on_project_saveas()
 
     def on_project_saveas(self):
         filesel = QFileDialog(self)
@@ -606,13 +671,6 @@ class MainWindow(MainWindowUI):
 
     def exit(self):
         grafity.settings.set('windows', 'recent', ' '.join(self.recent))
-        
-#        s = QString()
-#        st = QTextStream(s, IO_WriteOnly)
-#        st << self
-#        s = str(s)
-#        settings.set('windows', 'toolbars', s)
-#        project.settings['/grafit/console/history'] = '\n'.join(self.script.history[-20:])
         grafity.settings.set('script', 'history', '\n'.join(self.script.history[-20:]))
         
         try:
@@ -652,6 +710,3 @@ class MainWindow(MainWindowUI):
 def splash_message(text):
     if __name__ == '__main__':
         splash.message (text, Qt.AlignLeft, Qt.gray)
-    pass
-
-

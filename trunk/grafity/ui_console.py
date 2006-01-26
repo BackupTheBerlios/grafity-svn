@@ -104,14 +104,14 @@ class Console (QextScintilla):
         sys.ps1 = '>>> '
         sys.ps2 = '... '
 
-        self.clear()
-        self.write('# Welcome to Grafity\n>>> ')
 
         self.completer = rlcompleter.Completer()
 
         self.current_object = None
         self.set_current_object(None)
         self.locals['go'] = self.set_current_object
+
+        self.write(sys.ps1)
 
     def set_current_object(self, obj):
         if obj is None:
@@ -164,6 +164,9 @@ class Console (QextScintilla):
 
     def get_input(self, line=-2):
         return unicode(self.text(self.lines()+line)).split('\n')[0][len(sys.ps1):self.lineLength(self.lines()+line)]
+
+    def runsource(self, line):
+        return self.interpreter.runsource(line)
             
     def run(self):
         """
@@ -177,37 +180,38 @@ class Console (QextScintilla):
         self.pointer = 0
         self.history.append(line)
         self.last_lines.append(line)
-        source = '\n'.join(self.last_lines).replace('{', 'array([').replace('}', '])')
-        source = re.sub('\$(?P<name>[0-9a-zA-Z_]*)', 'project[\'\g<name>\']', source)
+        source = '\n'.join(self.last_lines)
+#.replace('{', 'array([').replace('}', '])')
+#        source = re.sub('\$(?P<name>[0-9a-zA-Z_]*)', 'project[\'\g<name>\']', source)
 
 #        patt = r'\b%s\.%s\b' % (self.worksheet.name, name)
 #        repl = '%s.%s' % (self.worksheet.name, newname)
 #        source = re.sub ($<S-F1>patt, repl, source)
 
-        protected = ['project', 'mainwin']
-
-        class ForbiddenAssignmentError (Exception): pass
-
-        class Walker:
-            def visitAssign(self, node):
-                var = node.asList()[0]
-                if len(var)==2 and isinstance(var[0], str) and var[0] in protected:
-                     print "# Assignment to %s not allowed" % var[0]
-                     raise ForbiddenAssignmentError
-                    
-        walker = Walker()
-
-        forbidden_assign = False
-        try:
-            tree = compiler.parse (source) 
-            compiler.walk (tree, walker)
-        except ForbiddenAssignmentError:
-            forbidden_assign = True
-        except:
-            pass
-
-        if not forbidden_assign:
-            self.more = self.interpreter.runsource(source)
+#        protected = ['project', 'mainwin']
+#
+#        class ForbiddenAssignmentError (Exception): pass
+#
+#        class Walker:
+#            def visitAssign(self, node):
+#                var = node.asList()[0]
+#                if len(var)==2 and isinstance(var[0], str) and var[0] in protected:
+#                     print "# Assignment to %s not allowed" % var[0]
+#                     raise ForbiddenAssignmentError
+#                    
+#        walker = Walker()
+#
+#        forbidden_assign = False
+#        try:
+#            tree = compiler.parse (source) 
+#            compiler.walk (tree, walker)
+#        except ForbiddenAssignmentError:
+#            forbidden_assign = True
+#        except:
+#            pass
+#
+#        if not forbidden_assign:
+        self.more = self.interpreter.runsource(source)
 
         if self.more:
             self.write(sys.ps2)

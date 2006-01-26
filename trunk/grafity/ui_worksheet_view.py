@@ -1,12 +1,17 @@
-import sys
+import sys, os
 
 sys.modules['__main__'].splash.message('loading ui_worksheet_view')
 from qt import *
 from qttable import *
 from grafity.arrays import clip, nan, arange, log10, isnan
+from grafity.settings import DATADIR
 
 from grafity import Worksheet
 
+def getpixmap(name, pixmaps={}):
+    if name not in pixmaps:
+        pixmaps[name] = QPixmap(os.path.join(DATADIR, 'data', 'images', '16', name+'.png'))
+    return pixmaps[name]
 
 class HeaderToolTip(QToolTip):
     def __init__(self, header, worksheet, group=None):
@@ -49,17 +54,18 @@ class WorksheetView(QTabWidget):
         self.worksheet.connect('rename-column', self.update_column_names)
 
         self.worksheet.connect('rename', self.on_rename)
-        self.setCaption(self.worksheet.name)
+        self.setCaption(self.worksheet.fullname)
         self.setWFlags(Qt.WDestructiveClose)
 
         self.tip = HeaderToolTip(self.table.horizontalHeader(), self.worksheet)
+        self.setIcon(getpixmap('worksheet'))
     
     def closeEvent(self, event):
         event.accept()
         self.worksheet._view = None
 
     def on_rename(self, *args, **kwds):
-        self.setCaption(self.worksheet.name)
+        self.setCaption(self.worksheet.fullname)
 
     def on_data_changed(self):
         self.update_size()

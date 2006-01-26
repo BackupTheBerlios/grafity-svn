@@ -29,9 +29,6 @@
     <property name="caption">
         <string>Grafity</string>
     </property>
-    <property name="iconText">
-        <string>ass</string>
-    </property>
     <property name="usesBigPixmaps">
         <bool>false</bool>
     </property>
