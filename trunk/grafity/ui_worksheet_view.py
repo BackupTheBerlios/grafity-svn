@@ -7,6 +7,28 @@ from grafity.arrays import clip, nan, arange, log10, isnan
 
 from grafity import Worksheet
 
+
+class HeaderToolTip(QToolTip):
+    def __init__(self, header, worksheet, group=None):
+        QToolTip.__init__(self, header,group)
+        self.worksheet = worksheet
+
+    def maybeTip (self, p):
+        header = self.parentWidget()
+        if header.orientation() == Qt.Horizontal:
+            section = header.sectionAt(p.x())
+        else:
+            section = header.sectionAt(p.y())
+
+        c = self.worksheet.columns[section]
+
+        d = ', '.join(col.fullname for col in c.dependencies)
+        tipString = '<b>column:</b> %s<br><b>expr:</b> <i>%s</i><br><b>deps:</b> %s' % (c.name, c.expr, d)
+
+        self.tip(header.sectionRect(section), tipString, "This is a section in a header")
+
+
+
 class WorksheetView(QTabWidget):
     def __init__(self, parent, mainwin, worksheet):
         QTabWidget.__init__(self, parent)
@@ -28,6 +50,13 @@ class WorksheetView(QTabWidget):
 
         self.worksheet.connect('rename', self.on_rename)
         self.setCaption(self.worksheet.name)
+        self.setWFlags(Qt.WDestructiveClose)
+
+        self.tip = HeaderToolTip(self.table.horizontalHeader(), self.worksheet)
+    
+    def closeEvent(self, event):
+        event.accept()
+        self.worksheet._view = None
 
     def on_rename(self, *args, **kwds):
         self.setCaption(self.worksheet.name)

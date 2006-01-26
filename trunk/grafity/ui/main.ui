@@ -53,6 +53,7 @@
         <action name="act_project_save"/>
         <action name="act_project_saveas"/>
         <separator/>
+        <separator/>
         <action name="act_exit"/>
     </item>
     <item text="&amp;Edit" name="Edit">
@@ -494,6 +495,22 @@
         </property>
         <property name="menuText">
             <string>&amp;About...</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>Action</cstring>
+        </property>
+        <property name="text">
+            <string></string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>Action_2</cstring>
+        </property>
+        <property name="text">
+            <string>Unnamed</string>
         </property>
     </action>
 </actions>

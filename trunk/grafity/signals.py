@@ -183,7 +183,7 @@ class HasSignals(object):
                 # then we remove them from the slots list.
                 try:
                     results.append(slot(*args, **kwds))
-                except ReferenceError:
+                except (ReferenceError, RuntimeError):
                     # We can't do self._signals[signal].remove(slot) because that calls slot.__eq__
                     # and raises another ReferenceError. So we might as well remove all expired slots.
                     self._signals[signal] = [s for s in self._signals[signal] if not s.is_expired()]
@@ -201,7 +201,7 @@ class HasSignals(object):
             for slot in _global_signals[signal]:
                 try:
                     results.append(slot(self, *args, **kwds))
-                except ReferenceError:
+                except (ReferenceError, RuntimeError):
                     _global_signals[signal] = [s for s in _global_signals[signal] if not s.is_expired()]
 #                except TypeError, arg:
 #                    if '_wxPyDeadObject' in str(arg):

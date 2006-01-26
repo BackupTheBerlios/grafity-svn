@@ -130,6 +130,8 @@ class GraphView(QTabWidget):
 
         self.mode = 'arrow'
         self.setCaption(self.graph.name)
+        self.setWFlags(Qt.WDestructiveClose)
+
 
     def on_rename(self, *args, **kwds):
         self.setCaption(self.graph.name)

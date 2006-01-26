@@ -371,6 +371,8 @@ class MainWindow(MainWindowUI):
             self.recent = [s for s in self.recent.split(' ') if os.path.isfile(s)]
         self.recentids = []
 
+        self.connect(self.File, SIGNAL('aboutToShow()'), self.fileMenuAboutToShow)
+
 #        self.history = QListBox(self.workspace)
 #        self.connect(self.history, SIGNAL("doubleClicked(QListBoxItem*)"), self.history_select)
 #        self.history.setIcon(QPixmap(project.datadir + 'pixmaps/undo_history.png'))
@@ -394,7 +396,7 @@ class MainWindow(MainWindowUI):
         self.script = Console(self.bpanel, locals=locals)
         self.script.cmd(['from grafity import *'])
         self.script.cmd(['from grafity.arrays import *'])
-        locals['mainwin'] = self
+        locals['mw'] = self
         locals['undo'] = undo
         locals['redo'] = redo
         self.script.clear()
@@ -424,16 +426,24 @@ class MainWindow(MainWindowUI):
         self.rpanel.add('Axes', getpixmap('axes'), self.graph_axes)
         self.rpanel.add('fit', getpixmap('function'), self.graph_fit)
 
-        self.open_project(grafity.Project('../test/pdms.gt'))
+        self.open_project(grafity.Project())#'../test/pdms.gt'))
 
         global_connect('status-message', self.status_message)
 
+        self.worksheet_toolbar.hide()
+        self.graph_toolbar.hide()
+        self.rpanel.hide()
+
     def on_activated(self, obj):
-        if isinstance(obj, grafity.Graph):
-            obj._view = GraphView(self.workspace, self, obj)
-            obj._view.show()
-        elif isinstance(obj, grafity.Worksheet):
-            obj._view = WorksheetView(self.workspace, self, obj)
+        if not hasattr(obj, '_view') or obj._view is None:
+            if isinstance(obj, grafity.Graph):
+                obj._view = GraphView(self.workspace, self, obj)
+                obj._view.show()
+            elif isinstance(obj, grafity.Worksheet):
+                obj._view = WorksheetView(self.workspace, self, obj)
+                obj._view.show()
+        else:
+            obj._view.hide()
             obj._view.show()
 
     def open_project(self, project):
@@ -451,7 +461,11 @@ class MainWindow(MainWindowUI):
         """Disconnect the current project form the gui"""
 #        self.project.disconnect('change-current-folder', self.on_change_folder)
         self.explorer.set_project(None)
-        # and close all pages
+        self.graph_data.set_project(None)
+        self.script.set_current_object(None)
+        for i in self.project.items.values():
+            if hasattr(i, '_view') and i._view is not None:
+                i._view.close()
         self.project = None
 
     def on_undo(self):
@@ -494,13 +508,14 @@ class MainWindow(MainWindowUI):
         if filesel.exec_loop() != 1:
             return
         self.close_project()
+        self.recent = ([unicode(filesel.selectedFile())]+self.recent)[:5]
         self.open_project(grafity.Project(str(filesel.selectedFile())))
 
     def on_project_save(self):
         if self.project.filename is not None:
             self.project.commit()
         else:
-            self.on_file_saveas(item)
+            self.on_project_saveas(item)
 
     def on_project_saveas(self):
         filesel = QFileDialog(self)
@@ -529,19 +544,22 @@ class MainWindow(MainWindowUI):
         self.project.new(grafity.Graph)
 
     def fileMenuAboutToShow(self):
-        return
-        menu = self.menus['&File']
         for id in self.recentids:
-            menu.removeItem(id)
+            self.File.removeItem(id)
 
         self.recentids = []
         for i, name in enumerate(self.recent):
-            id = menu.insertItem('%d. %s' % (i, name), self.on_recent, 0, -1, 5+i)
-            menu.setItemParameter(id, i)
+            id = self.File.insertItem('&%d. %s' % (i, name), self.on_recent, 0, -1, 6+i)
+            self.File.setItemParameter(id, i)
             self.recentids.append(id)
 
     def on_recent(self, id):
-        project.load(self.recent[id])
+        try:
+            self.ask_save()
+        except Cancel:
+            return
+        self.close_project()
+        self.open_project(grafity.Project(self.recent[id]))
 
     def windowMenuAboutToShow(self):
         menu = self.menus['&Window']

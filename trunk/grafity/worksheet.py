@@ -7,7 +7,7 @@ except:
 
 
 from grafity.signals import HasSignals
-from grafity.actions import action_from_methods, action_from_methods2, StopAction
+from grafity.actions import action_from_methods, action_from_methods2, StopAction, action_list
 from grafity.project import Item, wrap_attribute, register_class, create_id
 
 from grafity.arrays import MkArray, transpose, array, asarray
@@ -33,6 +33,10 @@ class Column(MkArray, HasSignals):
     def get_name(self):
         return self.data.name.decode('utf-8')
     name = property(get_name, set_name)
+
+    def get_fullname(self):
+        return self.worksheet.fullname+'.'+self.name
+    fullname = property(get_fullname)
 
     def do_set_expr(self, state, expr, setstate=True):
         # find dependencies and error-check expression

@@ -178,6 +178,10 @@ class Item(HasSignals):
             if self.check_name(name, parent):
                 return name
 
+    def get_fullname(self):
+        return '.'.join(reversed([self.name] + [a.name for a in self.ancestors()]))
+    fullname = property(get_fullname)
+
     def ancestors(self):
         if self == self.project.top:
             return
@@ -388,6 +392,11 @@ class Project(HasSignals):
                     else:
                         self.deleted[row.id] = cls(self, location=(view, row, row.id))
 
+        action_list.disable()
+        for item in (p for p in self.items.values() if isinstance(p, grafity.worksheet.Worksheet)):
+            for c in item.columns:
+                c.expr = c.expr
+        action_list.enable()
 
     def on_action_added(self, action=None):
         self.modified = True
