@@ -1,12 +1,251 @@
-The ``grafit.worksheet`` module
+The ``grafity.worksheet`` module
 ================================
 
-Calculated columns
-------------------
+.. contents::
+
+Introduction
+------------
+
+The worksheet is a type of window available in the Origin project. Its primary function is to hold and organize
+the data that you bring into Origin, although data manipulation, exploration, and analysis are often and easily
+performed within the worksheet. 
+
+When Origin starts, it opens a new project displaying a single worksheet created from the ORIGIN.OTW worksheet
+template. Like other window types, you can open multiple worksheets in an Origin project. To open additional
+worksheets in the project, select File:New. This menu command opens the New dialog box. Select Worksheet from
+the Window Type list box. Select the desired template from the Template drop-down list and then click OK to
+close the dialog box and open the new worksheet. 
+
+Performing Basic Worksheet Operations
+-------------------------------------
+
+To help you organize your worksheet data, Origin provides menu commands and tools to add, delete, and arrange
+columns, and to insert and delete rows. Additionally, you can transpose the columns and rows in your worksheet. 
+
+Adding Columns
+~~~~~~~~~~~~~~
+To add columns to the worksheet, perform one of the following operations: 
+1) Select Column:Add New Columns. 
+2) Click the Add New Columns button on the Standard toolbar. 
+3) Right-click inside the worksheet window but to the right of the worksheet grid. Select Add New Column from
+the shortcut menu. 
+The Column:Add New Columns menu command opens the Add New Columns dialog box in which you specify the number of
+columns to add to the worksheet. The Add New Columns button on the Standard toolbar and the Add New Column
+shortcut menu command add one column to the worksheet. Each method adds the Y column(s) to the right of the
+last worksheet column. Each new column is named alphabetically (A, B, C, ... X, Y, Z, AA, BB, CC, ...),
+starting with the first letter that is not already used as a column name in the worksheet. 
+
+Inserting Columns
+~~~~~~~~~~~~~~~~~
+To add a single column to a specific location in the worksheet, highlight the column located to the immediate right
+of where you want to insert the column and select Edit:Insert or right-click and select Insert from the shortcut
+menu. The new column inserts to the immediate left of the highlighted column. The new column is designated as a Y
+column, independent of the designation of the highlighted column. Each new column is named alphabetically, starting
+with the first letter that is not already used as a column name in the worksheet. 
+To insert n columns in a specific location in the worksheet, perform the single insertion method n times.
+Alternatively, highlight n columns to the immediate right of where you want to insert the new columns and then
+select Edit:Insert or right-click and select Insert from the shortcut menu. 
+
+Deleting Columns
+~~~~~~~~~~~~~~~~
+To delete one or more columns from the worksheet, highlight the column(s) and select Edit:Delete or right-click and
+select Delete. Note that when you delete columns (data sets) from the worksheet, any other visual representation of
+the data sets will also be deleted from the project. For example, if you delete a column of data that also displays
+as a data plot in a graph window, the data plot is deleted from the graph window. 
+Note: To clear the column values but retain the columns, select Edit:Clear. 
+
+Moving Columns
+~~~~~~~~~~~~~~
+To move the highlighted column to the first (leftmost) position in the worksheet, select Column:Move to First. To
+move the highlighted column to the last (rightmost) position in the worksheet, select Column:Move to Last. If more
+than one column is selected, the selected columns move, maintaining their existing order. 
+You can also move columns using the following buttons on the Column toolbar: Move to First, Move to Last, Move Left,
+Move Right 
+To open the Column toolbar, select View:Toolbars and select the Column check box. To use these buttons, highlight
+the desired column(s) and click the appropriate button. 
+
+Inserting Rows
+~~~~~~~~~~~~~~
+To insert a single row in a specific location in the worksheet, highlight the row that is directly below where you
+want to insert the new row and then select Edit:Insert or right-click and select Insert from the shortcut menu. The
+new row inserts above the highlighted row. 
+To insert n rows in a specific location in the worksheet, perform the single insertion method n times.
+Alternatively, highlight n rows directly below where you want to insert the new rows and then select Edit:Insert or
+right-click and select Insert from the shortcut menu. 
+
+Deleting Rows
+~~~~~~~~~~~~~
+To delete one or more rows from the worksheet, highlight the row(s) and select Edit:Delete or right-click and select
+Delete. After deleting the selected rows, the rows below the selection move up in the worksheet. 
+Note: To clear the cell contents but retain the row(s), select Edit:Clear instead of Edit:Delete. 
+
+Transposing the Columns and Rows
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+To transpose the columns and rows in the active worksheet, select Edit:Transpose. This menu command exchanges the
+worksheet columns with rows, and the rows with columns. 
+1) Prior to transposing, if the worksheet contains more row values than columns, Origin adds the necessary columns
+to the worksheet during the transpose process. Origin names these added columns alphabetically, starting with the
+first letter that is not already used as a column name in the worksheet. 
+2) Prior to transposing, if the worksheet contains more columns than row values, Origin maintains the extra columns
+in the worksheet. This default behavior can be altered by selecting a new option from the Delete Empty Columns After
+Worksheet Transpose drop-down list on the Miscellaneous tab of the Options dialog box (Tools:Options). 
+Note: To transpose the columns and rows in your worksheet, each of the columns in the worksheet must be of the same
+"display type." For example, each of the columns must be set to "Text and Numeric" type, or "Numeric" type. The
+column display type is set from the Display drop-down list in each column's Worksheet Column Format dialog box.
+Double-click on a column heading to open this dialog box. In the default Origin worksheet, each column is set to the
+"Text and Numeric" display type. 
+
+Entering and Deleting Data in the Worksheet
+-------------------------------------------
+Origin provides several ways to add data to the worksheet: 
+1) Entering data using the keyboard. 
+2) Importing a file. 
+3) Pasting data from another application using the Clipboard. 
+4) Pasting data from another (or the same) Origin worksheet using the Clipboard. 
+5) Creating a data set based on row numbers or random numbers. 
+6) Using a function to set column values. 
+7) Setting incremental X values. 
+Note: If you are displaying numbers in a worksheet cell using a format that does not show the entire number, Origin
+will now display the cell value as ######. This differs from previous versions of Origin, in which the numbers
+incompletely displayed, sometimes causing confusion over the actual cell value. 
+Even though the cell value will now display as ######, when you enter the cell editing mode, the numbers display. 
+This feature is controlled by a LabTalk numeric system variable. To disable this feature, type the following line in
+the Script window: 
+@wc = 1 (PRESS ENTER) 
+To reactivate the feature, set @wc back to 0. 
+
+
+Filling Columns with Row Numbers or Random Numbers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+To quickly fill a column, or a selected range of cells, with either the associated row number, uniform random
+numbers, or normal random numbers, perform one of the following operations after selecting the desired cells: 
+1) To fill with row numbers, click the Set Column Value According to Row Number button on the Worksheet Data
+toolbar. Alternatively, select Column:Fill Column With:Row Numbers or right-click and select Fill Column With:Row
+Numbers. 
+2) To fill with uniform random numbers, click the Set Column Values with Uniform Random Numbers button on the
+Worksheet Data toolbar. Alternatively, select Column:Fill Column With:Uniform Random Numbers or right-click and
+select Fill Column With:Uniform Random Numbers. 
+3) To fill with normal random numbers, click the Set Column Values with Normal Random Numbers button on the
+Worksheet Data toolbar. Alternatively, select Column:Fill Column With:Normal Random Numbers or right-click and
+select Fill Column With:Normal Random Numbers. 
+For the normal random number fill, the mean and the standard deviation are controlled by the NORMAL_MEAN and
+NORMAL_SIGMA variables in the [FillColumn] section of the ORIGIN.INI file. By default, these variables are set to 0
+and 1, respectively. For the uniform random number fill, the minimum and maximum numbers generated are determined by
+the UNIFORM_MIN and UNIFORM_MAX variables. By default, these variables are set to 0 and 1, respectively.
+
+Using Functions to Set Column Values or Mathematically Transform Values
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+To create or transform data sets using any mathematical expression recognized by Origin, perform one of the
+following operations after selecting a worksheet column or a range of cells in a column: 
+1) Select Column:Set Column Values. 
+2) Right-click and select Set Column Values from the shortcut menu. 
+3) Click the Set Column Values button on the Worksheet Data toolbar. 
+The Set Column Values Dialog Box 
+1) Select a Worksheet Range 
+After you select a column or a range of cells in a column and then open this dialog box, the beginning and ending
+row numbers in your worksheet column selection are automatically displayed in the For Row (i) and To text boxes. To
+alter the selection range, type new values in these text boxes. After editing this dialog box and clicking OK,
+calculated values are entered only in the cells that fall within the selection range. 
+2) Select the Function(s) and Data set(s) 
+The Add Function and Add Column drop-down lists and associated buttons are provided to help you build the desired
+expression in the ColumnName= text box. Instead of typing the proper function and data set syntax directly in the
+ColumnName= text box, you can select functions and data sets from these drop-down lists. 
+The Add Function drop-down list includes Origin's built-in mathematical and statistical distribution functions. To
+view the details of a function, select the function from the drop-down list. A function summary including a
+description of the function arguments displays in the left view box. To select a function so that it displays in the
+ColumnName= text box, click the Add Function button after selecting it from the drop-down list. How the function
+displays in the ColumnName= text box depends on whether any text was highlighted in the text box prior to selecting
+the function. If text was highlighted in the text box, then that text becomes the (last) argument for the selected
+function. If no text was highlighted, then the function displays at the last active cursor location in the text box. 
+The Add Column drop-down list includes an entry for each of the columns in the active worksheet. Select a column
+from the drop-down list and then click the Add Column button. If text was highlighted in the ColumnName= text box,
+Origin overtypes this text with the selected column name. Otherwise, Origin adds the column name at the last active
+cursor location in the text box. 
+3) Complete the Expression in the ColumnName= Text Box 
+The expression you type in this text box is used to fill the selected worksheet column cells with values. The
+expression can include any data sets (columns) in the project as well as any of Origin's built-in functions. The Add
+Function and Add Column controls provide an easy method for adding mathematical and statistical distribution
+functions and data sets from the same worksheet to the expression. However, you can use any of Origin's built-in
+functions, following the syntax described in the LabTalk Manual. You can also access data sets from other worksheets
+using the WorksheetName_ColumnName syntax. For example, to specify the C column in the Data3 worksheet, you can type
+Data3_C. In addition to data sets and functions, you can use any operators recognized by Origin, as well as any
+defined variables. 
+The variable i can be used in an expression to indicate the row number. For example, the expression col(A)=i fills
+column A with row number values. 
+Note: Do not include a semicolon after the expression entered in the Set Column Values dialog box. 
+4) The OK Button 
+Click this button to close the dialog box and set the values for the selected cells according to the specified
+expression in the ColumnName= text box. 
+5) The Undo/Redo Button 
+Click this button to undo/redo the last change made to the expression in the ColumnName= text box. 
+Note: To update all the columns in the active worksheet in which you have set a formula using Set Column Values,
+select Analysis:Set All Column Values or click the Set All Column Values button on the Worksheet Data toolbar. This
+is an easy method for updating, as opposed to opening each column's Set Column Values dialog box and clicking OK. 
+
+Deleting Data
+~~~~~~~~~~~~~
+To clear the entire contents of a worksheet, select Edit:Clear Worksheet. An Attention box opens confirming your
+menu selection. 
+To delete a range of cells from the worksheet, select the desired cells and select Edit:Delete. The Edit:Delete menu
+command can also be used to delete a selected column or row from the worksheet. When the Edit:Delete menu command is
+selected, the worksheet values, as well as the worksheet cells, are deleted. 
+Data can be deleted from the worksheet without deleting the corresponding cells. To accomplish this, select the
+cells containing the data you want to delete and press the DELETE key. Missing values (--) fill the selected cells.
+Alternatively, select Edit:Clear to delete the values from the selected cells. 
+
+Selecting Worksheet Data
+------------------------
+Many of Origin's plotting and analysis features act on the data that is currently selected in the active worksheet.
+The worksheet's data selection methods are reviewed in the following sections. 
+
+Selecting the Entire Worksheet
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+To select all the columns in the worksheet, perform one of the following operations: 
+1) Point to the blank space in the upper-left corner of the worksheet, so that the mouse pointer changes to an
+arrow, and click the left mouse button. 
+2) Click to select the first column heading and then drag to the last column in the worksheet. Release the mouse
+button to select all the columns. (Note: Origin does not automatically scroll the columns.) 
+3) Click to select the first column heading, scroll the worksheet to display the last column, and then hold down the
+SHIFT key and click on the last column heading. 
+
+Selecting Adjacent Columns
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+To select adjacent columns in the worksheet, perform one of the following operations: 
+1) Click to select the first column heading in the desired range and then drag to the last column in the desired
+range. Release the mouse button to select the columns. (Note: Origin does not automatically scroll the columns.) 
+2) Click to select the first column heading in the desired range, scroll the worksheet to display the last column in
+the desired range, and then hold down the SHIFT key and click on this last column heading. 
+
+Selecting Rows
+~~~~~~~~~~~~~~
+To select a row range, perform one of the following operations: 
+1) Click to select the first row heading in the desired range and then drag to the last row in the desired range.
+Release the mouse button to select the rows. 
+2) Click to select the first row heading in the desired range, scroll the worksheet to display the last row in the
+desired range, and then hold down the SHIFT key and click on this last row heading. 
+
+Selecting Cells
+~~~~~~~~~~~~~~~
+To select a range of cells in the worksheet, click-and-drag to select the cells. 
+
+Deleting a Worksheet from a Project
+-----------------------------------
+When you delete a worksheet, you delete the worksheet window from the project, as well as all the data contained in
+the worksheet. Any other visual representations of that data are also deleted from the project. Thus, any data plots
+based on the deleted worksheet data are deleted from the respective graph windows. 
+To delete a worksheet from the project, perform one of the following operations: 
+1) Click the Close Window button in the upper-right corner of the worksheet. 
+2) Right-click on the worksheet window icon in Project Explorer and select Delete Window from the shortcut menu. 
+3) Click on the worksheet window icon in Project Explorer and then press DELETE. 
+Because of the potential for unexpected loss of data, Origin opens a Deletion Confirmation box. 
+Note: Hiding a worksheet instead of deleting it allows you to visually remove the worksheet from the workspace, but
+maintain the window and data in the project. If you hide the worksheet, you can re-activate its view in the Project
+Explorer.
+
 
 When evaluating calculated columns, the namespace used contains the following (in order of precedence):
 
-* math, using ``from grafit.arrays import *`` (which includes numarray)
+* math, using ``from grafity.arrays import *`` (which includes numarray)
 
 * ``here``, ``top``, ``up`` and ``this`` with their usual meanings
 
