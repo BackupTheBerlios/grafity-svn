@@ -33,7 +33,7 @@ class mydict(dict):
                             'up': self.lookup_object.parent,
                             'top': self.lookup_object.project.top }
         else:
-            special = {}
+            self.special = {}
 
 
 class Interpreter (code.InteractiveInterpreter):
@@ -73,7 +73,7 @@ class Console (QextScintilla):
         self.locals = mydict(locals)
         self.interpreter = Interpreter(self.locals)
 
-        self.resize (500, 300)
+        self.resize(500, 300)
 
         lex = QextScintillaLexerPython()
         lex.setDefaultFont(QApplication.font())

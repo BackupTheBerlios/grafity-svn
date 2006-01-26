@@ -59,6 +59,7 @@ class WorksheetView(QTabWidget):
 
         self.tip = HeaderToolTip(self.table.horizontalHeader(), self.worksheet)
         self.setIcon(getpixmap('worksheet'))
+        self.resize(400, 400)
     
     def closeEvent(self, event):
         event.accept()
@@ -140,6 +141,9 @@ class WorksheetView(QTabWidget):
             self.table.selectColumn(c)
     selected_columns = property(get_selected_columns, set_selected_columns)
 
+    def on_header_context_menu_requested(self, event):
+        print >>sys.stderr, "sod off!"
+
         
 
 class HeaderEventHandler(QObject):
@@ -154,7 +158,7 @@ class HeaderEventHandler(QObject):
                 return True
         if event.type() == QEvent.MouseButtonPress:
             if event.button() == Qt.RightButton:
-                self.table.worksheet.on_header_context_menu_requested(event)
+                self.table.worksheet._view.on_header_context_menu_requested(event)
                 return True
         return False
 

@@ -44,8 +44,8 @@ class VarOperation(object):
         return repr(self.oper).replace('UFunc', 'vUFunc')
 
 # wrap all ufuncs with VarOperations
-#mod_ufuncs = dict([(k, VarOperation(v)) for k, v in ufunc._UFuncs.iteritems() if v.arity in (1,2)])
-#globals().update(mod_ufuncs)
+mod_ufuncs = dict([(k, VarOperation(v)) for k, v in ufunc._UFuncs.iteritems() if v.arity in (1,2)])
+globals().update(mod_ufuncs)
 
 def asvarray(*args, **kwds):
     arr = asarray(*args, **kwds)

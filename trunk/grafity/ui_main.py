@@ -458,6 +458,7 @@ class MainWindow(MainWindowUI):
         locals['mw'] = self
         locals['undo'] = undo
         locals['redo'] = redo
+        locals['mainwin'] = self
 #        self.script.clear()
 
         self.bpanel.add('Script', getpixmap('console'), self.script)
@@ -467,7 +468,7 @@ class MainWindow(MainWindowUI):
         self.explorer = ProjectExplorer(self.lpanel)
         self.explorer.connect('activated', self.on_activated)
         self.lpanel.add('Explorer', getpixmap('folder'), self.explorer)
-        self.lpanel._Explorer_callback(True)
+        self.lpanel.btns['Explorer'].setOn(True)
 
         self.actionlist = ActionList(self.lpanel)
         self.lpanel.add('Actions', getpixmap('undo'), self.actionlist)

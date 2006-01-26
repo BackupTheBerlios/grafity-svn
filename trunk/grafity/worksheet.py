@@ -1,15 +1,14 @@
 import sys
+import re
 
 try:
    sys.modules['__main__'].splash.message('loading worksheet')
 except:
     pass
 
-
 from grafity.signals import HasSignals
 from grafity.actions import action_from_methods, action_from_methods2, StopAction, action_list
 from grafity.project import Item, wrap_attribute, register_class, create_id
-
 from grafity.arrays import MkArray, transpose, array, asarray
 
 import grafity.arrays as arrays
@@ -28,7 +27,7 @@ class Column(MkArray, HasSignals):
     def set_name(self, name):
         prevname = self.data.name
         self.data.name = name.encode('utf-8')
-        self.emit('rename', prevname, name)
+        self.emit('rename', self, prevname, name)
         self.worksheet.emit('rename-column', self, prevname, name)
     def get_name(self):
         return self.data.name.decode('utf-8')
@@ -40,20 +39,21 @@ class Column(MkArray, HasSignals):
 
     def do_set_expr(self, state, expr, setstate=True):
         # find dependencies and error-check expression
-        self.worksheet.record = set()
         try:
             data = asarray(self.worksheet.evaluate(expr))
         except Exception, ar:
             print >>sys.stderr, '*****************', ar
             raise StopAction, False
-        newdep = self.worksheet.record
-        self.worksheet.record = None
+        self.depdict = self.analyze_expression(expr)
+        newdep = set(self.depdict.values())
 
         # set dependencies
         for column in newdep - self.dependencies:
             column.connect('data-changed', self.calculate)
+            column.connect('rename', self.on_dep_rename)
         for column in self.dependencies - newdep:
             column.disconnect('data-changed', self.calculate)
+            column.disconnect('rename', self.on_dep_rename)
         self.dependencies = newdep
 
         # action state
@@ -88,6 +88,32 @@ class Column(MkArray, HasSignals):
 
     def calculate(self):
         self[:] = self.worksheet.evaluate(self.expr)
+
+    def analyze_expression(self, expr):
+        idents = re.findall(r'\b([a-zA-Z_][\w\.]*)\b(?!\()', expr)
+        wsnames = ['.'.join(ident.split('.')[:-1]) for ident in idents]
+        worksheets = [self.worksheet.evaluate(name) for name in wsnames]
+        for i, w in enumerate(worksheets):
+            if w == []:
+                worksheets[i] = self.worksheet
+        columns = [ident.split('.')[-1] for ident in idents]
+        deps = [getattr(w, c) for w, c in zip(worksheets, columns)]
+        depdict = dict(zip(idents, deps))
+        return depdict
+
+    def on_dep_rename(self, col, oldname, newname):
+        expr = self.expr
+        oldexpr = expr
+        for depstr, depcol in self.depdict.iteritems():
+            if depcol == col:
+                if col.worksheet == self.worksheet:
+                    name = newname
+                elif col.worksheet.parent == self.worksheet.parent:
+                    name = '.'.join(col.worksheet.name, col.name)
+                else:
+                    name = '.'.join(col.worksheet.fullname, col.name)
+                expr = re.sub(r'\b%s\b(?!\()'%depstr, newname, expr)
+        self.expr = expr
 
     def set_id(self, id):
         self.data.id = id
@@ -126,8 +152,6 @@ class Worksheet(Item, HasSignals):
                     self.columns.append(Column(self, i))
 
         self.__attr = True
-
-    record = None
 
     def __items__(self):
         return dict((c.name, c) for c in self.columns)
@@ -192,36 +216,20 @@ class Worksheet(Item, HasSignals):
         project = self.project
         worksheet = self
 
-        class funnydict(dict):
-            def __init__(self, recordkeys, *args, **kwds):
-                dict.__init__(self, *args, **kwds)
-                self.recordset = set()
-                self.recordkeys = recordkeys
-
-            def __getitem__(self, key):
-                if key in self.recordkeys:
-                    self.recordset.add(key)
-                return dict.__getitem__(self, key)
-
-        namespace = funnydict((c.name for c in worksheet.columns)) 
-
+        namespace = {}
         namespace.update(arrays.__dict__)
-
         namespace['top'] = project.top
         namespace['here'] = project.this
-        namespace['this'] = worksheet
-        namespace['up'] = worksheet.parent.parent
-
-        namespace.update(dict([(c.name, c) for c in worksheet.columns]))
-        namespace.update(dict([(i.name, i) for i in worksheet.parent.contents()]))
+        namespace['this'] = self
+        namespace['up'] = self.parent.parent
+        namespace.update(dict([(c.name, c) for c in self.columns]))
+        namespace.update(dict([(i.name, i) for i in self.parent.contents()]))
 
         try:
             result = eval(expression, namespace)
         except:
             raise ValueError
 
-        for name in namespace.recordset:
-            self[name]
         return result
 
     def __getattr__(self, name):
@@ -319,10 +327,7 @@ class Worksheet(Item, HasSignals):
         if isinstance(key, int):
             return self.columns[key]
         elif isinstance(key, basestring) and key in self.column_names:
-            column = self.columns[self.column_names.index(key)]
-            if self.record is not None:
-                self.record.add(column)
-            return column
+            return self.columns[self.column_names.index(key)]
         else:
             raise IndexError
 
