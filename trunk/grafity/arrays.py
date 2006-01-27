@@ -125,6 +125,12 @@ class MkArray(with_new_opers):
                     length = 1
             else:
                 length = abs(key.start - key.stop)
+        elif hasattr(key, '__getitem__'):
+            #XXX: works, but...
+            arr = self[:]
+            arr[key] = value
+            self[:] = arr
+            return
 
         # adjust size
         if start > len(self):

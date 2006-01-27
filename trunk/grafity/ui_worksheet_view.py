@@ -8,6 +8,17 @@ from grafity.settings import DATADIR
 
 from grafity import Worksheet
 
+def sortcol(col):
+    notnan = ~isnan(col)
+    col[notnan] = sorted(col[notnan])
+
+register_column_tool("Sort Column", sortcol)
+
+
+def squeeze(col):
+    col[:] = col[~isnan(col)]
+
+
 def getpixmap(name, pixmaps={}):
     if name not in pixmaps:
         pixmaps[name] = QPixmap(os.path.join(DATADIR, 'data', 'images', '16', name+'.png'))

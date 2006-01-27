@@ -26,6 +26,17 @@ class ListViewItem(QListViewItem):
                             grafity.Graph: 'graph', 
                             grafity.Folder: 'folder'}[type(obj)])
         self.setPixmap (0, pixmap)
+
+        self._object.connect('rename', self.on_object_renamed)
+        self._object.connect('set-parent', self.on_object_set_parent)
+
+    def on_object_renamed(self, name, item):
+        self.setText(0, name)
+
+    def on_object_set_parent(self, parent):
+        self.parent().takeItem(self)
+        parent._tree_item.insertItem(self)
+        
 #        self.setDragEnabled(obj!=obj.project.top)
 #        self.setDropEnabled(isinstance(obj, grafity.Folder))
 #        print >>sys.stderr, self.dragEnabled(), self.dropEnabled()
@@ -451,15 +462,13 @@ class MainWindow(MainWindowUI):
 
 ### bottom panel ###############################################################################
         locals = {}
+        locals['undo'] = undo
+        locals['redo'] = redo
+        locals['main'] = self
         self.bpanel = Panel(self, QMainWindow.DockBottom)
         self.script = Console(self.bpanel, locals=locals)
         self.script.runsource('from grafity import *')
         self.script.runsource('from grafity.arrays import *')
-        locals['mw'] = self
-        locals['undo'] = undo
-        locals['redo'] = redo
-        locals['mainwin'] = self
-#        self.script.clear()
 
         self.bpanel.add('Script', getpixmap('console'), self.script)
 

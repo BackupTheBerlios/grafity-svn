@@ -10,7 +10,7 @@ cleanall: clean
 	@rm -f *.html *.pdf
 
 .txt.html:
-	rest2html --stylesheet=effbot.css --embed-stylesheet $(@:.html=.txt) $@
+	rest2html --stylesheet=style.css --embed-stylesheet $(@:.html=.txt) $@
 
 .txt.tex:
 	rest2latex $(@:.tex=.txt) $@

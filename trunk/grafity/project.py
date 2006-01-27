@@ -193,21 +193,25 @@ class Item(HasSignals):
         state['new'], state['old'] = parent, self._parent
         oldparent = self._parent
         self._parent = parent
-        self.parent.emit('modified')
-        if isinstance(oldparent, Folder):
-            oldparent.emit('modified')
-        else:
+        self.emit('set-parent', self._parent)
+#        self.parent.emit('modified')
+#        if isinstance(oldparent, Folder):
+#            oldparent.emit('modified')
+#        else:
+        if not isinstance(oldparent, Folder):
             raise StopAction
     def undo_set_parent(self, state):
         self._parent = state['old']
-        if state['old'] != '':
-            state['old'].emit('modified')
-        state['new'].emit('modified')
+        self.emit('set-parent', self._parent)
+#        if state['old'] != '':
+#            state['old'].emit('modified')
+#        state['new'].emit('modified')
     def redo_set_parent(self, state):
         self._parent = state['new']
-        if state['old'] != '':
-            state['old'].emit('modified')
-        state['new'].emit('modified')
+        self.emit('set-parent', parent)
+#        if state['old'] != '':
+#            state['old'].emit('modified')
+#        state['new'].emit('modified')
     set_parent = action_from_methods2('object/set-parent', set_parent, undo_set_parent, redo=redo_set_parent)
     def get_parent(self):
         return self._parent
