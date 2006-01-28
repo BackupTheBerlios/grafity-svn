@@ -38,15 +38,6 @@ class ListViewItem(QListViewItem):
         self.parent().takeItem(self)
         parent._tree_item.insertItem(self)
         
-#        self.setDragEnabled(obj!=obj.project.top)
-#        self.setDropEnabled(isinstance(obj, grafity.Folder))
-#        print >>sys.stderr, self.dragEnabled(), self.dropEnabled()
-#
-#    def acceptDrop(self, mimesrc):
-#        print >>sys.stderr, mimesrc
-#
-#    def dragEntered(self, *args, **kwds):
-#        print >>sys.stderr, 'ent', self, args, kwds
 
 class Panel(QDockWindow):
     """A panel in the main window similar to IDEAl mode"""
@@ -523,7 +514,6 @@ class MainWindow(MainWindowUI):
         worksheet = self.active.worksheet
         columns = [worksheet[col] for col in worksheet._view.selected_columns]
         column_tools[tool][1](worksheet, columns)
-
 
     def on_activated(self, obj):
         if not hasattr(obj, '_view') or obj._view is None:

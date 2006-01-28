@@ -113,7 +113,7 @@ class Dataset(HasSignals):
         return self.x.worksheet.name+':'+self.y.name+'('+self.x.name+')'
 
     def set_defaults(self):
-        self.data.color = "#000000"
+        self.data.color = 0
         self.data.symbol = 'square'
         self.data.size = 5
         self.data.fill = 'filled'
@@ -217,6 +217,11 @@ class Graph(Item, HasSignals):
 
 #        self.functions = []
         self.function = MFunctionSum(self.data.functions)
+
+        if self.xtype == '':
+            self.xtype = 'linear'
+        if self.ytype == '':
+            self.ytype = 'linear' 
 
     default_name_prefix = 'graph'
 

@@ -21,6 +21,27 @@ from grafity import Graph, Worksheet, Folder
 from grafity.settings import DATADIR, USERDATADIR
 from grafity.data import getimage
 
+class ListViewItem(QListViewItem):
+    def __init__(self, parent, obj):
+        QListViewItem.__init__(self, parent, obj.name)
+        obj._gd_item = self
+        self._object = obj
+
+        pixmap = getimage({Worksheet: 'worksheet', 
+                           Graph: 'graph', 
+                           Folder: 'folder'}[type(obj)])
+        self.setPixmap (0, pixmap)
+
+        self._object.connect('rename', self.on_object_renamed)
+        self._object.connect('set-parent', self.on_object_set_parent)
+
+    def on_object_renamed(self, name, item):
+        self.setText(0, name)
+
+    def on_object_set_parent(self, parent):
+        self.parent().takeItem(self)
+        parent._gd_item.insertItem(self)
+ 
 
 def efloat(f):
     try:
@@ -129,6 +150,9 @@ class GraphView(QTabWidget):
         self.setCaption(self.graph.fullname)
         self.setWFlags(Qt.WDestructiveClose)
 
+    def closeEvent(self, event):
+        self.graph._view = None
+        event.accept()
 
     def on_rename(self, *args, **kwds):
         self.setCaption(self.graph.fullname)
@@ -384,6 +408,7 @@ class FunctionsWindow(FunctionsWindowUI):
         if item is None:
             self.func = None
             self.tabs.setEnabled(False)
+            self.browse.setText("")
         else:
             self.updating = True
             self.tabs.setEnabled(True)
@@ -392,7 +417,8 @@ class FunctionsWindow(FunctionsWindowUI):
                 self.name.setText(func.name)
                 self.parameters.setText(', '.join(func.parameters))
                 self.equation.setText(func.text)
-#            self.extra.setText(func.extra)
+                desc = "<h2>%s</h2><hr>"%(func.name,)
+                self.browse.setText(desc)
             self.func = func
             self.updating = False
 
@@ -546,7 +572,6 @@ class GraphFit(GraphFitUI):
 
 
     def add_function(self, f):
-        print >>sys.stderr, 'add-function'
         n = 0
         while 'f%d'%n in [t.name for t in self.function.terms]:
             n+= 1
@@ -707,6 +732,7 @@ class GraphStyle(GraphStyleUI):
             if len(datasets) == 1: # single
                 self.group.setEnabled(False)
                 for w in self.checks:
+                    w.setChecked(True)
                     w.hide()
 
                 for w in self.widgets:
@@ -757,6 +783,7 @@ class GraphData(GraphDataUI):
         GraphDataUI.__init__(self, parent)
         self.worksheet_list.header().hide()
         self.mainwin = mainwin
+        self.project = None
 
     def set_graph(self, graph):
         self.graph = graph
@@ -803,27 +830,24 @@ class GraphData(GraphDataUI):
             self.graph._view.unfreeze()
 
     def set_project(self, project):
+        if self.project is not None:
+            self.project.top.disconnect('modified', self.on_mod)
+            self.project.disconnect('add-item', self.on_mod)
+            self.project.disconnect('remove-item', self.on_mod)
         self.project = project
         if self.project is not None:
-            self.worksheet_list.clear()
-            self.on_add_item(self.project.top, recursive=True)
-            project.top._gd_item.setOpen(True)
+            self.project.top.connect('modified', self.on_mod)
+            self.project.connect('add-item', self.on_mod)
+            self.project.connect('remove-item', self.on_mod)
 
-    def on_add_item(self, obj, recursive=False):
-        try:
-            parent = obj.parent._gd_item
-        except AttributeError:
-            parent = self.worksheet_list
-        item = obj._gd_item = QListViewItem(parent, obj.name)
-        pixmap = getimage({Worksheet: 'worksheet', 
-                            Graph: 'graph', 
-                            Folder: 'folder'}[type(obj)])
-        item.setPixmap (0, pixmap)
-#        item.setOpen (True)
-        item._object = obj
-        if recursive and isinstance(obj, Folder):
+    def on_mod(self, item=None):
+        self.worksheet_list.clear()
+        self.on_add_item(self.project.top, parent=self.worksheet_list)
+        self.project.top._gd_item.setOpen(True)
+
+    def on_add_item(self, obj, parent):
+        item = ListViewItem(parent, obj)
+        if isinstance(obj, Folder):
             for child in obj:
                 if isinstance(child, (Folder, Worksheet)):
-                    self.on_add_item(child, recursive=True)
-
-
+                    self.on_add_item(child, parent=item)

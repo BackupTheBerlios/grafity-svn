@@ -147,6 +147,32 @@
                 </property>
                 <widget class="QWidget">
                     <property name="name">
+                        <cstring>TabPage</cstring>
+                    </property>
+                    <attribute name="title">
+                        <string>Tab</string>
+                    </attribute>
+                    <vbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>browse</cstring>
+                            </property>
+                            <property name="text">
+                                <string>&lt;h2&gt;Havriliak-Negami&lt;/h2&gt;
+&lt;hr&gt;
+Havriliak-Negami function</string>
+                            </property>
+                            <property name="alignment">
+                                <set>WordBreak|AlignTop</set>
+                            </property>
+                        </widget>
+                    </vbox>
+                </widget>
+                <widget class="QWidget">
+                    <property name="name">
                         <cstring>tab</cstring>
                     </property>
                     <attribute name="title">
