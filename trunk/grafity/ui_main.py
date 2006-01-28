@@ -435,6 +435,7 @@ class MainWindow(MainWindowUI):
         self.recentids = []
 
         self.connect(self.File, SIGNAL('aboutToShow()'), self.fileMenuAboutToShow)
+        self.connect(self.Window, SIGNAL('aboutToShow()'), self.windowMenuAboutToShow)
 
 ### status bar #################################################################################
 
@@ -656,7 +657,7 @@ class MainWindow(MainWindowUI):
         self.open_project(grafity.Project(self.recent[id]))
 
     def windowMenuAboutToShow(self):
-        menu = self.menus['&Window']
+        menu = self.Window
         menu.clear()
 
         menu.insertSeparator()

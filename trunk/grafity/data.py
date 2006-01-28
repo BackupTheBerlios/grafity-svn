@@ -12,6 +12,15 @@ def column_tool(name, image=None):
 
 column_tools = []
 
+def dataset_tool(name, image=None):
+    def dataset_tool_dec(function):
+        dataset_tools.append((name, function, image))
+        return function
+    return dataset_tool_dec
+
+dataset_tools = []
+
+
 def scan_functions(dirs):
     functions = []
     def walk_functions(functions, folder, files):
@@ -40,10 +49,8 @@ def scan_images():
             full = os.path.join(folder, f)
             if os.path.isfile(full) and fnmatch.fnmatch(f, "*.png"):
                 images[f[:-4]] = full
-    sys.stderr.write("scanning images...")
     os.path.walk(os.path.join(DATADIR, 'data'), walk_images, None)
     os.path.walk(USERDATADIR, walk_images, None)
-    sys.stderr.write('%s loaded\n'%len(images))
 
 def getimage(name, cache={}):
     if name not in cache:

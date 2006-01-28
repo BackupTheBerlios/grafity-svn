@@ -401,26 +401,42 @@ class FunctionsWindow(FunctionsWindowUI):
         self.updating = False
         self.func = None
 
+        self.categories = {}
+
     def fill(self):
         self.functions.clear()
+        categories = {}
+        for catname in set(f.name.split('/')[0] for f in registry if '/' in f.name):
+            categories[catname] = QListViewItem(self.functions, catname)
+            categories[catname].setOpen(True)
+            categories[catname].setPixmap(0, getimage('folder'))
+            categories[catname].setSelectable(False)
+            categories[catname].category = True
+
         for function in registry:
-            item = QListViewItem(self.functions, function.name)
+            if '/' in function.name:
+                parent = categories[function.name.split('/')[0]]
+            else:
+                parent = self.functions
+            item = QListViewItem(parent, function.short)
+            item.setPixmap(0, getimage('function'))
+            item.funcname = function.name
 
     def on_selection_changed(self):#, item=None):
         item = self.functions.selectedItem()
-        if item is None:
+        if item is None or hasattr(item, 'category'):
             self.func = None
             self.tabs.setEnabled(False)
             self.browse.setText("")
         else:
             self.updating = True
             self.tabs.setEnabled(True)
-            func = registry[unicode(item.text(0))]
+            func = registry[item.funcname]
             if self.func is None or func.name != self.func.name:
                 self.name.setText(func.name)
                 self.parameters.setText(', '.join(func.parameters))
                 self.equation.setText(func.text)
-                desc = "<h2>%s</h2><hr>"%(func.name,)
+                desc = "<h2>%s</h2><hr>"%(func.short,)
                 self.browse.setText(desc)
             self.func = func
             self.updating = False

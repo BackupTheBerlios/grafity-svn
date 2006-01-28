@@ -317,6 +317,10 @@ class Function(HasSignals):
 
     def fromstring(self, s):
         self.name, param, self.text, self.extra = s.split('\n------\n')
+        if '/' in self.name:
+            self.category, self.short = self.name.split('/')
+        else:
+            self.category, self.short = None, self.name
         self.parameters = param.split(', ')
 
     def tostring(self):
