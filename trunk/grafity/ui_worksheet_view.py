@@ -5,24 +5,9 @@ from qt import *
 from qttable import *
 from grafity.arrays import clip, nan, arange, log10, isnan
 from grafity.settings import DATADIR
+from grafity.data import getimage
 
 from grafity import Worksheet
-
-def sortcol(col):
-    notnan = ~isnan(col)
-    col[notnan] = sorted(col[notnan])
-
-register_column_tool("Sort Column", sortcol)
-
-
-def squeeze(col):
-    col[:] = col[~isnan(col)]
-
-
-def getpixmap(name, pixmaps={}):
-    if name not in pixmaps:
-        pixmaps[name] = QPixmap(os.path.join(DATADIR, 'data', 'images', '16', name+'.png'))
-    return pixmaps[name]
 
 class HeaderToolTip(QToolTip):
     def __init__(self, header, worksheet, group=None):
@@ -69,7 +54,7 @@ class WorksheetView(QTabWidget):
         self.setWFlags(Qt.WDestructiveClose)
 
         self.tip = HeaderToolTip(self.table.horizontalHeader(), self.worksheet)
-        self.setIcon(getpixmap('worksheet'))
+        self.setIcon(getimage('worksheet'))
         self.resize(400, 400)
     
     def closeEvent(self, event):

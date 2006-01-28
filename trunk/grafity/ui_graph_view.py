@@ -19,11 +19,8 @@ from grafity.ui.fitoptions import FitOptionsUI
 
 from grafity import Graph, Worksheet, Folder
 from grafity.settings import DATADIR, USERDATADIR
+from grafity.data import getimage
 
-def getpixmap(name, pixmaps={}):
-    if name not in pixmaps:
-        pixmaps[name] = QPixmap(os.path.join(DATADIR, 'data', 'images', '16', name+'.png'))
-    return pixmaps[name]
 
 def efloat(f):
     try:
@@ -50,7 +47,7 @@ class GraphView(QTabWidget):
         self.mainwin = mainwin
         self.setTabShape(self.Triangular)
         self.setTabPosition(self.Bottom)
-        self.setIcon(getpixmap('graph'))
+        self.setIcon(getimage('graph'))
         self.mainpage = QSplitter(QSplitter.Horizontal, self)
         self.addTab(self.mainpage, 'graph')
 
@@ -818,7 +815,7 @@ class GraphData(GraphDataUI):
         except AttributeError:
             parent = self.worksheet_list
         item = obj._gd_item = QListViewItem(parent, obj.name)
-        pixmap = getpixmap({Worksheet: 'worksheet', 
+        pixmap = getimage({Worksheet: 'worksheet', 
                             Graph: 'graph', 
                             Folder: 'folder'}[type(obj)])
         item.setPixmap (0, pixmap)

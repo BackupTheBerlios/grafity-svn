@@ -23,7 +23,7 @@
     <property name="minimumSize">
         <size>
             <width>23</width>
-            <height>233</height>
+            <height>256</height>
         </size>
     </property>
     <property name="caption">
@@ -61,24 +61,27 @@
         <action name="act_copy"/>
         <action name="act_paste"/>
     </item>
-    <item text="Work&amp;sheet" name="Worksheet">
-        <action name="act_worksheet_newcolumn"/>
-        <action name="act_worksheet_delcolumn"/>
-        <separator/>
+    <item text="&amp;Worksheet" name="Worksheet">
         <action name="act_worksheet_transpose"/>
+        <separator/>
+        <action name="act_worksheet_export"/>
     </item>
     <item text="&amp;Column" name="Column">
-        <action name="act_worksheet_rename_column"/>
+        <action name="act_worksheet_newcolumn"/>
+        <action name="act_worksheet_delcolumn"/>
         <separator/>
         <action name="act_worksheet_left"/>
         <action name="act_worksheet_right"/>
         <action name="act_worksheet_first"/>
         <action name="act_worksheet_last"/>
+        <separator/>
+    </item>
+    <item text="&amp;Tools" name="Tools">
     </item>
     <item text="&amp;Window" name="Window">
     </item>
     <item text="&amp;Help" name="Help">
-        <action name="helpAboutAction_2"/>
+        <action name="helpAboutAction"/>
     </item>
 </menubar>
 <toolbars>
@@ -268,6 +271,9 @@
         <property name="text">
             <string>Cut</string>
         </property>
+        <property name="menuText">
+            <string>Cu&amp;t</string>
+        </property>
     </action>
     <action>
         <property name="name">
@@ -278,6 +284,9 @@
         </property>
         <property name="text">
             <string>Copy</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Copy</string>
         </property>
     </action>
     <action>
@@ -290,6 +299,9 @@
         <property name="text">
             <string>Paste</string>
         </property>
+        <property name="menuText">
+            <string>&amp;Paste</string>
+        </property>
     </action>
     <action>
         <property name="name">
@@ -301,6 +313,9 @@
         <property name="text">
             <string>Undo</string>
         </property>
+        <property name="menuText">
+            <string>&amp;Undo</string>
+        </property>
     </action>
     <action>
         <property name="name">
@@ -311,6 +326,9 @@
         </property>
         <property name="text">
             <string>Redo</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Redo</string>
         </property>
     </action>
     <actiongroup>
@@ -428,8 +446,8 @@
             <property name="iconSet">
                 <iconset>image19</iconset>
             </property>
-            <property name="text">
-                <string>Action</string>
+            <property name="menuText">
+                <string>&amp;New</string>
             </property>
         </action>
         <action>
@@ -440,7 +458,7 @@
                 <iconset>image20</iconset>
             </property>
             <property name="text">
-                <string>Action_2</string>
+                <string>Delete</string>
             </property>
         </action>
         <action>
@@ -451,7 +469,10 @@
                 <iconset>image21</iconset>
             </property>
             <property name="text">
-                <string>Action_3</string>
+                <string>Move Left</string>
+            </property>
+            <property name="menuText">
+                <string>Move &amp;Left</string>
             </property>
         </action>
         <action>
@@ -462,7 +483,10 @@
                 <iconset>image22</iconset>
             </property>
             <property name="text">
-                <string>Action_4</string>
+                <string>Move Right</string>
+            </property>
+            <property name="menuText">
+                <string>Move &amp;Right</string>
             </property>
         </action>
         <action>
@@ -473,7 +497,10 @@
                 <iconset>image23</iconset>
             </property>
             <property name="text">
-                <string>Action_5</string>
+                <string>Move to Beginning</string>
+            </property>
+            <property name="menuText">
+                <string>Move to &amp;Beginning</string>
             </property>
         </action>
         <action>
@@ -484,7 +511,10 @@
                 <iconset>image24</iconset>
             </property>
             <property name="text">
-                <string>Action_6</string>
+                <string>Move to End</string>
+            </property>
+            <property name="menuText">
+                <string>Move to &amp;End</string>
             </property>
         </action>
         <action>
@@ -500,40 +530,24 @@
                 <cstring>act_worksheet_transpose</cstring>
             </property>
             <property name="text">
-                <string>Action_3</string>
+                <string>Transpose</string>
+            </property>
+            <property name="menuText">
+                <string>&amp;Transpose</string>
             </property>
         </action>
         <action>
             <property name="name">
-                <cstring>act_worksheet_sort_column</cstring>
+                <cstring>act_worksheet_export</cstring>
             </property>
             <property name="text">
-                <string>Action_3</string>
-            </property>
-        </action>
-        <action>
-            <property name="name">
-                <cstring>act_worksheet_sort_worksheet</cstring>
-            </property>
-            <property name="text">
-                <string>Action_3</string>
+                <string>Export ASCII...</string>
             </property>
         </action>
     </actiongroup>
     <action>
         <property name="name">
             <cstring>helpAboutAction</cstring>
-        </property>
-        <property name="text">
-            <string>&amp;About...</string>
-        </property>
-        <property name="menuText">
-            <string>&amp;About...</string>
-        </property>
-    </action>
-    <action>
-        <property name="name">
-            <cstring>helpAboutAction_2</cstring>
         </property>
         <property name="text">
             <string>&amp;About...</string>
@@ -556,17 +570,6 @@
         </property>
         <property name="text">
             <string>Unnamed</string>
-        </property>
-    </action>
-    <action>
-        <property name="name">
-            <cstring>columnnew_itemAction</cstring>
-        </property>
-        <property name="text">
-            <string>new item</string>
-        </property>
-        <property name="menuText">
-            <string>new item</string>
         </property>
     </action>
 </actions>

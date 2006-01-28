@@ -7,14 +7,15 @@ import sys
 
 from qt import *
 
-import grafity
+from grafity.data import getimage, column_tools
 from grafity.signals import HasSignals, global_connect
 from grafity.actions import undo, redo, action_list
 from grafity.ui_graph_view import GraphView, GraphStyle, GraphData, GraphAxes, GraphFit
 from grafity.ui_worksheet_view import WorksheetView
 from grafity.ui_console import Console
-
 from grafity.ui.main import MainWindowUI
+
+import grafity
 
 class ListViewItem(QListViewItem):
     def __init__(self, parent, obj):
@@ -22,7 +23,7 @@ class ListViewItem(QListViewItem):
         obj._tree_item = obj
         self._object = obj
 
-        pixmap = getpixmap({grafity.Worksheet: 'worksheet', 
+        pixmap = getimage({grafity.Worksheet: 'worksheet', 
                             grafity.Graph: 'graph', 
                             grafity.Folder: 'folder'}[type(obj)])
         self.setPixmap (0, pixmap)
@@ -46,11 +47,6 @@ class ListViewItem(QListViewItem):
 #
 #    def dragEntered(self, *args, **kwds):
 #        print >>sys.stderr, 'ent', self, args, kwds
-
-def getpixmap(name, pixmaps={}):
-    if name not in pixmaps:
-        pixmaps[name] = QPixmap(os.path.join(grafity.DATADIR, 'data', 'images', '16', name+'.png'))
-    return pixmaps[name]
 
 class Panel(QDockWindow):
     """A panel in the main window similar to IDEAl mode"""
@@ -470,17 +466,17 @@ class MainWindow(MainWindowUI):
         self.script.runsource('from grafity import *')
         self.script.runsource('from grafity.arrays import *')
 
-        self.bpanel.add('Script', getpixmap('console'), self.script)
+        self.bpanel.add('Script', getimage('console'), self.script)
 
 ### left panel #################################################################################
         self.lpanel = Panel(self, QMainWindow.DockLeft)
         self.explorer = ProjectExplorer(self.lpanel)
         self.explorer.connect('activated', self.on_activated)
-        self.lpanel.add('Explorer', getpixmap('folder'), self.explorer)
+        self.lpanel.add('Explorer', getimage('folder'), self.explorer)
         self.lpanel.btns['Explorer'].setOn(True)
 
         self.actionlist = ActionList(self.lpanel)
-        self.lpanel.add('Actions', getpixmap('undo'), self.actionlist)
+        self.lpanel.add('Actions', getimage('undo'), self.actionlist)
 
 
 ### right panel ################################################################################
@@ -490,10 +486,10 @@ class MainWindow(MainWindowUI):
         self.graph_style = GraphStyle(self.bpanel, self)
         self.graph_axes = GraphAxes(self.bpanel, self)
         self.graph_fit = GraphFit(self.bpanel, self)
-        self.rpanel.add('Data', getpixmap('worksheet'), self.graph_data)
-        self.rpanel.add('Style', getpixmap('style'), self.graph_style)
-        self.rpanel.add('Axes', getpixmap('axes'), self.graph_axes)
-        self.rpanel.add('fit', getpixmap('function'), self.graph_fit)
+        self.rpanel.add('Data', getimage('worksheet'), self.graph_data)
+        self.rpanel.add('Style', getimage('style'), self.graph_style)
+        self.rpanel.add('Axes', getimage('axes'), self.graph_axes)
+        self.rpanel.add('fit', getimage('function'), self.graph_fit)
 
         self.open_project(grafity.Project())#'../test/pdms.gt'))
 
@@ -502,6 +498,32 @@ class MainWindow(MainWindowUI):
         self.worksheet_toolbar.hide()
         self.graph_toolbar.hide()
         self.rpanel.hide()
+
+        self.column_tool_submenus = {'': self.Column}
+
+        for i, (name, function, image) in enumerate(column_tools):
+            if '/' in name:
+                path, name = name.split('/')
+            else:
+                path = ''
+
+            if path not in self.column_tool_submenus:
+                self.column_tool_submenus[path] = QPopupMenu()
+                self.Column.insertItem(path, self.column_tool_submenus[path])
+            menu = self.column_tool_submenus[path]
+            
+            if image is not None:
+                item = menu.insertItem(QIconSet(getimage(image)), name)
+            else:
+                item = menu.insertItem(name)
+            menu.connectItem(item, self.on_column_tool)
+            menu.setItemParameter(item, i)
+
+    def on_column_tool(self, tool):
+        worksheet = self.active.worksheet
+        columns = [worksheet[col] for col in worksheet._view.selected_columns]
+        column_tools[tool][1](worksheet, columns)
+
 
     def on_activated(self, obj):
         if not hasattr(obj, '_view') or obj._view is None:

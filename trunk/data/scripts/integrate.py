@@ -1,4 +1,4 @@
-from grafit.arrays import *
+from grafity.arrays import *
 
 def integrate(x, y):
     dx = x[1:]-x[:-1]
