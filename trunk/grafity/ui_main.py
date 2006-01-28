@@ -563,7 +563,7 @@ class MainWindow(MainWindowUI):
             return
         message = "<b>Do you want to save the changes you made to the document?</b>" \
                   "<p>Your changes will be lost if you don't save them"
-        resp = QMessageBox.information(None, "Grafit", message, 
+        resp = QMessageBox.information(None, "Grafity", message, 
                                        "&Save",  "&Cancel", "&Don't Save", 0, 1)
         if resp == 0:
             self.on_project_save()
