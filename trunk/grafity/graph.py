@@ -11,6 +11,25 @@ from grafity.project import Item, wrap_attribute, register_class, create_id
 from grafity.actions import action_from_methods, action_from_methods2, StopAction
 from grafity.functions import FunctionSum, registry
 
+symbols = ['circle', 'square', 'diamond', 'triangleup']
+fills = ['filled', 'open']
+colors = ['#000000', '#ff0000', '#8b0000', '#00ff00', '#006400', '#0000ff', '#00008b', 
+          '#00ffff', '#008b8b', '#ff00ff', '#8b008b', '#ffff00', '#000000', '#bebebe', 
+          '#a9a9a9', '#d3d3d3', '#7ac5cd', '#6495ed', '#ffb90f', '#bcee68', '#ff7f00', 
+          '#e9967a', '#00ced1', '#ee1289', '#00bfff', '#1874cd', '#ff69b4', '#cd6090', 
+          '#cd5c5c', '#90ee90', '#5d478b', '#000000']
+linetypes = ['none', 'straight', 'spline']
+linestyles = ['solid', 'dash', 'dot', 'dashdot', 'dashdotdot']
+
+attr_values = {'color': colors, 'symbol': symbols, 'fill': fills, 
+               'linetype': linetypes, 'linestyle': linestyles }
+
+attrs = ['symbol', 'fill', 'size', 'color', 'linestyle', 'linewidth', 'linetype']
+
+class Bunch(object):
+    def __init__(self, **kwds):
+        self.__dict__.update(kwds)
+
 class Style(object):
     def __init__(self, dataset):
         self.dataset = dataset
@@ -154,7 +173,7 @@ class Dataset(HasSignals):
         elif style == 'linetype':
             self.data.linetype = value
 
-        self.graph.emit('style-changed', self, style, value)
+#        self.graph.emit('style-changed', [self], [], **{style: value})
 
 
 class MFunctionSum(FunctionSum):
@@ -215,7 +234,6 @@ class Graph(Item, HasSignals):
                     self.datasets.append(Dataset(self, i))
                     self.datasets[-1].connect('modified', self.on_dataset_modified)
 
-#        self.functions = []
         self.function = MFunctionSum(self.data.functions)
 
         if self.xtype == '':
@@ -224,11 +242,6 @@ class Graph(Item, HasSignals):
             self.ytype = 'linear' 
 
     default_name_prefix = 'graph'
-
-    def redraw(self, recalc=False):
-        if recalc:
-            self.recalc = True
-        self.emit('redraw')
 
     def get_xmin(self): 
         try: return float(self._zoom.split()[0])
@@ -255,8 +268,6 @@ class Graph(Item, HasSignals):
     ymin = property(get_ymin, set_ymin)
     ymax = property(get_ymax, set_ymax)
 
-
-
     # axis scales
 
     def set_xtype(self, _state, tp):
@@ -264,11 +275,9 @@ class Graph(Item, HasSignals):
 #            raise StopAction
         _state['old'] = self._xtype
         self._xtype = tp
-        self.redraw(True)
         self.emit('set-scale', 'x', self.xtype)
     def undo_set_xtype(self, _state):
         self._xtype = _state['old']
-        self.redraw(True)
         self.emit('set-scale', 'x', self.xtype)
     set_xtype = action_from_methods2('graph-set-xaxis-scale', set_xtype, undo_set_xtype)
     def get_xtype(self):
@@ -280,11 +289,9 @@ class Graph(Item, HasSignals):
 #            raise StopAction
         _state['old'] = self._ytype
         self._ytype = tp
-        self.redraw(True)
         self.emit('set-scale', 'y', self.ytype)
     def undo_set_ytype(self, _state):
         self._ytype = _state['old']
-        self.redraw(True)
         self.emit('set-scale', 'y', self.ytype)
     set_ytype = action_from_methods2('graph-set-xaxis-scale', set_ytype, undo_set_ytype)
     def get_ytype(self):
@@ -297,43 +304,28 @@ class Graph(Item, HasSignals):
     def set_xtitle(self, state, title):
         state['old'], state['new'] = self._xtitle, title
         self._xtitle = title
-        self.reshape()
         self.emit('set-title', 'x', self.xtitle)
-        self.redraw()
     def undo_set_xtitle(self, state):
         self._xtitle = state['old']
         self.emit('set-title', 'x', self.xtitle)
-        self.reshape()
-        self.redraw()
     def redo_set_xtitle(self, state):
         self._xtitle = state['new']
         self.emit('set-title', 'x', self.xtitle)
-        self.reshape()
-        self.redraw()
     def get_xtitle(self):
         return self._xtitle
     set_xtitle = action_from_methods2('graph/set-xtitle', set_xtitle, undo_set_xtitle, redo=redo_set_xtitle)
     xtitle = property(get_xtitle, set_xtitle)
 
-    def reshape(self):
-        pass
-
     def set_ytitle(self, state, title):
         state['old'], state['new'] = self._ytitle, title
         self._ytitle = title
         self.emit('set-title', 'y', self.ytitle)
-        self.reshape()
-        self.redraw()
     def undo_set_ytitle(self, state):
         self._ytitle = state['old']
-        self.reshape()
         self.emit('set-title', 'y', self.ytitle)
-        self.redraw()
     def redo_set_ytitle(self, state):
         self._ytitle = state['new']
-        self.reshape()
         self.emit('set-title', 'y', self.ytitle)
-        self.redraw()
     def get_ytitle(self):
         return self._ytitle
     set_ytitle = action_from_methods2('graph/set-ytitle', set_ytitle, undo_set_ytitle, redo=redo_set_ytitle)
@@ -355,14 +347,12 @@ class Graph(Item, HasSignals):
         obj = state['obj']
         self.graph_objects.remove(obj)
         obj.id = '-'+obj.id
-        self.redraw()
 
     def redo_new_object(self, state):
         obj = state['obj']
         self.graph_objects.append(obj)
         location =  { Line: self.data.lines, Text: self.data.text }[type(obj)]
         obj.id = obj.id[1:]
-        self.redraw()
 
     new_object = action_from_methods2('graph/new-object', new_object, undo_new_object, 
                                        redo=redo_new_object)
@@ -370,9 +360,45 @@ class Graph(Item, HasSignals):
         obj.id = '-'+obj.id
         self.graph_objects.remove(obj)
         state['obj'] = obj
-        self.redraw()
     delete_object = action_from_methods2('graph/delete-object', delete_object, redo_new_object,
                                           redo=undo_new_object)
+
+    def set_style(self, state, datasets, series=None, **kwds):
+        for d in datasets:
+            state[d] = dict((attr, d.get_style(attr)) for attr in kwds)
+        if series is None:
+            series = []
+        for attr in ['color', 'symbol', 'fill', 
+                     'linestyle', 'linetype']:
+            if attr in kwds:
+                if attr in series:
+                    for i, d in enumerate(datasets):
+                        values = attr_values[attr]
+                        value = values[(values.index(kwds[attr])+i)%len(values)]
+                        d.set_style(attr, value)
+                else:
+                    for d in datasets:
+                        d.set_style(attr, kwds[attr])
+        for attr in ['size', 'linewidth']:
+            if attr in kwds:
+                if attr in series:
+                    for i, d in enumerate(datasets):
+                        d.set_style(attr, kwds[attr]+i)
+                else:
+                    for d in datasets:
+                        d.set_style(attr, kwds[attr])
+
+        self.emit('style-changed', datasets)
+
+
+    def undo_set_style(self, state):
+        for d, style in state.iteritems():
+            for attr, value in style.iteritems():
+                d.set_style(attr, value)
+        self.emit('style-changed', state.keys())
+
+    set_style = action_from_methods2('graph_set_style', set_style, undo_set_style)
+        
 
 
     # add and remove datasets
@@ -384,7 +410,6 @@ class Graph(Item, HasSignals):
         d.set_defaults()
         self.datasets.append(d)
         pos = len(self.datasets)-1
-#        print 'added dataset, index %d, position %d' % (ind, pos)
 
         d.connect('modified', self.on_dataset_modified)
         d.connect_signals()
@@ -399,12 +424,10 @@ class Graph(Item, HasSignals):
     def undo_add(self, state):
         d = state['obj']
 
-#        print 'undoing addition of dataset, index %d, position %d' % (d.ind, pos)
         self.datasets.remove(d)
         d.disconnect_signals()
         d.disconnect('modified', self.on_dataset_modified)
         self.emit('remove-dataset', d)
-        self.redraw(True)
         d.id = '-'+d.id
 #        self.data.datasets.delete(d.ind)
 
@@ -415,7 +438,6 @@ class Graph(Item, HasSignals):
         d.connect('modified', self.on_dataset_modified)
         d.connect_signals()
         self.emit('add-dataset', d)
-        self.redraw(True)
 
     add = action_from_methods2('graph_add_dataset', add, undo_add, redo=redo_add)
 
@@ -433,7 +455,6 @@ class Graph(Item, HasSignals):
         except NameError:
             pass
         self.emit('remove-dataset', dataset)
-        self.redraw(True)
         return (dataset.ind, ind), None
 
     def undo_remove(self, data):
@@ -445,12 +466,11 @@ class Graph(Item, HasSignals):
         self.datasets.insert(pos, dataset)
         dataset.connect('modified', self.on_dataset_modified)
         self.emit('add-dataset', dataset)
-        self.redraw(True)
 
     remove = action_from_methods('graph_remove_dataset', remove, undo_remove)
 
     def on_dataset_modified(self, d=None):
-        self.redraw(True)
+        pass
 
     def paint_axes(self):
         for a in self.axes:
@@ -487,14 +507,10 @@ class Graph(Item, HasSignals):
     def zoom_redo(self, state):
         self.xmin, self.xmax, self.ymin, self.ymax = state['new']
         self.emit('zoom-changed', self.xmin, self.xmax, self.ymin, self.ymax)
-        self.reshape()
-        self.redraw(True)
 
     def zoom_undo(self, state):
         self.xmin, self.xmax, self.ymin, self.ymax = state['old']
         self.emit('zoom-changed', self.xmin, self.xmax, self.ymin, self.ymax)
-        self.reshape()
-        self.redraw(True)
 
     def zoom_combine(self, state, other):
         return False
@@ -532,237 +548,6 @@ class Graph(Item, HasSignals):
         glPixelStorei(GL_PACK_ALIGNMENT, 1)
 
         self.listno = glGenLists(1)
-
-    def show(self):
-        for d in self.datasets:
-            if not hasattr(d, 'xx'):
-                d.recalculate()
-
-    def button_press(self, x, y, button=None):
-        if self.mode == 'zoom':
-            if button in (1,3):
-                self.paint_xor_objects = True
-                self.pixx, self.pixy = x, y
-                self.ix, self.iy = self.mouse_to_phys(x, y)
-                self.rubberband.show(self.ix, self.iy, self.ix, self.iy)
-                self.redraw()
-            if button == 2:
-                self.haha = True
-            else:
-                self.haha = False
-        elif self.mode == 'hand':
-            if self.selected_function is not None:
-                self.selected_function.set_reg(False)
-                self.selected_function.move(*self.mouse_to_data(x, y))
-#                self.emit('redraw')
-                self._movefunc = DrawFunction(self, self.selected_function)
-                self.objects.append(self._movefunc)
-                self.paint_xor_objects = True
-                self._movefunc.show(*self.mouse_to_data(x, y))
-                self.redraw()
-        elif self.mode == 's-reader':
-            self.paint_xor_objects = True
-            self.cross.show(*self.mouse_to_phys(x, y))
-            self.redraw()
-            self.emit('status-message', '%f, %f' % self.mouse_to_data(x, y))
-        elif self.mode == 'range':
-            self.paint_xor_objects = True
-            self.rangehandle.show(*self.mouse_to_phys(x, y))
-            self.redraw()
-        elif self.mode == 'd-reader':
-            qx, qy = self.mouse_to_data(x, y)
-
-            distances = []
-            closest_ind = []
-
-            for d in self.datasets:
-                dist = (d.xx-qx)*(d.xx-qx) + (d.yy-qy)*(d.yy-qy)
-                arg = argmin(dist)
-                closest_ind.append(arg)
-                distances.append(dist[arg])
-
-            ind = argmin(distances)
-            dataset = self.datasets[ind]
-            x, y = dataset.xx[closest_ind[ind]], dataset.yy[closest_ind[ind]]
-
-            self.paint_xor_objects = True
-            self.cross.show(*self.data_to_phys(x, y))
-            self.redraw()
-            self.emit('status-message', '%f, %f' % (x, y))
-        elif self.mode == 'arrow':
-            if button == 1:
-                x, y = self.mouse_to_phys(x, y)
-                for o in self.graph_objects:
-                    if o.hittest(x, y):
-                        self.selected_object = o
-                        self.dragobj = o
-                        self.dragobj.rec = False
-                        self.dragobj_xor = Move(self.dragobj)
-                        self.objects.append(self.dragobj_xor)
-                        self.paint_xor_objects = True
-                        self.dragobj_xor.show(x, y)
-                        if o.hittest_handles(x, y):
-                            self.dragobj.dragstart = None
-                        break
-                else:
-                    self.selected_object = None
-                self.redraw()
-            elif button == 3:
-                self.emit('right-clicked', None)
-                print >>sys.stderr, 'right-clicked', None
-        elif self.mode in ('draw-line', 'draw-text'):
-            xi, yi = self.mouse_to_phys(x, y)
-            createobj = self.new_object({'draw-line': Line, 
-                                         'draw-text': Text}[self.mode])
-            createobj.begin(xi, yi)
-
-            self.dragobj = createobj
-            self.dragobj_xor = Move(self.dragobj)
-            self.objects.append(self.dragobj_xor)
-
-            self.paint_xor_objects = True
-            self.dragobj_xor.show(xi, yi)
-            self.selected_object = createobj
-            self.mode = 'arrow'
-            self.redraw()
-            self.emit('request-cursor', 'arrow')
-      
-    def button_doubleclick(self, x, y, button):
-        if self.mode == 'arrow' and button == 1:
-            x, y = self.mouse_to_phys(x, y)
-            for o in self.graph_objects:
-                if o.hittest_handles(x, y):
-                    self.emit('object-doubleclicked', o)
-                    o.emit('modified')
-                    break
-     
-    def button_release(self, x, y, button):
-        if self.mode == 'zoom':
-            if button == 2:
-                self.autoscale()
-                self.redraw(True)
-            elif button == 1 or button == 3:
-                self.rubberband.hide()
-                self.redraw()
-                self.paint_xor_objects = False
-
-                zix, ziy = self.mouse_to_data(self.pixx, self.pixy)
-                zfx, zfy = self.mouse_to_data(x, y)
-
-                _xmin, _xmax = min(zix, zfx), max(zix, zfx)
-                _ymin, _ymax = min(zfy, ziy), max(zfy, ziy)
-
-                if button == 3:
-                    _xmin, _xmax = self.axis_bottom.transform(_xmin), self.axis_bottom.transform(_xmax)
-                    _ymin, _ymax = self.axis_left.transform(_ymin), self.axis_left.transform(_ymax)
-
-                    xmin, xmax = self.zoomout(self.axis_bottom.transform(self.xmin), 
-                                              self.axis_bottom.transform(self.xmax), _xmin, _xmax)
-                    ymin, ymax = self.zoomout(self.axis_left.transform(self.ymin), 
-                                              self.axis_left.transform(self.ymax), _ymin, _ymax)
-
-                    xmin, xmax = self.axis_bottom.invtransform(xmin), self.axis_bottom.invtransform(xmax)
-                    ymin, ymax = self.axis_left.invtransform(ymin), self.axis_left.invtransform(ymax)
-                else:
-                    xmin, xmax, ymin, ymax = _xmin, _xmax, _ymin, _ymax
-                self.zoom(xmin, xmax, ymin, ymax)
-                self.reshape()
-                self.redraw(True)
-        elif self.mode == 'hand':
-            if self.selected_function is not None:
-                self.selected_function.set_reg(True)
-                self.selected_function.move(*self.mouse_to_data(x, y))
-                del self.objects[-1]
-                self.paint_xor_objects = False
-                self.redraw(True)
-        elif self.mode == 's-reader':
-            self.cross.hide()
-            self.redraw()
-            self.paint_xor_objects = False
-        elif self.mode == 'd-reader':
-            self.cross.hide()
-            self.redraw()
-            self.paint_xor_objects = False
-
-        elif self.mode == 'arrow':
-            if button == 1:
-                if self.dragobj is not None:
-                    self.dragobj.rec = True
-                    self.dragobj.record_position()
-                    self.dragobj = None
-                    self.dragobj_xor.hide()
-                    self.objects.remove(self.dragobj_xor)
-                    self.paint_xor_objects = False
-                    self.redraw()
-        elif self.mode == 'range':
-            if button is None:
-                button = self.__button
-            else:
-                self.__button = button
-
-            x, y = self.mouse_to_data(x, y)
-            for d in self.selected_datasets:
-                if button == 1:
-                    d.range = (x, d.range[1])
-                elif button == 3:
-                    d.range = (d.range[0], x)
-                elif button == 2:
-                    d.range = (-inf, inf)
-            self.rangehandle.hide()
-            self.redraw()
-            self.paint_xor_objects = False
-  
-    def button_motion(self, x, y, dragging):
-        if self.mode == 'zoom' and dragging and hasattr(self, 'ix'):
-            self.rubberband.move(self.ix, self.iy, *self.mouse_to_phys(x, y))
-            self.redraw()
-        elif self.mode == 'range' and dragging:
-            self.rangehandle.move(*self.mouse_to_phys(x, y))
-            self.redraw()
-#            self.button_press(x, y)
-        elif self.mode == 'hand' and dragging:
-            if self.selected_function is not None:
-                self.selected_function.move(*self.mouse_to_data(x, y))
-                self._movefunc.move(*self.mouse_to_data(x, y))
-                self.redraw()
-        elif self.mode == 's-reader' and dragging:
-            self.cross.move(*self.mouse_to_phys(x, y))
-            self.redraw()
-            self.emit('status-message', '%f, %f' % self.mouse_to_data(x, y))
-        elif self.mode == 'd-reader' and dragging:
-            qx, qy = self.mouse_to_data(x, y)
-            distances = []
-            closest_ind = []
-
-            for d in self.datasets:
-                dist = (d.xx-qx)*(d.xx-qx) + (d.yy-qy)*(d.yy-qy)
-                arg = argmin(dist)
-                closest_ind.append(arg)
-                distances.append(dist[arg])
-
-            ind = argmin(distances)
-            dataset = self.datasets[ind]
-            x, y = dataset.xx[closest_ind[ind]], dataset.yy[closest_ind[ind]]
-
-            self.cross.move(*self.data_to_phys(x, y))
-            self.redraw()
-            self.emit('status-message', '%f, %f' % (x, y))
-        elif self.mode == 'arrow':
-            if not hasattr(self, 'res'):
-                # not initialized yet, do nothing
-                return
-            x, y = self.mouse_to_phys(x, y)
-            if self.dragobj is not None: # drag a handle on an object
-                self.dragobj_xor.move(x, y)
-                self.redraw()
-                self.emit('request-cursor', 'none')
-            else: # look for handles
-                for o in self.graph_objects:
-                    if o.hittest(x, y):
-                        self.emit('request-cursor', 'hand')
-                        break
-                else:
-                    self.emit('request-cursor', 'arrow')
 
     _xtype = wrap_attribute('xtype')
     _ytype = wrap_attribute('ytype')

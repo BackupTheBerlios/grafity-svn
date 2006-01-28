@@ -12,6 +12,7 @@ from grafity.arrays import zeros, nan
 from grafity.actions import action_from_methods, StopAction, action_from_methods2
 from grafity.settings import DATADIR, USERDATADIR
 from grafity.project import create_id
+from data import scan_functions
 
 def gen_flatten(s):
     try:
@@ -39,29 +40,28 @@ class FunctionsRegistry(HasSignals):
         """Create a new function registry from a directory"""
         self.functions = []
         self.dirs = dirs
-        self.scan()
+        self.rescan()
 
     def rescan(self):
         """Rescan the directory and check for changed functions"""
         names = []
-        for dir in self.dirs:
-            for f in os.listdir(dir):
-                try:
-                    func = Function()
-                    func.fromstring(open(dir+'/'+f).read())
-                    func.filename = dir + '/' + f
-                    names.append(func.name)
-                except IOError, s:
-                    continue
+        for f in scan_functions(self.dirs):
+            try:
+                func = Function()
+                func.fromstring(open(f).read())
+                func.filename = f
+                names.append(func.name)
+            except IOError, s:
+                continue
 
-                if func.name not in [f.name for f in self.functions]:
-                    self.functions.append(func)
-                    self.emit('added', func)
-                else:
-                    for i, f in enumerate(self.functions):
-                        if f.name == func.name:
-                            self.functions[i] = func
-                            self.emit('modified', func)
+            if func.name not in [f.name for f in self.functions]:
+                self.functions.append(func)
+                self.emit('added', func)
+            else:
+                for i, f in enumerate(self.functions):
+                    if f.name == func.name:
+                        self.functions[i] = func
+                        self.emit('modified', func)
 
         for f in self:
             if f.name not in names:
@@ -70,7 +70,7 @@ class FunctionsRegistry(HasSignals):
 
 #            self.functions.sort()
 
-    def scan(self, dirs=None):
+    def aaaaaaaascan(self, dirs=None):
         if dirs == None:
             dirs = self.dirs
         self.functions = []

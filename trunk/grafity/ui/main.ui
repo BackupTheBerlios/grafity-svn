@@ -23,7 +23,7 @@
     <property name="minimumSize">
         <size>
             <width>23</width>
-            <height>256</height>
+            <height>302</height>
         </size>
     </property>
     <property name="caption">
@@ -60,6 +60,10 @@
         <action name="act_cut"/>
         <action name="act_copy"/>
         <action name="act_paste"/>
+    </item>
+    <item text="&amp;Dataset" name="Dataset">
+    </item>
+    <item text="&amp;Graph" name="Graph">
     </item>
     <item text="&amp;Worksheet" name="Worksheet">
         <action name="act_worksheet_transpose"/>
@@ -570,6 +574,17 @@
         </property>
         <property name="text">
             <string>Unnamed</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>graphnew_itemAction</cstring>
+        </property>
+        <property name="text">
+            <string>new item</string>
+        </property>
+        <property name="menuText">
+            <string>new item</string>
         </property>
     </action>
 </actions>

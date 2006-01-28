@@ -20,6 +20,7 @@ from grafity.ui.fitoptions import FitOptionsUI
 from grafity import Graph, Worksheet, Folder
 from grafity.settings import DATADIR, USERDATADIR
 from grafity.data import getimage
+from grafity.graph import symbols, fills, colors, linetypes, linestyles, attrs
 
 class ListViewItem(QListViewItem):
     def __init__(self, parent, obj):
@@ -212,7 +213,7 @@ class GraphView(QTabWidget):
         d._curveid = self.plot.insertCurve('')
         d.recalculate()
         for s in ['symbol', 'color', 'size', 'linetype', 'linestyle', 'linewidth']:
-            self.on_change_style(d, s, d.get_style(s))
+            self.on_change_style([d])#, s, d.get_style(s))
         self.redraw()
         self.update_legend()
      
@@ -348,7 +349,7 @@ class GraphView(QTabWidget):
         'magenta', 'DarkMagenta', 'yellow', 'DarkYellow', 'gray', 'DarkGray', 'LightGray',
         'CadetBlue3', 'CornflowerBlue', 'DarkGoldenrod1', 'DarkOliveGreen2', 'DarkOrange1', 
         'DarkSalmon', 'DarkTurquoise', 'DeepPink2', 'DeepSkyBlue1', 'DodgerBlue3', 'HotPink', 
-        'HotPink3', 'IndianRed', 'LightGreen', 'MediumPurple4', 'MediumViloetRed' ]
+        'HotPink3', 'IndianRed', 'LightGreen', 'MediumPurple4', 'MediumVioletRed' ]
 
     qcolors = [QColor(s) for s in colornames]
     colors = [unicode(s.name()) for s in qcolors]
@@ -359,31 +360,33 @@ class GraphView(QTabWidget):
     line_style_names = ['solid', 'dash', 'dot', 'dashdot', 'dashdotdot']
 
 
-    def on_change_style(self, d, style, value):
-        curve = self.plot.curve(d._curveid)
-        if style == 'symbol':
-            curve.symbol().setStyle(self.symbols[value])
-        elif style == 'fill':
-            if value == 'open':
+    def on_change_style(self, datasets):#, style, value):
+        for d in datasets:
+            curve = self.plot.curve(d._curveid)
+
+            curve.symbol().setStyle(self.symbols[d.style.symbol])
+
+            if d.style.fill == 'open':
                 brush = self.fills['open']
-            elif value == 'filled':
+            elif d.style.fill == 'filled':
                 brush = QBrush(self.qcolors[self.colors.index(d.style.color)])
             curve.symbol().setBrush(brush)
-        elif style == 'color':
-            color = self.qcolors[self.colors.index(value)]
+
+            color = self.qcolors[self.colors.index(d.style.color)]
             curve.symbol().brush().setColor(color)
             curve.symbol().pen().setColor(color)
             curve.pen().setColor(color)
-        elif style == 'size':
-            curve.symbol().setSize(value)
-        elif style == 'linetype':
-            curve.setStyle(self.line_types[self.line_type_names.index(value)])
-        elif style == 'linestyle':
-            curve.pen().setStyle(self.line_styles[self.line_style_names.index(value)])
-        elif style == 'linewidth':
-            curve.pen().setWidth(value)
+
+            curve.symbol().setSize(d.style.size)
+            
+            curve.setStyle(self.line_types[self.line_type_names.index(d.style.linetype)])
+
+            curve.pen().setStyle(self.line_styles[self.line_style_names.index(d.style.linestyle)])
+
+            curve.pen().setWidth(d.style.linewidth)
 
         self.redraw()
+        self.update_legend()
         self.mainwin.graph_style.on_selection_changed()
 
 class FitOptions(FitOptionsUI):
@@ -667,7 +670,7 @@ class GraphStyle(GraphStyleUI):
         self.checks = [self.shape_ch, self.fill_ch, self.size_ch, self.color_ch,
                        self.ltype_ch, self.lstyle_ch, self.lwidth_ch]
 
-        self.props = ['symbol', 'fill', 'size', 'color', 'linetype', 'linestyle', 'linewidth']
+#        self.props = ['symbol', 'fill', 'size', 'color', 'linetype', 'linestyle', 'linewidth']
 
         self.updating = False
         self.datasets = []
@@ -690,27 +693,16 @@ class GraphStyle(GraphStyleUI):
         self.lstyle.setCurrentItem(GraphView.line_style_names.index(style.linestyle))
         self.lwidth.setValue(style.linewidth)
 
-    def get_to_dataset(self, dataset, ind=0):
-        style = dataset.style
-
-        ind_color = self.color_ch.isOn()*ind
-        ind_symbol = ind_fill = ind_linetype = 0
-
-        if self.shape_ch.isOn():
-            style.symbol = GraphView.symbol_names[(self.shape.currentItem()+ind_symbol)%len(GraphView.symbol_names)]
-        if self.fill_ch.isOn():
-            style.fill = GraphView.fill_names[(self.fill.currentItem()+ind_fill)%len(GraphView.fill_names)]
-        if self.color_ch.isOn():
-            style.color = GraphView.colors[(self.color.currentItem()+ind_color)%len(GraphView.colors)]
-        if self.ltype_ch.isOn():
-            style.linetype = GraphView.line_type_names[(self.ltype.currentItem()+ind_linetype)%len(GraphView.line_type_names)]
-
-        if self.lstyle_ch.isOn():
-            style.linestyle = GraphView.line_style_names[self.lstyle.currentItem()]
-        if self.size_ch.isOn():
-            style.size = self.size.value()
-        if self.size_ch.isOn():
-            style.linewidth = self.lwidth.value()
+    def get_attrs_from_ui(self):
+        return {
+            'symbol': symbols[self.shape.currentItem()],
+            'fill': fills[self.fill.currentItem()],
+            'color': colors[self.color.currentItem()],
+            'linetype': linetypes[self.ltype.currentItem()],
+            'linestyle': linestyles[self.lstyle.currentItem()],
+            'size': self.size.value(),
+            'linewidth': self.lwidth.value(),
+        }
 
     def on_group_changed(self):
         self.on_selection_changed(self.datasets)
@@ -744,12 +736,12 @@ class GraphStyle(GraphStyleUI):
                     w.show()
 
                 if self.group.currentItem() == 0: # identical
-                    for prop, widget, check in zip(self.props, self.widgets, self.checks):
+                    for prop, widget, check in zip(attrs, self.widgets, self.checks):
                         thesame = len(set(getattr(d.style, prop) for d in datasets))==1
                         check.setChecked(thesame)
                         widget.setEnabled(thesame)
                 elif self.group.currentItem() == 1: # series
-                    for prop, widget, check in zip(self.props, self.widgets, self.checks):
+                    for prop, widget, check in zip(attrs, self.widgets, self.checks):
                         if prop == 'color': # can do series
                             colors = [GraphView.colors.index(d.style.color) for d in datasets]
                             c0 = colors[0]
@@ -764,17 +756,27 @@ class GraphStyle(GraphStyleUI):
             self.updating = False
 
     def on_checks_changed(self):
-        for prop, widget, check in zip(self.props, self.widgets, self.checks):
+        for prop, widget, check in zip(attrs, self.widgets, self.checks):
             widget.setEnabled(check.isOn())
         self.on_ui_changed()
 
     def on_ui_changed(self):
         if self.updating:
             return
+
+        cattrs = [attr for attr, check in zip(attrs, self.checks) if check.isOn()]
         series = self.group.currentItem() == 1
+
         self.graph._view.freeze()
-        for i, d in enumerate(self.datasets):
-            self.get_to_dataset(d, i*series)
+
+        style = self.get_attrs_from_ui()
+        for attr in attrs:
+            if attr not in cattrs:
+                print >>sys.stderr, attr
+                del style[attr]
+        print style
+        self.graph.set_style(self.datasets, cattrs*series, **style)
+            
         self.graph._view.unfreeze()
 
 

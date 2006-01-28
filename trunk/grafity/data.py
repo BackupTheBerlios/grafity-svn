@@ -1,6 +1,7 @@
 import sys
 import fnmatch
 import os.path
+from settings import DATADIR, USERDATADIR
 from qt import QPixmap
 
 def column_tool(name, image=None):
@@ -11,31 +12,43 @@ def column_tool(name, image=None):
 
 column_tools = []
 
+def scan_functions(dirs):
+    functions = []
+    def walk_functions(functions, folder, files):
+        for f in files:
+            full = os.path.join(folder, f)
+            if os.path.isfile(full) and fnmatch.fnmatch(f, "*.function"):
+                functions.append(full)
+    for dir in dirs:
+        os.path.walk(dir, walk_functions, functions)
+    return functions
+
+def scan_plugins():
+    def walk_plugins(_, folder, files):
+        for f in files:
+            full = os.path.join(folder, f)
+            if os.path.isfile(full) and fnmatch.fnmatch(f, "*.py"):
+                execfile(full, {})
+    os.path.walk(os.path.join(DATADIR, 'data'), walk_plugins, None)
+    os.path.walk(USERDATADIR, walk_plugins, None)
+
+images = {}
+
+def scan_images():
+    def walk_images(_, folder, files):
+        for f in files:
+            full = os.path.join(folder, f)
+            if os.path.isfile(full) and fnmatch.fnmatch(f, "*.png"):
+                images[f[:-4]] = full
+    sys.stderr.write("scanning images...")
+    os.path.walk(os.path.join(DATADIR, 'data'), walk_images, None)
+    os.path.walk(USERDATADIR, walk_images, None)
+    sys.stderr.write('%s loaded\n'%len(images))
 
 def getimage(name, cache={}):
     if name not in cache:
         cache[name] = QPixmap(images[name])
     return cache[name]
 
-
-def walk_data_dir((images, pyfiles, functions), folder, files):
-    for f in files:
-        full = os.path.join(folder, f)
-        if os.path.isfile(full):
-            if fnmatch.fnmatch(f, "*.png"):
-                images[f[:-4]] = full
-            elif fnmatch.fnmatch(f, "*.py"):
-                pyfiles.append(full)
-            elif fnmatch.fnmatch(f, "*.function"):
-                functions.append(full)
-
-images = {}
-pyfiles = []
-functions = []
-
-sys.stderr.write("searching...")
-os.path.walk('../data', walk_data_dir, (images, pyfiles, functions))
-sys.stderr.write("%d images, %d scripts, %d fit functions loaded.\n" % (len(images), len(pyfiles), len(functions)))
-
-for f in pyfiles:
-    execfile(f, {})
+scan_images()
+scan_plugins()

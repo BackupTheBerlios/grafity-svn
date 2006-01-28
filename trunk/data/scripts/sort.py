@@ -11,7 +11,7 @@ def sortcol_asc(worksheet, col):
 def sortcol_desc(worksheet, col):
     col = col[0]
     notnan = ~isnan(col)
-    col[notnan] = sorted(col[notnan])
+    col[notnan] = sorted(col[notnan], reverse=True)
 
 @column_tool('Squeeze')
 def squeeze(worksheet, col):

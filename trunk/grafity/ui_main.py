@@ -510,6 +510,13 @@ class MainWindow(MainWindowUI):
             menu.connectItem(item, self.on_column_tool)
             menu.setItemParameter(item, i)
 
+        self.menubar.removeItem(self.menubar.idAt(2))
+        self.menubar.removeItem(self.menubar.idAt(2))
+        self.menubar.removeItem(self.menubar.idAt(2))
+        self.menubar.removeItem(self.menubar.idAt(2))
+
+        self.active = None
+
     def on_column_tool(self, tool):
         worksheet = self.active.worksheet
         columns = [worksheet[col] for col in worksheet._view.selected_columns]
@@ -660,10 +667,16 @@ class MainWindow(MainWindowUI):
             menu.setItemChecked(id, self.workspace.activeWindow() == win)
 
     def on_window_activated(self, window):
+        prev = self.active
+        self.active = window
+
+        if prev is not None:
+            self.menubar.removeItem(self.menubar.idAt(2))
+            self.menubar.removeItem(self.menubar.idAt(2))
+
         if window is None:
             return
 
-        self.active = window
         self.worksheet_toolbar.hide()
         self.graph_toolbar.hide()
         self.rpanel.hide()
@@ -676,9 +689,13 @@ class MainWindow(MainWindowUI):
             self.graph_style.set_graph(window.graph)
             self.graph_fit.set_graph(window.graph)
             getattr(self, 'act_graph_%s'%window.mode).setOn(True)
- 
+            self.menubar.insertItem('&Dataset', self.Dataset, -1, 2)
+            self.menubar.insertItem('&Graph', self.Graph, -1, 2)
+
         elif isinstance(window, WorksheetView):
             self.worksheet_toolbar.show()
+            self.menubar.insertItem('&Column', self.Column, -1, 2)
+            self.menubar.insertItem('&Worksheet', self.Worksheet, -1, 2)
 
     def clear (self):
         aw = self.workspace.activeWindow()

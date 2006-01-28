@@ -96,7 +96,7 @@ class ErrorWindow(exception_form):
         self.label.setText("An error <b>(%s)</b> has occurred.<br><i>%s</i><br>This should not happen, please tell Daniel!" % (type, value))
         self.pixmap.setPixmap(QPixmap(DATADIR + '/data/images/vogel.png'))
         lines = ''.join(traceback.format_exception (type, value, tback))
-        f = file('.grafit-birds', 'a')
+        f = file('.grafity-birds', 'a')
         f.write('# bird at %s\n' % time.strftime("%d %b %Y %H:%M:%S"))
         f.write(lines)
         f.write('\n\n')
