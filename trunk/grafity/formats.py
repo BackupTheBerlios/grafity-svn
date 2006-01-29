@@ -13,7 +13,7 @@ from grafity.graph import attrs, attr_values
 def pyget (elem, name):
     return eval (elem.get (name), {"__builtins__": { 'True': True, 'False':False, 'None':None, 'nan':0.0 }})
 
-def load(project, filename): 
+def load(project, filename, progress=None, message=None): 
     f = open(filename)
     header = f.read(10)
 
@@ -32,8 +32,15 @@ def load(project, filename):
 
     root = tree.getroot()
 
+    totalprogress = len(root)
+    prog = 0
+
     for welem in root.findall('Worksheet'):
         wsheet = project.new(Worksheet, welem.get("name"))
+        print >>sys.stderr, 'loading worksheet %s' % wsheet.name
+        prog += 100./totalprogress
+        if progress:
+            progress(prog)
 
         for celem in welem:
             if celem.tag == 'CalcColumn':
@@ -51,6 +58,10 @@ def load(project, filename):
 
     for gelem in root.findall('Graph'):
         graph = project.new(Graph, eval(gelem.get("name")))
+        print >>sys.stderr, 'loading graph %s'% graph.name
+        prog += 100./totalprogress
+        if progress:
+            progress(prog)
 
         # axes
         for aelem in gelem.findall('Axis'):
@@ -86,6 +97,9 @@ def load(project, filename):
                         value = attr_values[prop][0]
 
                 ds.set_style(prop, value)
+
+    if progress:
+        progress(100)
 
 if __name__ == '__main__':
     load(sys.argv[1])

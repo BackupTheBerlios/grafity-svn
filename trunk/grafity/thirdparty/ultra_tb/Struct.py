@@ -17,7 +17,7 @@ $Id: Struct.py,v 1.8 2004/11/04 07:58:17 fperez Exp $"""
 __all__ = ['Struct']
 
 import types
-from thirdparty.genutils import list2dict2
+from genutils import list2dict2
 
 class Struct:
     """Class to mimic C structs but also provide convenient dictionary-like

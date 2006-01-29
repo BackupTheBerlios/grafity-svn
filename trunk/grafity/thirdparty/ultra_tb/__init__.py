@@ -86,7 +86,7 @@ from UserDict import UserDict
 #
 #from IPython.Struct import Struct
 from ColorANSI import *
-from thirdparty.genutils import Term,uniq_stable,error,info
+from genutils import Term,uniq_stable,error,info
 
 #---------------------------------------------------------------------------
 # Code begins

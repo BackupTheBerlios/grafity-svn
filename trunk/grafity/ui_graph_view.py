@@ -765,7 +765,7 @@ class GraphStyle(GraphStyleUI):
                 elif self.group.currentItem() == 1: # series
                     for prop, widget, check in zip(attrs, self.widgets, self.checks):
                         if prop == 'color': # can do series
-                            dcolors = [GraphView.colors.index(d.style.color) for d in datasets]
+                            dcolors = [colors.index(d.style.color) for d in datasets]
                             c0 = dcolors[0]
                             series = dcolors==[c % len(colors) for c in range(c0, c0+len(colors))]
                             check.setChecked(series)
