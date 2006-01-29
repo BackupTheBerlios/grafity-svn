@@ -10,10 +10,11 @@ from qt import *
 from grafity.data import getimage, column_tools
 from grafity.signals import HasSignals, global_connect
 from grafity.actions import undo, redo, action_list
-from grafity.ui_graph_view import GraphView, GraphStyle, GraphData, GraphAxes, GraphFit
-from grafity.ui_worksheet_view import WorksheetView
-from grafity.ui_console import Console
-from grafity.ui.main import MainWindowUI
+from grafity.ui.graph_view import GraphView, GraphStyle, GraphData, GraphAxes, GraphFit
+from grafity.ui.worksheet_view import WorksheetView
+from grafity.ui.console import Console
+
+from grafity.ui.forms.main import MainWindowUI
 
 import grafity
 

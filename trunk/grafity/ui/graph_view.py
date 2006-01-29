@@ -10,12 +10,12 @@ from grafity.arrays import clip, nan, arange, log10
 from grafity.actions import CompositeAction, action_list
 from grafity.functions import registry, Function
 
-from grafity.ui.graph_style import GraphStyleUI
-from grafity.ui.graph_data import GraphDataUI
-from grafity.ui.graph_axes import GraphAxesUI
-from grafity.ui.graph_fit import GraphFitUI
-from grafity.ui.functions import FunctionsWindowUI
-from grafity.ui.fitoptions import FitOptionsUI
+from grafity.ui.forms.graph_style import GraphStyleUI
+from grafity.ui.forms.graph_data import GraphDataUI
+from grafity.ui.forms.graph_axes import GraphAxesUI
+from grafity.ui.forms.graph_fit import GraphFitUI
+from grafity.ui.forms.functions import FunctionsWindowUI
+from grafity.ui.forms.fitoptions import FitOptionsUI
 
 from grafity import Graph, Worksheet, Folder
 from grafity.settings import DATADIR, USERDATADIR

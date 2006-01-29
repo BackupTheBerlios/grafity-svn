@@ -125,7 +125,7 @@ splash = GrafitSplash(QPixmap(DATADIR + '/data/images/logos/grafity.png'))
 splash.show()
 splash.message('')
 
-from ui_main import MainWindow
+from ui.main import MainWindow
 
 sys.modules['__main__'].splash.message('building user interface')
 
