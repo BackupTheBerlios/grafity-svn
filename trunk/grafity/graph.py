@@ -11,13 +11,15 @@ from grafity.project import Item, wrap_attribute, register_class, create_id
 from grafity.actions import action_from_methods, action_from_methods2, StopAction
 from grafity.functions import FunctionSum, registry
 
-symbols = ['circle', 'square', 'diamond', 'triangleup']
+symbols = ['none', 'square', 'circle', 'diamond', 
+           'triangleup', 'triangledown', 'triangleleft', 'triangleright', '+', 'x', ]
 fills = ['filled', 'open']
 colors = ['#000000', '#ff0000', '#8b0000', '#00ff00', '#006400', '#0000ff', '#00008b', 
-          '#00ffff', '#008b8b', '#ff00ff', '#8b008b', '#ffff00', '#000000', '#bebebe', 
+          '#00ffff', '#008b8b', '#ff00ff', '#8b008b', '#ffff00', '#bebebe', 
           '#a9a9a9', '#d3d3d3', '#7ac5cd', '#6495ed', '#ffb90f', '#bcee68', '#ff7f00', 
           '#e9967a', '#00ced1', '#ee1289', '#00bfff', '#1874cd', '#ff69b4', '#cd6090', 
-          '#cd5c5c', '#90ee90', '#5d478b', '#000000']
+          '#cd5c5c', '#90ee90', '#5d478b', ]
+
 linetypes = ['none', 'straight', 'spline']
 linestyles = ['solid', 'dash', 'dot', 'dashdot', 'dashdotdot']
 
@@ -25,10 +27,6 @@ attr_values = {'color': colors, 'symbol': symbols, 'fill': fills,
                'linetype': linetypes, 'linestyle': linestyles }
 
 attrs = ['symbol', 'fill', 'size', 'color', 'linestyle', 'linewidth', 'linetype']
-
-class Bunch(object):
-    def __init__(self, **kwds):
-        self.__dict__.update(kwds)
 
 class Style(object):
     def __init__(self, dataset):
@@ -174,7 +172,6 @@ class Dataset(HasSignals):
             self.data.linetype = value
 
 #        self.graph.emit('style-changed', [self], [], **{style: value})
-
 
 class MFunctionSum(FunctionSum):
     signals = {'add-term(term)': 'A term has been added to the function',

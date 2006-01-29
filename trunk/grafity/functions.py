@@ -316,7 +316,7 @@ class Function(HasSignals):
         file(self.filename, 'wb').write(self.tostring())
 
     def fromstring(self, s):
-        self.name, param, self.text, self.extra = s.split('\n------\n')
+        self.name, self.desc, param, self.text, self.tex, self.extra = s.split('\n------\n')
         if '/' in self.name:
             self.category, self.short = self.name.split('/')
         else:
@@ -326,8 +326,10 @@ class Function(HasSignals):
     def tostring(self):
         st = []
         st.append(self.name)
+        st.append(self.desc)
         st.append(', '.join(self.parameters))
         st.append(self.text)
+        st.append(self.tex)
         st.append(self.extra)
         st = '\n------\n'.join(st)
         return st

@@ -57,6 +57,12 @@ class WorksheetView(QTabWidget):
         self.setIcon(getimage('worksheet'))
         self.resize(400, 400)
     
+        self.worksheet.project.connect('remove-item', self.on_project_remove_item)
+
+    def on_project_remove_item(self, item):
+        if item == self.worksheet:
+            self.close()
+
     def closeEvent(self, event):
         event.accept()
         self.worksheet._view = None

@@ -676,7 +676,10 @@ class MainWindow(MainWindowUI):
             self.menubar.removeItem(self.menubar.idAt(2))
 
         if window is None:
-            return
+            self.graph_data.set_graph(None)
+            self.graph_axes.set_graph(None)
+            self.graph_style.set_graph(None)
+            self.graph_fit.set_graph(None)
 
         self.worksheet_toolbar.hide()
         self.graph_toolbar.hide()

@@ -22,6 +22,31 @@ from grafity.settings import DATADIR, USERDATADIR
 from grafity.data import getimage
 from grafity.graph import symbols, fills, colors, linetypes, linestyles, attrs
 
+from mimetex import mimetex
+
+qsymbols = {
+    'none': QwtSymbol.None,
+    'circle': QwtSymbol.Ellipse,
+    'square': QwtSymbol.Rect,
+    'diamond': QwtSymbol.Diamond,
+    'triangleup': QwtSymbol.UTriangle, 
+    'triangledown': QwtSymbol.DTriangle, 
+    'triangleleft': QwtSymbol.LTriangle, 
+    'triangleright': QwtSymbol.RTriangle, 
+    '+': QwtSymbol.Cross,
+    'x': QwtSymbol.XCross,
+}
+
+qfills = { 'filled': QBrush(Qt.black), 
+           'open': QBrush(), }
+
+qcolors = [QColor(s) for s in colors]
+
+qlinetypes = [QwtCurve.NoCurve, QwtCurve.Lines, QwtCurve.Spline]
+qlinestyles = [Qt.SolidLine, Qt.DashLine, Qt.DotLine, Qt.DashDotLine, Qt.DashDotDotLine]
+
+
+
 class ListViewItem(QListViewItem):
     def __init__(self, parent, obj):
         QListViewItem.__init__(self, parent, obj.name)
@@ -47,7 +72,7 @@ class ListViewItem(QListViewItem):
 def efloat(f):
     try:
         return float(f)
-    except:
+    except Exception:
         return nan
 
 
@@ -150,6 +175,12 @@ class GraphView(QTabWidget):
         self.mode = 'arrow'
         self.setCaption(self.graph.fullname)
         self.setWFlags(Qt.WDestructiveClose)
+
+        self.graph.project.connect('remove-item', self.on_project_remove_item)
+
+    def on_project_remove_item(self, item):
+        if item == self.graph:
+            self.close()
 
     def closeEvent(self, event):
         self.graph._view = None
@@ -333,55 +364,30 @@ class GraphView(QTabWidget):
         self.plot.setCurveData(d._curveid, x, y)
         self.redraw()
 
-    symbols = {'circle': QwtSymbol.Ellipse,
-               'square': QwtSymbol.Rect,
-               'diamond': QwtSymbol.Diamond,
-               'triangleup': QwtSymbol.UTriangle, }
-
-    symbol_names = ['circle', 'square', 'diamond', 'triangleup']
-
-    fills = { 'filled': QBrush(Qt.black), 
-              'open': QBrush(), }
-    fill_names = ['filled', 'open']
-
-    colornames = [
-        'black', 'red', 'DarkRed', 'green', 'DarkGreen', 'blue', 'DarkBlue', 'cyan', 'DarkCyan',
-        'magenta', 'DarkMagenta', 'yellow', 'DarkYellow', 'gray', 'DarkGray', 'LightGray',
-        'CadetBlue3', 'CornflowerBlue', 'DarkGoldenrod1', 'DarkOliveGreen2', 'DarkOrange1', 
-        'DarkSalmon', 'DarkTurquoise', 'DeepPink2', 'DeepSkyBlue1', 'DodgerBlue3', 'HotPink', 
-        'HotPink3', 'IndianRed', 'LightGreen', 'MediumPurple4', 'MediumVioletRed' ]
-
-    qcolors = [QColor(s) for s in colornames]
-    colors = [unicode(s.name()) for s in qcolors]
-
-    line_types = [QwtCurve.NoCurve, QwtCurve.Lines, QwtCurve.Spline]
-    line_type_names = ['none', 'straight', 'spline']
-    line_styles = [Qt.SolidLine, Qt.DashLine, Qt.DotLine, Qt.DashDotLine, Qt.DashDotDotLine]
-    line_style_names = ['solid', 'dash', 'dot', 'dashdot', 'dashdotdot']
-
-
     def on_change_style(self, datasets):#, style, value):
         for d in datasets:
             curve = self.plot.curve(d._curveid)
 
-            curve.symbol().setStyle(self.symbols[d.style.symbol])
+            curve.symbol().setStyle(qsymbols[d.style.symbol])
 
             if d.style.fill == 'open':
-                brush = self.fills['open']
+                brush = qfills['open']
             elif d.style.fill == 'filled':
-                brush = QBrush(self.qcolors[self.colors.index(d.style.color)])
+                brush = QBrush(qcolors[colors.index(d.style.color)])
+            else:
+                brush = QBrush(qcolors[colors.index(d.style.color)])
             curve.symbol().setBrush(brush)
 
-            color = self.qcolors[self.colors.index(d.style.color)]
+            color = qcolors[colors.index(d.style.color)]
             curve.symbol().brush().setColor(color)
             curve.symbol().pen().setColor(color)
             curve.pen().setColor(color)
 
             curve.symbol().setSize(d.style.size)
             
-            curve.setStyle(self.line_types[self.line_type_names.index(d.style.linetype)])
+            curve.setStyle(qlinetypes[linetypes.index(d.style.linetype)])
 
-            curve.pen().setStyle(self.line_styles[self.line_style_names.index(d.style.linestyle)])
+            curve.pen().setStyle(qlinestyles[linestyles.index(d.style.linestyle)])
 
             curve.pen().setWidth(d.style.linewidth)
 
@@ -432,12 +438,22 @@ class FunctionsWindow(FunctionsWindowUI):
             self.updating = True
             self.tabs.setEnabled(True)
             func = registry[item.funcname]
+
+            if func.tex.strip() == '':
+                pixmap = QPixmap()
+            else:
+                pixmap = mimetex(func.tex)
+
+            QMimeSourceFactory.defaultFactory().setPixmap('mimetex', pixmap)
             if self.func is None or func.name != self.func.name:
                 self.name.setText(func.name)
                 self.parameters.setText(', '.join(func.parameters))
                 self.equation.setText(func.text)
-                desc = "<h2>%s</h2><hr>"%(func.short,)
+                desc = "<h2>%s</h2><hr><img src='mimetex'>"%(func.short,)
                 self.browse.setText(desc)
+                self.tex.setText(func.tex)
+                self.desc.setText(func.desc)
+                self.extra.setText(func.extra)
             self.func = func
             self.updating = False
 
@@ -463,7 +479,9 @@ class FunctionsWindow(FunctionsWindowUI):
         self.func.name = unicode(self.name.text())
         self.func.parameters = [p.strip() for p in unicode(self.parameters.text()).split(',')]
         self.func.text = unicode(self.equation.text())
-#        self.func.extra = unicode(self.extra.text())
+        self.func.desc = unicode(self.desc.text())
+        self.func.tex = unicode(self.tex.text())
+        self.func.extra = unicode(self.extra.text())
         self.func.save()
         registry.rescan()
         self.fill()
@@ -617,10 +635,10 @@ class GraphAxes(GraphAxesUI):
             self.graph.connect('set-title', self.on_set_title)
             self.graph.connect('set-scale', self.on_set_scale)
 
-        self.on_set_title('x', self.graph.xtitle)
-        self.on_set_title('y', self.graph.ytitle)
-        self.on_set_scale('x', self.graph.xtype)
-        self.on_set_scale('y', self.graph.ytype)
+            self.on_set_title('x', self.graph.xtitle)
+            self.on_set_title('y', self.graph.ytitle)
+            self.on_set_scale('x', self.graph.xtype)
+            self.on_set_scale('y', self.graph.ytype)
 
     def on_set_title(self, axis, title):
         self.updating = True
@@ -645,13 +663,13 @@ class GraphStyle(GraphStyleUI):
         GraphStyleUI.__init__(self, parent)
         self.mainwin = mainwin
 
-        for c in GraphView.qcolors:
+        for c in qcolors:
             p = QPixmap()
             p.resize(30, 10)
             p.fill(c)
             self.color.insertItem(p)
 
-        for l in GraphView.line_styles:
+        for l in qlinestyles:
             p = QPixmap()
             p.resize(50, 10)
             paint = QPainter()
@@ -665,15 +683,15 @@ class GraphStyle(GraphStyleUI):
             p.setMask(p.createHeuristicMask())
             self.lstyle.insertItem(p)
 
-        brush = GraphView.fills['filled']
+        brush = qfills['filled']
         pen = QPen()
-        for l in GraphView.symbol_names:
+        for l in symbols:
             p = QPixmap()
             p.resize(12,12)
             paint = QPainter()
             p.fill(Qt.white)
             paint.begin(p)
-            QwtSymbol(GraphView.symbols[l], brush, pen, QSize(10, 10)).draw(paint, 6, 6)
+            QwtSymbol(qsymbols[l], brush, pen, QSize(10, 10)).draw(paint, 6, 6)
             paint.end()
             p.setMask(p.createHeuristicMask())
             self.shape.insertItem(p)
@@ -685,8 +703,6 @@ class GraphStyle(GraphStyleUI):
 
         self.checks = [self.shape_ch, self.fill_ch, self.size_ch, self.color_ch,
                        self.ltype_ch, self.lstyle_ch, self.lwidth_ch]
-
-#        self.props = ['symbol', 'fill', 'size', 'color', 'linetype', 'linestyle', 'linewidth']
 
         self.updating = False
         self.datasets = []
@@ -701,25 +717,15 @@ class GraphStyle(GraphStyleUI):
     def set_from_dataset(self, dataset):
         """Updates the gui to reflect the style of a dataset"""
         style = dataset.style
-        self.shape.setCurrentItem(GraphView.symbol_names.index(style.symbol))
-        self.fill.setCurrentItem(GraphView.fill_names.index(style.fill))
-        self.color.setCurrentItem(GraphView.colors.index(style.color))
+        self.shape.setCurrentItem(symbols.index(style.symbol))
+        self.fill.setCurrentItem(fills.index(style.fill))
+        self.color.setCurrentItem(colors.index(style.color))
         self.size.setValue(style.size)
-        self.ltype.setCurrentItem(GraphView.line_type_names.index(style.linetype))
-        self.lstyle.setCurrentItem(GraphView.line_style_names.index(style.linestyle))
+        self.ltype.setCurrentItem(linetypes.index(style.linetype))
+        self.lstyle.setCurrentItem(linestyles.index(style.linestyle))
         self.lwidth.setValue(style.linewidth)
 
-    def get_attrs_from_ui(self):
-        return {
-            'symbol': symbols[self.shape.currentItem()],
-            'fill': fills[self.fill.currentItem()],
-            'color': colors[self.color.currentItem()],
-            'linetype': linetypes[self.ltype.currentItem()],
-            'linestyle': linestyles[self.lstyle.currentItem()],
-            'size': self.size.value(),
-            'linewidth': self.lwidth.value(),
-        }
-
+      
     def on_group_changed(self):
         self.on_selection_changed(self.datasets)
 
@@ -759,9 +765,9 @@ class GraphStyle(GraphStyleUI):
                 elif self.group.currentItem() == 1: # series
                     for prop, widget, check in zip(attrs, self.widgets, self.checks):
                         if prop == 'color': # can do series
-                            colors = [GraphView.colors.index(d.style.color) for d in datasets]
-                            c0 = colors[0]
-                            series = colors==[c % len(GraphView.colors) for c in range(c0, c0+len(colors))]
+                            dcolors = [GraphView.colors.index(d.style.color) for d in datasets]
+                            c0 = dcolors[0]
+                            series = dcolors==[c % len(colors) for c in range(c0, c0+len(colors))]
                             check.setChecked(series)
                             widget.setEnabled(series)
                         else:
@@ -784,13 +790,19 @@ class GraphStyle(GraphStyleUI):
         series = self.group.currentItem() == 1
 
         self.graph._view.freeze()
+        style = {
+            'symbol': symbols[self.shape.currentItem()],
+            'fill': fills[self.fill.currentItem()],
+            'color': colors[self.color.currentItem()],
+            'linetype': linetypes[self.ltype.currentItem()],
+            'linestyle': linestyles[self.lstyle.currentItem()],
+            'size': self.size.value(),
+            'linewidth': self.lwidth.value(),
+        }
 
-        style = self.get_attrs_from_ui()
         for attr in attrs:
             if attr not in cattrs:
-                print >>sys.stderr, attr
                 del style[attr]
-        print style
         self.graph.set_style(self.datasets, cattrs*series, **style)
             
         self.graph._view.unfreeze()
@@ -857,6 +869,7 @@ class GraphData(GraphDataUI):
             self.project.top.connect('modified', self.on_mod)
             self.project.connect('add-item', self.on_mod)
             self.project.connect('remove-item', self.on_mod)
+            self.on_mod()
 
     def on_mod(self, item=None):
         self.worksheet_list.clear()

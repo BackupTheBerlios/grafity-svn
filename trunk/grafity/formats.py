@@ -8,6 +8,7 @@ import pickle
 import cElementTree as xml
 
 from grafity import Worksheet, Graph
+from grafity.graph import attrs, attr_values
 
 def pyget (elem, name):
     return eval (elem.get (name), {"__builtins__": { 'True': True, 'False':False, 'None':None, 'nan':0.0 }})
@@ -72,49 +73,19 @@ def load(project, filename):
             coly = pyget(delem, "ycolumn")
             rangemin, rangemax = pyget(delem, "range")
             ds = graph.add(wsheet[colx], wsheet[coly])
+            ds = graph.datasets[ds]
             # line and symbol styles
-#            for prop in Dataset.props:
-#                ds.set_curve_style(prop, pyget(delem, prop))
+            oldprops = [ 'symbol_style', 'symbol_fill', 'symbol_size', 'symbol_color',
+                         'line_type', 'line_style', 'line_width' ]
+            for oldprop, prop in zip(oldprops, attrs):
+                value = pyget(delem, oldprop)
+                if prop in attr_values:
+                    try:
+                        value = attr_values[prop][value]
+                    except IndexError:
+                        value = attr_values[prop][0]
 
-"""
-    def from_element(self, elem):
-        self.destroy_ui()
-        self.functions = []
-        try:
-            instnames = pyget(elem, "inst_names")
-        except:
-            instnames = [None for f in pyget(elem, "names")]
-
-        try:
-            self.extra_properties = pyget(elem, "extra_properties")
-        except:
-            pass
-
-        try:
-            self.maxiter = pyget(elem, "max_iterations")
-        except:
-            pass
-
-        try:
-            self.resultsws = pyget(elem, "resultsws")
-        except:
-            pass
-
-        for name, varshare, instname in zip(pyget(elem, "names"), pyget(elem, "varshares"), instnames):
-            try:
-                id = [f.name for f in self.available_functions].index(name)
-            except ValueError: # function not available
-                print >>sys.stderr, "Function not available: %s" % (name,)
-                continue
-            func = function_class_from_function(self.available_functions[id])()
-            func.varshare = varshare
-            func.inst_name = instname
-            self.functions.append(func)
-        self.graph.fitdatasets = [self.graph.datasets[i] for i in pyget(elem, "datasets")]
-        self.params_flat_to_func(pyget(elem, "params")[0])
-        self.build_ui()
-"""
-
+                ds.set_style(prop, value)
 
 if __name__ == '__main__':
     load(sys.argv[1])

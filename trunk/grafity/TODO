@@ -1,0 +1,5 @@
+- make graphview work with all symbols
+- close view when a graph or worksheet is removed
+- put extra in function editor
+* show description in function editor
+* do something when a function is not found

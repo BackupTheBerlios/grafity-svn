@@ -1,6 +1,11 @@
-Quadratic
+Basic/Quadratic
+------
+
 ------
 a, b, c
 ------
 y=a*x*x + b*x + c
 ------
+f(x) = ax^2+bx+c
+------
+

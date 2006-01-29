@@ -5,7 +5,6 @@ ext = Extension('__mimetex',
      define_macros=[('GIF', None), ('AA', None)],
      include_dirs=['src'],
 )
-
     
 setup(name='mimetex',
       version='0.1',
