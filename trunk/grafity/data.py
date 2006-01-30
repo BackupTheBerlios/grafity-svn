@@ -1,7 +1,7 @@
 import sys
 import fnmatch
 import os.path
-from settings import DATADIR, USERDATADIR
+from settings import USERDATADIR
 from qt import QPixmap
 
 def column_tool(name, image=None):
@@ -20,44 +20,75 @@ def dataset_tool(name, image=None):
 
 dataset_tools = []
 
-def scan_functions(dirs):
-    functions = []
+def scan_functions_dir(functions, dirs):
     def walk_functions(functions, folder, files):
         for f in files:
             full = os.path.join(folder, f)
             if os.path.isfile(full) and fnmatch.fnmatch(f, "*.function"):
-                functions.append(full)
+                functions.append((False, full))
     for dir in dirs:
         os.path.walk(dir, walk_functions, functions)
+
+def scan_functions_resource(functions, start='data'):
+    for name in resource_listdir('grafity', start):
+        full = os.path.join(start, name)
+        if resource_isdir('grafity', full):
+            scan_functions_resource(functions, full)
+        elif fnmatch.fnmatch(name, "*.function"):
+            functions.append((True, full))
+
+def scan_functions(dirs):
+    functions = []
+    scan_functions_dir(functions, dirs)
+    scan_functions_resource(functions)
     return functions
 
-def scan_plugins():
+def scan_plugins_dir():
     def walk_plugins(_, folder, files):
         for f in files:
             full = os.path.join(folder, f)
             if os.path.isfile(full) and fnmatch.fnmatch(f, "*.py"):
                 execfile(full, {})
-    os.path.walk(os.path.join(DATADIR, 'data'), walk_plugins, None)
     os.path.walk(USERDATADIR, walk_plugins, None)
+
+def scan_plugins_resource(start='data'):
+    for name in resource_listdir('grafity', start):
+        full = os.path.join(start, name)
+        if resource_isdir('grafity', full):
+            scan_plugins_resource(full)
+        elif fnmatch.fnmatch(name, "*.py"):
+            execfile(resource_filename('grafity', full), {})
+
 
 images = {}
 
 from pkg_resources import resource_isdir, resource_listdir, resource_filename
 
-def scan_images(start=''):
+def scan_images_resource(start='data'):
     for name in resource_listdir('grafity', start):
         full = os.path.join(start, name)
         if resource_isdir('grafity', full):
-            scan_images(full)
-        if fnmatch.fnmatch(name, "*.png"):
-            images[name[:-4]] = full
+            scan_images_resource(full)
+        elif fnmatch.fnmatch(name, "*.png"):
+            images[name[:-4]] = (True, full)
+
+def scan_images_dir():
+    def walk_images(_, folder, files):
+        for f in files:
+            full = os.path.join(folder, f)
+            if os.path.isfile(full) and fnmatch.fnmatch(f, "*.png"):
+                images[f[:-4]] = (False, full)
+    os.path.walk(USERDATADIR, walk_images, None)
 
 def getimage(name, cache={}):
     if name not in cache:
-        cache[name] = QPixmap(resource_filename('grafity', images[name]))
-        print >>sys.stderr, name
+        resource, file = images[name]
+        if resource:
+            file = resource_filename('grafity', file)
+        cache[name] = QPixmap(file)
     return cache[name]
 
-
-scan_images()
-scan_plugins()
+scan_images_resource()
+scan_images_dir()
+scan_plugins_resource()
+scan_plugins_dir()

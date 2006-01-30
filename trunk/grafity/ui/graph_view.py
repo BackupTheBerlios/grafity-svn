@@ -18,7 +18,7 @@ from grafity.ui.forms.functions import FunctionsWindowUI
 from grafity.ui.forms.fitoptions import FitOptionsUI
 
 from grafity import Graph, Worksheet, Folder
-from grafity.settings import DATADIR, USERDATADIR
+from grafity.settings import USERDATADIR
 from grafity.data import getimage
 from grafity.graph import symbols, fills, colors, linetypes, linestyles, attrs
 
@@ -464,7 +464,7 @@ class FunctionsWindow(FunctionsWindowUI):
 
     def on_new(self):
         num = 0
-        while 'function%d.function'%num in (f.filename.split('/')[-1] for f in registry):
+        while 'function%d.function'%num in (f.filename.split('/')[-1] for f in registry if f.filename is not None):
             num += 1
         self.function = Function('function%d'%num, [], 'y=f(x)', '')
         open(USERDATADIR+'/functions/function%d.function'%num, 'wb').write(self.function.tostring())

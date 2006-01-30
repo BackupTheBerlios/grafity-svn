@@ -2,11 +2,12 @@ import sys
 import os
 
 import odr
+from pkg_resources import resource_string
 
 from grafity.signals import HasSignals
 from grafity.arrays import zeros, nan
 from grafity.actions import action_from_methods, StopAction, action_from_methods2
-from grafity.settings import DATADIR, USERDATADIR
+from grafity.settings import USERDATADIR
 from grafity.project import create_id
 from data import scan_functions
 
@@ -41,11 +42,15 @@ class FunctionsRegistry(HasSignals):
     def rescan(self):
         """Rescan the directory and check for changed functions"""
         names = []
-        for f in scan_functions(self.dirs):
+        for res, f in scan_functions(self.dirs):
             try:
                 func = Function()
-                func.fromstring(open(f).read())
-                func.filename = f
+                if res:
+                    func.fromstring(resource_string('grafity', f))
+                    func.filename = None
+                else:
+                    func.fromstring(open(f).read())
+                    func.filename = f
                 names.append(func.name)
             except IOError, s:
                 continue
@@ -63,26 +68,6 @@ class FunctionsRegistry(HasSignals):
             if f.name not in names:
                 self.functions.remove(f)
                 self.emit('removed', f)
-
-#            self.functions.sort()
-
-    def aaaaaaaascan(self, dirs=None):
-        if dirs == None:
-            dirs = self.dirs
-        self.functions = []
-
-        for dir in dirs:
-
-            for f in os.listdir(dir):
-                try:
-                    func = Function()
-                    func.fromstring(open(dir+'/'+f).read())
-                    func.filename = dir + '/' + f
-                except IOError, s:
-                    continue
-
-                self.functions.append(func)
-#        self.functions.sort()
 
     def __getitem__(self, name):
         return [f for f in self.functions if f.name == name][0]
@@ -277,6 +262,8 @@ class Function(HasSignals):
         self._parameters = parameters
         self._text = text
         self._extra = extra
+        self.desc = ''
+        self.tex = ''
 
     extra = mod_property('extra')
     text = mod_property('text')
@@ -309,7 +296,8 @@ class Function(HasSignals):
         return ns['func']
 
     def save(self):
-        file(self.filename, 'wb').write(self.tostring())
+        if self.filename is not None:
+            file(self.filename, 'wb').write(self.tostring())
 
     def fromstring(self, s):
         self.name, self.desc, param, self.text, self.tex, self.extra = s.split('\n------\n')
@@ -330,5 +318,4 @@ class Function(HasSignals):
         st = '\n------\n'.join(st)
         return st
 
-registry = FunctionsRegistry([os.path.join(DATADIR, 'data', 'functions'), 
-                              os.path.join(USERDATADIR, 'functions')])
+registry = FunctionsRegistry([os.path.join(USERDATADIR, 'functions')])

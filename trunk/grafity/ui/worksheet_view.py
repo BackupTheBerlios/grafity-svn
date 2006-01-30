@@ -4,7 +4,6 @@ sys.modules['grafity.ui.start'].splash.message('loading ui_worksheet_view')
 from qt import *
 from qttable import *
 from grafity.arrays import clip, nan, arange, log10, isnan
-from grafity.settings import DATADIR
 from grafity.data import getimage
 
 from grafity import Worksheet

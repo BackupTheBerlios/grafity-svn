@@ -27,11 +27,11 @@ for subdir in ['functions', 'scripts']:
 
 log.info('User data directory is %s', USERDATADIR)
 
-import grafity.config
-DATADIR=grafity.config.datadir
+#import grafity.config
+#DATADIR=grafity.config.datadir
 #DATADIR = os.path.normpath(os.path.abspath(os.path.dirname(sys.argv[0]))+'/../') + '/'
 
-log.info('Data directory is %s', DATADIR)
+#log.info('Data directory is %s', DATADIR)
 
 class Settings(object):
     def __init__(self, filename):
