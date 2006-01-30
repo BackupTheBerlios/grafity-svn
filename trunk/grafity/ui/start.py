@@ -7,7 +7,6 @@ from optparse import OptionParser
 from pkg_resources import require, resource_filename
 from qt import *
 
-require("odr")
 require('mimetex')
 
 class GrafitSplash(QSplashScreen):
