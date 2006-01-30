@@ -93,6 +93,7 @@ class Dataset(HasSignals):
         length = min(len(self.x), len(self.y))
         x = asarray(self.x)[:length]
         y = asarray(self.y)[:length]
+        self.minx, self.maxx = min(x), max(x)
         ind = isfinite(x) & isfinite(y) & (self.xfrom <= x) & (x <= self.xto)
         xx = x[ind]
         yy = y[ind]

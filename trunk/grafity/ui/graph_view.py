@@ -364,7 +364,7 @@ class GraphView(QTabWidget):
         self.plot.setCurveData(d._curveid, x, y)
         self.redraw()
 
-    def on_change_style(self, datasets):#, style, value):
+    def on_change_style(self, datasets):
         for d in datasets:
             curve = self.plot.curve(d._curveid)
 
@@ -428,7 +428,7 @@ class FunctionsWindow(FunctionsWindowUI):
             item.setPixmap(0, getimage('function'))
             item.funcname = function.name
 
-    def on_selection_changed(self):#, item=None):
+    def on_selection_changed(self):
         item = self.functions.selectedItem()
         if item is None or hasattr(item, 'category'):
             self.func = None

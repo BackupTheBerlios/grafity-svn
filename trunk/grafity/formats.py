@@ -85,18 +85,15 @@ def load(project, filename, progress=None, message=None):
             rangemin, rangemax = pyget(delem, "range")
             ds = graph.add(wsheet[colx], wsheet[coly])
             ds = graph.datasets[ds]
-            # line and symbol styles
-            oldprops = [ 'symbol_style', 'symbol_fill', 'symbol_size', 'symbol_color',
-                         'line_type', 'line_style', 'line_width' ]
-            for oldprop, prop in zip(oldprops, attrs):
-                value = pyget(delem, oldprop)
-                if prop in attr_values:
-                    try:
-                        value = attr_values[prop][value]
-                    except IndexError:
-                        value = attr_values[prop][0]
 
-                ds.set_style(prop, value)
+            ds.set_style('fill', ['open', 'filled'][pyget(delem, 'symbol_fill')])
+            ds.set_style('symbol', ['none', 'circle', 'square', 'diamond', 'triangleup', 
+                          'triangledown', 'triangleleft', 'triangleright', '+', 'x'][pyget(delem, 'symbol_style')])
+            ds.set_style('size', pyget(delem, 'symbol_size'))
+            ds.set_style('linewidth', pyget(delem, 'line_width'))
+            ds.set_style('color', attr_values['color'][pyget(delem, 'symbol_color')])
+            ds.set_style('linetype', attr_values['linetype'][pyget(delem, 'line_type')])
+            ds.set_style('linestyle', attr_values['linestyle'][pyget(delem, 'line_style')])
 
     if progress:
         progress(100)

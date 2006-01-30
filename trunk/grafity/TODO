@@ -9,3 +9,7 @@
 * drag and drop to folder in project explorer
 * rename fit function
 * hide fit function
+* update legend on column rename
+* double-click on action list to undo/redo
+* window/close and close all
+* cut/copy/paste in worksheets

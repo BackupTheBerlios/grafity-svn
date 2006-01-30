@@ -1,20 +1,18 @@
 #!/usr/bin/env python
 
 import os, sys
-
-DATADIR = os.path.normpath(os.path.abspath(os.path.dirname(sys.argv[0]))+'/../') + '/'
-sys.path.append(DATADIR)
-#sys.path.append(DATADIR+'/grafity/thirdparty/')
-
 import logging
+import traceback, time
 from optparse import OptionParser
 
 from pkg_resources import require
 from qt import *
 
 require("odr")
-#require("numpy")
 require('mimetex')
+
+DATADIR = os.path.normpath(os.path.abspath(os.path.dirname(sys.argv[0]))+'/../') + '/'
+sys.path.append(DATADIR)
 
 parser = OptionParser()
 parser.add_option('-l', '--log', dest='log', help='Log program events')
@@ -34,9 +32,6 @@ class GrafitSplash(QSplashScreen):
         font = painter.font()
         font.setPointSize(10)
         QSplashScreen.drawContents(self, painter)
-#        text = 'r'+REVISION
-#        painter.drawText(418, 100, text, len(text))
-
 
 
 class exception_form(QDialog):
@@ -46,7 +41,6 @@ class exception_form(QDialog):
         if not name:
             self.setName("exception_form")
 
-#        self.setSizePolicy(QSizePolicy(0,0,0,0,self.sizePolicy().hasHeightForWidth()))
         self.setSizeGripEnabled(1)
 
         exception_formLayout = QVBoxLayout(self,1,6,"exception_formLayout")
@@ -55,7 +49,6 @@ class exception_form(QDialog):
         layout2 = QHBoxLayout(None,0,6,"layout2")
 
         self.pixmap = QLabel(self,"pixmap")
-#        self.pixmap.setSizePolicy(QSizePolicy(0,0,0,0,self.pixmap.sizePolicy().hasHeightForWidth()))
         self.pixmap.setScaledContents(1)
         layout2.addWidget(self.pixmap)
 
@@ -79,12 +72,10 @@ class exception_form(QDialog):
 
         self.connect(self.closebtn,SIGNAL("clicked()"),self,SLOT("close()"))
 
-
     def languageChange(self):
         self.setCaption(self.__tr("Den Vogel"))
         self.label.setText(QString.null)
         self.closebtn.setText(self.__tr("OK!"))
-
 
     def __tr(self,s,c = None):
         return qApp.translate("exception_form",s,c)
@@ -101,24 +92,12 @@ class ErrorWindow(exception_form):
         f.write(lines)
         f.write('\n\n')
 
-import traceback, time
        
 def excepthook(type, value, traceback):
-#    if type is OverflowError:
-#        print >>sys.stderr, 'OverflowError'
-#        return
     ErrorWindow(type, value, traceback).exec_loop()
     sys.__excepthook__(type, value, traceback)
-
     
 sys.excepthook = excepthook
-
-
-
-
-
-
-
 
 app = QApplication(sys.argv)
 splash = GrafitSplash(QPixmap(DATADIR + '/data/images/logos/grafity.png'))
