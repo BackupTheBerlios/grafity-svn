@@ -20,7 +20,6 @@ def dataset_tool(name, image=None):
 
 dataset_tools = []
 
-
 def scan_functions(dirs):
     functions = []
     def walk_functions(functions, folder, files):
@@ -43,20 +42,22 @@ def scan_plugins():
 
 images = {}
 
-def scan_images():
-    def walk_images(_, folder, files):
-        for f in files:
-            full = os.path.join(folder, f)
-            if os.path.isfile(full) and fnmatch.fnmatch(f, "*.png"):
-                images[f[:-4]] = full
-    os.path.walk(os.path.join(DATADIR, 'data'), walk_images, None)
-    os.path.walk(USERDATADIR, walk_images, None)
+from pkg_resources import resource_isdir, resource_listdir, resource_filename
+
+def scan_images(start=''):
+    for name in resource_listdir('grafity', start):
+        full = os.path.join(start, name)
+        if resource_isdir('grafity', full):
+            scan_images(full)
+        if fnmatch.fnmatch(name, "*.png"):
+            images[name[:-4]] = full
 
 def getimage(name, cache={}):
     if name not in cache:
-        cache[name] = QPixmap(images[name])
+        cache[name] = QPixmap(resource_filename('grafity', images[name]))
         print >>sys.stderr, name
     return cache[name]
+
 
 scan_images()
 scan_plugins()

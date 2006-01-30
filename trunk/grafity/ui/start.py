@@ -72,7 +72,7 @@ class ErrorWindow(exception_form):
     def __init__(self, type, value, tback):
         exception_form.__init__(self, mainwin, 'error', True)
         self.label.setText("An error <b>(%s)</b> has occurred.<br><i>%s</i><br>This should not happen, please tell Daniel!" % (type, value))
-        self.pixmap.setPixmap(QPixmap(DATADIR + '/data/images/vogel.png'))
+        self.pixmap.setPixmap(getimage('vogel'))
         lines = ''.join(traceback.format_exception (type, value, tback))
         f = file('.grafity-birds', 'a')
         f.write('# bird at %s\n' % time.strftime("%d %b %Y %H:%M:%S"))
@@ -86,13 +86,12 @@ def excepthook(type, value, traceback):
     
 sys.excepthook = excepthook
 
-#sys.path.append(DATADIR)
-from grafity.config import datadir as DATADIR
-
 splash = None
+mainwin = None
+from grafity.data import getimage
 
 def main():
-    global DATADIR, splash
+    global splash, mainwin
 
     parser = OptionParser()
     parser.add_option('-l', '--log', dest='log', help='Log program events')
@@ -111,7 +110,7 @@ def main():
     logging.basicConfig(format="%(asctime)s [%(name)s] %(message)s")
 
     app = QApplication(sys.argv)
-    splash = GrafitSplash(QPixmap(DATADIR + '/data/images/logos/grafity.png'))
+    splash = GrafitSplash(getimage('grafity'))
     splash.show()
     splash.message('')
 

@@ -8,8 +8,12 @@ setup(
     install_requires = ["odr", "mimetex"],
 
     entry_points = {
-        'gui_scripts': [
-            'grafity = grafity.ui.start:main',
-        ]
-    }
+        'gui_scripts': [ 'grafity = grafity.ui.start:main', ]
+    },
+
+    include_package_data = True,
+
+    package_data = {
+        'grafity': ['data/scripts/*.py'], 
+    },
 )
