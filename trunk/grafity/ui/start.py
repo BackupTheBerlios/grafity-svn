@@ -1,16 +1,11 @@
 #!/usr/bin/env python
-
 import os, sys
 import logging
 import traceback, time
 from optparse import OptionParser
 
-from pkg_resources import require
+from pkg_resources import require, resource_filename
 from qt import *
-
-def test(arg):
-    print >>sys.stderr, arg
-sys.path_hooks.append(test)
 
 require("odr")
 require('mimetex')
@@ -92,7 +87,9 @@ sys.excepthook = excepthook
 
 splash = None
 mainwin = None
-from grafity.ui.utils import getimage
+
+def getimage(name):
+    return QPixmap(resource_filename('grafity', 'data/images/'+name+'.png'))
 
 def main():
     global splash, mainwin
@@ -114,7 +111,7 @@ def main():
     logging.basicConfig(format="%(asctime)s [%(name)s] %(message)s")
 
     app = QApplication(sys.argv)
-    splash = GrafitSplash(getimage('grafity'))
+    splash = GrafitSplash(getimage('logos/grafity'))
     splash.show()
     splash.message('')
 
