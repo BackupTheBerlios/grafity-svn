@@ -5,5 +5,11 @@ setup(
     name = "grafity",
     version = "0.1",
     packages = find_packages(),
-)
+    install_requires = ["odr", "mimetex"],
 
+    entry_points = {
+        'gui_scripts': [
+            'grafity = grafity.ui.start:main',
+        ]
+    }
+)

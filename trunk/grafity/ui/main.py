@@ -1,9 +1,6 @@
 import os
-try:
-    sys.modules['__main__'].splash.message('loading main')
-except:
-    pass
 import sys
+sys.modules['__main__'].splash.message('loading main')
 
 from qt import *
 

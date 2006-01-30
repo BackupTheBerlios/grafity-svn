@@ -55,6 +55,7 @@ def scan_images():
 def getimage(name, cache={}):
     if name not in cache:
         cache[name] = QPixmap(images[name])
+        print >>sys.stderr, name
     return cache[name]
 
 scan_images()

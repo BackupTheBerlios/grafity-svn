@@ -1,11 +1,6 @@
 import sys
 import re
 
-try:
-   sys.modules['__main__'].splash.message('loading worksheet')
-except:
-    pass
-
 from grafity.signals import HasSignals
 from grafity.actions import action_from_methods, action_from_methods2, StopAction, action_list
 from grafity.project import Item, wrap_attribute, register_class, create_id

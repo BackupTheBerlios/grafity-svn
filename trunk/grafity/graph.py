@@ -1,10 +1,5 @@
 import sys
 
-try:
-    sys.modules['__main__'].splash.message('loading graph')
-except:
-    pass
-
 from grafity.arrays import *
 from grafity.signals import HasSignals
 from grafity.project import Item, wrap_attribute, register_class, create_id

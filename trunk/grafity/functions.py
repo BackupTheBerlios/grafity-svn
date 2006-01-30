@@ -1,9 +1,5 @@
 import sys
 import os
-try:
-   sys.modules['__main__'].splash.message('loading functions')
-except:
-    pass
 
 import odr
 

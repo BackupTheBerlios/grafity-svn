@@ -11,19 +11,6 @@ from qt import *
 require("odr")
 require('mimetex')
 
-DATADIR = os.path.normpath(os.path.abspath(os.path.dirname(sys.argv[0]))+'/../') + '/'
-sys.path.append(DATADIR)
-
-parser = OptionParser()
-parser.add_option('-l', '--log', dest='log', help='Log program events')
-options, args = parser.parse_args()
-
-if options.log is not None:
-    for l in options.log.split(','):
-        logging.getLogger(l).setLevel(logging.DEBUG)
-
-logging.basicConfig(format="%(asctime)s [%(name)s] %(message)s")
-
 class GrafitSplash(QSplashScreen):
     def __init__(self, pixmap):
         QSplashScreen.__init__(self, pixmap)
@@ -99,18 +86,35 @@ def excepthook(type, value, traceback):
     
 sys.excepthook = excepthook
 
-app = QApplication(sys.argv)
-splash = GrafitSplash(QPixmap(DATADIR + '/data/images/logos/grafity.png'))
-splash.show()
-splash.message('')
+def main():
+    DATADIR = os.path.normpath(os.path.abspath(os.path.dirname(sys.argv[0]))+'/../') + '/'
+    sys.path.append(DATADIR)
 
-from ui.main import MainWindow
+    parser = OptionParser()
+    parser.add_option('-l', '--log', dest='log', help='Log program events')
+    options, args = parser.parse_args()
 
-sys.modules['__main__'].splash.message('building user interface')
+    if options.log is not None:
+        for l in options.log.split(','):
+            logging.getLogger(l).setLevel(logging.DEBUG)
 
-mainwin = MainWindow()
-mainwin.app = app
-splash.finish(mainwin)
-app.setMainWidget(mainwin)
-mainwin.show()
-app.exec_loop()
+    logging.basicConfig(format="%(asctime)s [%(name)s] %(message)s")
+
+    app = QApplication(sys.argv)
+    splash = GrafitSplash(QPixmap(DATADIR + '/data/images/logos/grafity.png'))
+    splash.show()
+    splash.message('')
+
+    from ui.main import MainWindow
+
+    sys.modules['__main__'].splash.message('building user interface')
+
+    mainwin = MainWindow()
+    mainwin.app = app
+    splash.finish(mainwin)
+    app.setMainWidget(mainwin)
+    mainwin.show()
+    app.exec_loop()
+
+if __name__=='__main__':
+    main()

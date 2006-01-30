@@ -4,11 +4,6 @@ import time, random, socket, md5
 import string
 
 try:
-    sys.modules['__main__'].splash.message('loading project')
-except:
-    pass
-
-try:
     import metakit
 except ImportError:
     import grafity.thirdparty.metakit as metakit
