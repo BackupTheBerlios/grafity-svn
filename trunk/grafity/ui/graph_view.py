@@ -19,7 +19,7 @@ from grafity.ui.forms.fitoptions import FitOptionsUI
 
 from grafity import Graph, Worksheet, Folder
 from grafity.settings import USERDATADIR
-from grafity.data import getimage
+from grafity.ui.utils import getimage
 from grafity.graph import symbols, fills, colors, linetypes, linestyles, attrs
 
 from mimetex import mimetex

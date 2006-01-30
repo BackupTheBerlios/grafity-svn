@@ -4,7 +4,8 @@ sys.modules['grafity.ui.start'].splash.message('loading main')
 
 from qt import *
 
-from grafity.data import getimage, column_tools
+from grafity.data import column_tools
+from grafity.ui.utils import getimage
 from grafity.signals import HasSignals, global_connect
 from grafity.actions import undo, redo, action_list
 from grafity.ui.graph_view import GraphView, GraphStyle, GraphData, GraphAxes, GraphFit
@@ -33,6 +34,7 @@ class ListViewItem(QListViewItem):
         self.setText(0, name)
 
     def on_object_set_parent(self, parent):
+        print >>sys.stderr, self._object, parent
         self.parent().takeItem(self)
         parent._tree_item.insertItem(self)
         
@@ -208,7 +210,7 @@ class ActionList(HasSignals, QListView):
 
 class ObjDrag(QTextDrag):
     def __init__(self, objects, widget):
-        QTextDrag.__init__(self, str(objects), widget)
+        QTextDrag.__init__(self, ' '.join(obj.id for obj in objects), widget)
 
 
 class ProjectExplorer(HasSignals, QListView):
@@ -284,7 +286,7 @@ class ProjectExplorer(HasSignals, QListView):
 
     def dragObject(self, *args, **kwds):
         items = [i for i in self.project.items.values() 
-                   if isinstance(i, (grafity.Worksheet, grafity.Graph))
+                   if isinstance(i, (grafity.Worksheet, grafity.Graph, grafity.Folder))
                       and self.isSelected(i._tree_item)]
         drag = ObjDrag(items, self)
         return drag
@@ -331,7 +333,7 @@ class ProjectExplorer(HasSignals, QListView):
         self.oldCurrent = self.currentItem()
 
         item = self.itemAt(self.contentsToViewport(event.pos()))
-        if item:
+        if item is not None and isinstance(item._object, grafity.Folder):
             self.dropItem = item
 
     def contentsDragMoveEvent(self, event):
@@ -340,7 +342,7 @@ class ProjectExplorer(HasSignals, QListView):
             return
 
         item = self.itemAt(self.contentsToViewport(event.pos()))
-        if item:
+        if item is not None and isinstance(item._object, grafity.Folder):
 #            self.setSelected(item, True)
             event.accept()
             if item != self.dropItem:
@@ -367,11 +369,13 @@ class ProjectExplorer(HasSignals, QListView):
             return
 
         item = self.itemAt(self.contentsToViewport(event.pos()))
-        if item:
+        if item is not None and isinstance(item._object, grafity.Folder):
             s = QString()
             QTextDrag.decode(event, s)
+            objects = [self.project.items[id] for id in unicode(s).split()]
+            for o in objects:
+                o.parent = item._object
             event.accept()
-            print >>sys.stderr, unicode(s)
         else:
             event.ignore()
 

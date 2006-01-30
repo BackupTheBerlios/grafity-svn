@@ -2,7 +2,7 @@ all: odr install clean
 
 odr:
 	@tar zxvf odr-0.6.1.tar.gz
-	@cd odr-0.6.1 && patch -p1 <../odr-g.patch
+	@cd odr-0.6.1 && patch -p1 <../odr-itercall.patch
 	@cd odr-0.6.1 && python setup.py build
 install:
 	cp odr-0.6.1/odrpack.py __init__.py

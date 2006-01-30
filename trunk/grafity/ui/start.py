@@ -8,6 +8,10 @@ from optparse import OptionParser
 from pkg_resources import require
 from qt import *
 
+def test(arg):
+    print >>sys.stderr, arg
+sys.path_hooks.append(test)
+
 require("odr")
 require('mimetex')
 
@@ -88,7 +92,7 @@ sys.excepthook = excepthook
 
 splash = None
 mainwin = None
-from grafity.data import getimage
+from grafity.ui.utils import getimage
 
 def main():
     global splash, mainwin

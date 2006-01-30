@@ -1,5 +1,19 @@
 import sys
+
 from qt import *
+from pkg_resources import resource_filename
+
+from grafity.data import images
+
+
+def getimage(name, cache={}):
+    if name not in cache:
+        resource, file = images[name]
+        if resource:
+            file = resource_filename('grafity', file)
+        cache[name] = QPixmap(file)
+    return cache[name]
+
 
 class Page(object):
     def __init__(self, parent, *items):

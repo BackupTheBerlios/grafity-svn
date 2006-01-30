@@ -2,7 +2,6 @@ import sys
 import fnmatch
 import os.path
 from settings import USERDATADIR
-from qt import QPixmap
 
 def column_tool(name, image=None):
     def column_tool_dec(function):
@@ -79,14 +78,6 @@ def scan_images_dir():
             if os.path.isfile(full) and fnmatch.fnmatch(f, "*.png"):
                 images[f[:-4]] = (False, full)
     os.path.walk(USERDATADIR, walk_images, None)
-
-def getimage(name, cache={}):
-    if name not in cache:
-        resource, file = images[name]
-        if resource:
-            file = resource_filename('grafity', file)
-        cache[name] = QPixmap(file)
-    return cache[name]
 
 scan_images_resource()
 scan_images_dir()

@@ -186,24 +186,14 @@ class Item(HasSignals):
         oldparent = self._parent
         self._parent = parent
         self.emit('set-parent', self._parent)
-#        self.parent.emit('modified')
-#        if isinstance(oldparent, Folder):
-#            oldparent.emit('modified')
-#        else:
         if not isinstance(oldparent, Folder):
             raise StopAction
     def undo_set_parent(self, state):
         self._parent = state['old']
         self.emit('set-parent', self._parent)
-#        if state['old'] != '':
-#            state['old'].emit('modified')
-#        state['new'].emit('modified')
     def redo_set_parent(self, state):
         self._parent = state['new']
         self.emit('set-parent', parent)
-#        if state['old'] != '':
-#            state['old'].emit('modified')
-#        state['new'].emit('modified')
     set_parent = action_from_methods2('object/set-parent', set_parent, undo_set_parent, redo=redo_set_parent)
     def get_parent(self):
         return self._parent
@@ -282,11 +272,7 @@ class Folder(Item, HasSignals):
             print >>sys.stderr, "are you kidding?"
             self._parent = oldparent
             return
-        if oldparent != '':
-            oldparent.emit('modified')
-        if isinstance(self.parent, Folder) and self != self.parent:
-            self.parent.emit('modified')
-            self.project.top.emit('modified')
+        self.emit('set-parent', self._parent)
     def get_parent(self):
         return self._parent
     parent = property(get_parent, set_parent)
@@ -359,8 +345,6 @@ class Project(HasSignals):
 
         self.items = {}
         self.deleted = {}
-        self._dict = {}
-        self.save_dict = {}
 
         # Create top folder.
         # - it must be created before all other items
@@ -403,48 +387,6 @@ class Project(HasSignals):
         else:
             return "<grafity.Project (untitled)>"
 
-    def cd(self, folder):
-        # restore dictionary
-        for o in self.here.contents():
-            try:
-                del self._dict[o.name]
-            except KeyError:
-                pass
-        self._dict.update(self.save_dict)
-        self._save_dict = {}
-        
-        self.here = folder
-
-        # update dictionary
-        self._dict['here'] = self.here
-        self._dict['up'] = self.here.up
-        for o in self.here.contents():
-            if o.name in self._dict:
-                self._save_dict[o.name] = self._dict[o.name]
-            self._dict[o.name] = o
-
-        self.emit('change-current-folder', folder)
-
-    def set_current(self, obj):
-        if obj not in list(self.here.contents()):
-            raise NotImplementedError
-        self.this = obj
-        self._dict['this'] = self.this
-        self.emit('set-current-object', obj)
-
-    def set_dict(self, d):
-        self._dict = d
-
-        self._dict['top'] = self.top
-        self._dict['this'] = self.this
-        self.cd(self.here)
-
-    def unset_dict(self):
-        for o in self.here.contents():
-            if o.name in self._dict:
-                self._save_dict[o.name] = self._dict[o.name]
-            self._dict[o.name] = o
-
     def cleanup(self):
         """Purge all deleted items from the database"""
         for cls, desc in storage_desc.iteritems():
@@ -480,8 +422,6 @@ class Project(HasSignals):
     def new(self, cls, *args, **kwds):
         obj = cls(self, *args, **kwds)
         self.items[obj.id] = obj
-        if obj.parent is self.top:
-            self._dict[obj.name] = obj
         # don't emit 'add-item' because it is emitted by Item.__init__
         return obj, obj
 
@@ -489,8 +429,6 @@ class Project(HasSignals):
         del self.items[obj.id]
         obj.id = '-'+obj.id
         self.deleted[obj.id] = obj
-        if obj.parent is self.top and obj.name in self._dict:
-            del self._dict[obj.name] 
         self.emit('remove-item', obj)
         obj.parent.emit('modified')
 
@@ -498,8 +436,6 @@ class Project(HasSignals):
         del self.deleted[obj.id]
         obj.id = obj.id[1:]
         self.items[obj.id] = obj
-        if obj.parent is self.top:
-            self._dict[obj.name] = obj
         self.emit('add-item', obj)
         obj.parent.emit('modified')
 
@@ -515,9 +451,6 @@ class Project(HasSignals):
     def remove(self, id):
         obj = self.items[id]
         ind = obj.view.find(id=id)
-
-        if obj.name in self._dict and obj.name in self._dict:
-            del self._dict[obj.name]
 
         if ind == -1:
             raise NameError
@@ -537,8 +470,6 @@ class Project(HasSignals):
         obj.id = obj.id[1:]
         self.items[obj.id] = obj
 
-        if obj.parent is self.top:
-            self._dict[obj.name] = obj
         self.emit('add-item', obj)
 
     remove = action_from_methods('project_remove', remove, remove_undo)
@@ -555,15 +486,8 @@ class Project(HasSignals):
         else:
             raise NameError, "folder '%s' does not exist" % path
 
-#    def icommit(self):
-#        print >>sys.stderr, 'icommit'
-#        self.db.commit()
-#        self.aside.commit()
-
     def commit(self):
-#        self.db.commit(1)
         self.db.commit()
-#        self.aside.commit()
         self.modified = False
 
     def saveto(self, filename):
@@ -579,8 +503,6 @@ class Project(HasSignals):
     def get_modified(self):
         return self._modified
     def set_modified(self, value):
-#        if value:
-#            self.icommit()
         if value and not self._modified:
             self.emit('modified')
         elif self._modified and not value:
