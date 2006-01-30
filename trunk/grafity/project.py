@@ -3,10 +3,7 @@ import re
 import time, random, socket, md5
 import string
 
-try:
-    import metakit
-except ImportError:
-    import grafity.thirdparty.metakit as metakit
+import metakit
 
 from grafity.actions import action_from_methods, action_list, action_from_methods2, StopAction
 from grafity.signals import HasSignals

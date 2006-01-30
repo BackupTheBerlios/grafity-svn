@@ -1,7 +1,4 @@
 uifiles: 
-	@(cd ui; make)
+	@(cd ui/forms; make)
 
-binary:
-	@(cd thirdparty; make)
-
-all: uifiles binary
+all: uifiles

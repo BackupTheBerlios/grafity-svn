@@ -1,6 +1,6 @@
 import sys, os
 
-sys.modules['__main__'].splash.message('loading ui_worksheet_view')
+sys.modules['grafity.ui.start'].splash.message('loading ui_worksheet_view')
 from qt import *
 from qttable import *
 from grafity.arrays import clip, nan, arange, log10, isnan

@@ -1,6 +1,6 @@
 import os
 import sys
-sys.modules['__main__'].splash.message('loading main')
+sys.modules['grafity.ui.start'].splash.message('loading main')
 
 from qt import *
 

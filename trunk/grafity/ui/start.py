@@ -86,13 +86,23 @@ def excepthook(type, value, traceback):
     
 sys.excepthook = excepthook
 
+#sys.path.append(DATADIR)
+from grafity.config import datadir as DATADIR
+
+splash = None
+
 def main():
-    DATADIR = os.path.normpath(os.path.abspath(os.path.dirname(sys.argv[0]))+'/../') + '/'
-    sys.path.append(DATADIR)
+    global DATADIR, splash
 
     parser = OptionParser()
     parser.add_option('-l', '--log', dest='log', help='Log program events')
+    parser.add_option('-d', '--set-data-dir', dest='datadir', help='Set grafity data directory')
     options, args = parser.parse_args()
+
+    if options.datadir is not None:
+        configdir = os.path.normpath(os.path.abspath(os.path.dirname(sys.argv[0]))+'/../') + '/'
+        open(configdir+'config.py', 'w').write('datadir="%s"'%options.datadir)
+        sys.exit(0)
 
     if options.log is not None:
         for l in options.log.split(','):
@@ -105,9 +115,9 @@ def main():
     splash.show()
     splash.message('')
 
-    from ui.main import MainWindow
+    from grafity.ui.main import MainWindow
 
-    sys.modules['__main__'].splash.message('building user interface')
+    splash.message('building user interface')
 
     mainwin = MainWindow()
     mainwin.app = app

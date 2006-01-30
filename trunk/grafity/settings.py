@@ -27,7 +27,9 @@ for subdir in ['functions', 'scripts']:
 
 log.info('User data directory is %s', USERDATADIR)
 
-DATADIR = os.path.normpath(os.path.abspath(os.path.dirname(sys.argv[0]))+'/../') + '/'
+import grafity.config
+DATADIR=grafity.config.datadir
+#DATADIR = os.path.normpath(os.path.abspath(os.path.dirname(sys.argv[0]))+'/../') + '/'
 
 log.info('Data directory is %s', DATADIR)
 

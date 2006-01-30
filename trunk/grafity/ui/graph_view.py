@@ -1,6 +1,6 @@
 import os
 import sys
-sys.modules['__main__'].splash.message('loading ui_graph_view')
+sys.modules['grafity.ui.start'].splash.message('loading ui_graph_view')
 
 from qt import *
 from qwt import *

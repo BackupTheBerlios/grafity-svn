@@ -4,7 +4,7 @@ import rlcompleter
 import operator
 import sets
 
-sys.modules['__main__'].splash.message('loading ui_console')
+sys.modules['grafity.ui.start'].splash.message('loading ui_console')
 
 from qt import *
 from qtext import QextScintilla,QextScintillaLexerPython, QextScintillaAPIs
