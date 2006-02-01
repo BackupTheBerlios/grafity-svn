@@ -16,7 +16,7 @@ def getimage(name, cache={}):
 
 
 class Page(object):
-    def __init__(self, parent, *items):
+    def __init__(self, parent, *items, **kwds):
         self.win = QDialog(parent, 'page', True)
 
         layout = QVBoxLayout(self.win)
@@ -34,6 +34,9 @@ class Page(object):
         ok = QPushButton('OK', self.win)
         self.win.connect(ok, SIGNAL('clicked()'), self.win.close)
         layout.addWidget(ok)
+
+        for item, value in kwds.iteritems():
+            self[item] = value
  
     def addgroup(self, name, items):
         self.win.layout().addWidget(QLabel('<b>'+name+'</b>', self.win))
@@ -100,18 +103,32 @@ class Page(object):
         
 def test_page():
         app = QApplication(sys.argv)
+#        p = Page(None,
+#            ('Termination Conditions', ['Tolerance (xsqr)', 'Tolerance (param)', '#Max Iterations']),
+#            ('Weighting', ['|Weighting method|No Weighting|Statistical|Logarithmic Fit']),
+#            ('Results', ['Worksheet', 'Extra properties', '?Save']),
+#        )
+#
+#        p['Worksheet'] = 'fitresults'
+#        p['Weighting method'] = 2
         p = Page(None,
-            ('Termination Conditions', ['Tolerance (xsqr)', 'Tolerance (param)', '#Max Iterations']),
-            ('Weighting', ['|Weighting method|No Weighting|Statistical|Logarithmic Fit']),
-            ('Results', ['Worksheet', 'Extra properties', '?Save']),
+            ('Limits', ['From', 'To']),
+            **{'From': 0, 'To': 5}
         )
-
-        p['Worksheet'] = 'fitresults'
-        p['Weighting method'] = 2
         p.run()
         print >>sys.stderr, p['Worksheet'], p['Save']
 
+class EventHandler(QObject):
+    def __init__(self, object, callback):
+        QObject.__init__(self, object)
+        self.object, self.callback = object, callback
+
+    def eventFilter(self, object, event):
+        return self.callback(event)
+
+def connectevents(object, callback):
+    object.installEventFilter(EventHandler (object, callback))
+
+
 if __name__=='__main__':
     test_page()
-
-

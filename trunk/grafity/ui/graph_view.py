@@ -19,7 +19,7 @@ from grafity.ui.forms.fitoptions import FitOptionsUI
 
 from grafity import Graph, Worksheet, Folder
 from grafity.settings import USERDATADIR
-from grafity.ui.utils import getimage
+from grafity.ui.utils import getimage, connectevents, Page
 from grafity.graph import symbols, fills, colors, linetypes, linestyles, attrs
 
 from mimetex import mimetex
@@ -74,18 +74,6 @@ def efloat(f):
         return float(f)
     except Exception:
         return nan
-
-
-class EventHandler(QObject):
-    def __init__(self, object, callback):
-        QObject.__init__(self, object)
-        self.object, self.callback = object, callback
-
-    def eventFilter(self, object, event):
-        return self.callback(event)
-
-def connectevents(object, callback):
-    object.installEventFilter(EventHandler (object, callback))
 
 class GraphView(QTabWidget):
     def __init__(self, parent, mainwin, graph):
@@ -490,6 +478,22 @@ class FunctionsWindow(FunctionsWindowUI):
     def on_add_function_clicked(self):
         self.fitwin.add_function(self.func)
 
+class MyLabel(QLabel):
+    def __init__(self, parent, term, n):
+        self.term, self.n = term, n
+        QLabel.__init__(self, self.term.function.parameters[n], parent)
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.RightButton:
+            menu = QPopupMenu()
+            
+            menu.insertItem('Limits', 1)
+            id = menu.exec_loop(self.mapToGlobal(event.pos()))
+            if id == 1:
+                p = Page(None, ('Limits', ['From', 'To']), **{'From': 0, 'To': 5})
+                p.run()
+
+
 class GraphFit(GraphFitUI):
     def __init__(self, parent, mainwin):
         GraphFitUI.__init__(self, parent)
@@ -530,7 +534,7 @@ class GraphFit(GraphFitUI):
 
     def on_add_term(self, term):
         term._box = box = QVBox(self.box)
-        box.setMaximumSize(QSize(120,3000))
+        box.setMaximumSize(QSize(135,3000))
         buttons = QHBox(box)
         term._butt = QPushButton('function', buttons)
         term._butt.setSizePolicy(QSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed))
@@ -554,11 +558,13 @@ class GraphFit(GraphFitUI):
         term._text = []
         term._lock = []
         for n, par in enumerate(term.function.parameters):
-            label = QLabel(par, grid)
+            label = MyLabel(grid, term, n)
             edit = QLineEdit(grid)
-            edit.setMinimumSize(QSize(20, 0))
+            edit.setMinimumSize(QSize(50, 0))
             self.connect(edit, SIGNAL("returnPressed()"), self.on_activate)
             self.connect(edit, SIGNAL("lostFocus()"), self.on_activate)
+#            limits = QPushButton('L', grid)
+#            limits.setMinimumSize(QSize(15, 0))
             lock = QCheckBox(grid)
             term._text.append(edit)
             term._lock.append(lock)
