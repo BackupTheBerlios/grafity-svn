@@ -1,7 +1,8 @@
-
+"""
+grafity.data
+"""
 __revision__ = "$Id$"
 
-import sys
 import fnmatch
 import os.path
 from grafity.settings import USERDATADIR
@@ -24,9 +25,9 @@ dataset_tools = []
 
 def scan_functions_dir(functions, dirs):
     def walk_functions(functions, folder, files):
-        for f in files:
-            full = os.path.join(folder, f)
-            if os.path.isfile(full) and fnmatch.fnmatch(f, "*.function"):
+        for fn  in files:
+            full = os.path.join(folder, fn)
+            if os.path.isfile(full) and fnmatch.fnmatch(fn, "*.function"):
                 functions.append((False, full))
     for dir in dirs:
         os.path.walk(dir, walk_functions, functions)

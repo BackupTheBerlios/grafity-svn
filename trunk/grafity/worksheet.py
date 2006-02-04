@@ -14,6 +14,7 @@ class Column(MkArray, HasSignals):
         self.worksheet = worksheet
         MkArray.__init__(self, worksheet.data.columns, worksheet.data.columns.data, ind)
         self.dependencies = set()
+        self.worksheet.connect('set-parent', self.on_ws_set_parent)
 
     def reload(self, ind):
         MkArray.__init__(self, self.worksheet.data.columns, self.worksheet.data.columns.data, ind)
@@ -49,6 +50,14 @@ class Column(MkArray, HasSignals):
         for column in self.dependencies - newdep:
             column.disconnect('data-changed', self.calculate)
             column.disconnect('rename', self.on_dep_rename)
+        newdepws = set(d.worksheet for d in newdep)
+        depws = set(d.worksheet for d in self.dependencies)
+        for worksheet in newdepws - depws:
+            worksheet.connect('fullname-changed', self.on_dep_ws_rename)
+            worksheet.connect('rename', self.on_dep_ws_rename)
+        for worksheet in depws - newdepws:
+            worksheet.disconnect('fullname-changed', self.on_dep_ws_rename)
+            worksheet.disconnect('rename', self.on_dep_ws_rename)
         self.dependencies = newdep
 
         # action state
@@ -96,20 +105,29 @@ class Column(MkArray, HasSignals):
         depdict = dict(zip(idents, deps))
         return depdict
 
-    def on_dep_rename(self, col, oldname, newname):
+    def update_expression(self, *args, **kwds):
+        if self.expr == '':
+            return
+
         expr = self.expr
         oldexpr = expr
-        for depstr, depcol in self.depdict.iteritems():
-            if depcol == col:
-                if col.worksheet == self.worksheet:
-                    name = newname
-                elif col.worksheet.parent == self.worksheet.parent:
-                    name = '.'.join(col.worksheet.name, col.name)
-                else:
-                    name = '.'.join(col.worksheet.fullname, col.name)
-                expr = re.sub(r'\b%s\b(?!\()'%depstr, newname, expr)
-        self.expr = expr
 
+        for depstr, col in self.depdict.iteritems():
+            if col.worksheet == self.worksheet:
+                name = col.name
+            elif col.worksheet.parent == self.worksheet.parent:
+                name = '.'.join([col.worksheet.name, col.name])
+            else:
+                name = '.'.join([col.worksheet.fullname, col.name])
+            expr = re.sub(r'\b%s\b(?!\()'%depstr, name, expr)
+        if oldexpr != expr:
+            print >>sys.stderr, "updating expression from %s to %s" % (oldexpr, expr)
+            self.expr = expr
+ 
+    def on_dep_rename(self, col, oldname, newname): self.update_expression()
+    def on_dep_ws_rename(self, name, item=None): self.update_expression()
+    def on_ws_set_parent(self, parent): self.update_expression()
+                
     def set_id(self, id):
         self.data.id = id
     def get_id(self):
@@ -223,7 +241,7 @@ class Worksheet(Item, HasSignals):
         try:
             result = eval(expression, namespace)
         except:
-            raise ValueError
+            raise ValueError, expression
 
         return result
 

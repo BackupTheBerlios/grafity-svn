@@ -106,6 +106,7 @@ class GraphView(QTabWidget):
         self.graph.connect('zoom-changed', self.on_zoom_changed)
         self.graph.connect('data-changed', self.on_recalc)
         self.graph.connect('rename', self.on_rename)
+        self.graph.connect('fullname-changed', self.on_rename)
 
         self.graph.connect('add-dataset', self.on_add_dataset)
         self.graph.connect('remove-dataset', self.on_remove_dataset)

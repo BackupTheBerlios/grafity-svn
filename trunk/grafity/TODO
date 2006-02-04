@@ -1,10 +1,6 @@
-- make graphview work with all symbols
-- close view when a graph or worksheet is removed
-- put extra in function editor
-- show description in function editor
-- drag and drop to folder in project explorer
-* update project explorer when folder is renamed
-* 'fullname-changed' signal and update of window captions (and automatic columns!)
+- update project explorer when folder is renamed
+- 'fullname-changed' signal and update of window captions 
+- update automatic column expr when worksheet or worksheet's parent is renamed
 * do something when a function is not found
 * zoom out on log axes
 * auto zoom

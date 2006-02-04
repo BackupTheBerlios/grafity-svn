@@ -157,6 +157,11 @@ class Item(HasSignals):
         # We can't emit in project.add()
         self.project.emit('add-item', self)
 
+        self.parent.connect('rename', self.on_parent_renamed)
+
+    def on_parent_renamed(self, name, item):
+        self.emit('fullname-changed', self.fullname, item=self)
+
     def check_name(self, name, parent):
         if not re.match('^[a-zA-Z]\w*$', name):
             return False
@@ -186,14 +191,17 @@ class Item(HasSignals):
         oldparent = self._parent
         self._parent = parent
         self.emit('set-parent', self._parent)
+        self.emit('fullname-changed', self.fullname, item=self)
         if not isinstance(oldparent, Folder):
             raise StopAction
     def undo_set_parent(self, state):
         self._parent = state['old']
         self.emit('set-parent', self._parent)
+        self.emit('fullname-changed', self.fullname, item=self)
     def redo_set_parent(self, state):
         self._parent = state['new']
         self.emit('set-parent', parent)
+        self.emit('fullname-changed', self.fullname, item=self)
     set_parent = action_from_methods2('object/set-parent', set_parent, undo_set_parent, redo=redo_set_parent)
     def get_parent(self):
         return self._parent
@@ -206,17 +214,13 @@ class Item(HasSignals):
             raise StopAction
         state['new'], state['old'] = n, self._name
         self._name = n
-        self.set_name_notify()
+        self.emit('rename', self._name, item=self)
     def undo_set_name(self, state):
         self._name = state['old']
-        self.set_name_notify()
+        self.emit('rename', self._name, item=self)
     def redo_set_name(self, state):
         self._name = state['new']
-        self.set_name_notify()
-    def set_name_notify(self):
         self.emit('rename', self._name, item=self)
-        if isinstance(self.parent, Folder):
-            self.parent.emit('modified')
     set_name = action_from_methods2('object/rename', set_name, undo_set_name, redo=redo_set_name)
 
     def get_name(self):
@@ -262,7 +266,7 @@ class Folder(Item, HasSignals):
             if isinstance(item, Folder):
                 yield item
 
-    name = wrap_attribute('name')
+#    name = wrap_attribute('name')
     _parent = wrap_attribute('parent')
 
     def set_parent(self, parent):
@@ -283,9 +287,6 @@ class Folder(Item, HasSignals):
     up = property(lambda self: self.parent)
 
     def __getattr__(self, key):
-#        try:
-#            attr = Item.__getattr__(self, key)
-#        except AttributeError, err:
         try:
             return self[key]
         except KeyError:
@@ -321,26 +322,15 @@ class Project(HasSignals):
             filename = filename.encode(sys.getfilesystemencoding())
         self.filename = filename
 
-
         if self.filename is None:
             # We initially create an in-memory database.
             # When we save to a file, we will reopen the database from the file.
             self.db = metakit.storage()
-#            self.filename = 'defau.gt'
-#            self.db = metakit.storage(self.filename, 1)
-#            for desc in storage_desc.values():
-#                self.db.getas(desc)
-#            self.db.commit()
         else:
             self.db = metakit.storage(self.filename, 1)
             self.cleanup()
 
-#        self.aside = metakit.storage('grafity-storage.mka', 1)
-#        self.db.aside(self.aside)
-#        print >>sys.stderr, "project created"
-
         self._modified = False
-
         action_list.connect('added', self.on_action_added)
 
         self.items = {}
@@ -366,9 +356,7 @@ class Project(HasSignals):
             for i, row in enumerate(view):
                 if row.id != self.top.id:
                     if not row.id.startswith('-'):
-#                        print 'loading', cls, row.id,
                         self.items[row.id] = cls(self, location=(view, row, row.id))
-#                        print 'end'
                     else:
                         self.deleted[row.id] = cls(self, location=(view, row, row.id))
 
@@ -473,18 +461,6 @@ class Project(HasSignals):
         self.emit('add-item', obj)
 
     remove = action_from_methods('project_remove', remove, remove_undo)
-
-
-    # Shortcuts for creating and removing folders
-        
-    def mkfolder(self, path, parent=None):
-        self.new(Folder, path, parent)
-
-    def rmfolder(self, path):
-        if path in self.here:
-            self.remove(self.here[path].id)
-        else:
-            raise NameError, "folder '%s' does not exist" % path
 
     def commit(self):
         self.db.commit()

@@ -49,6 +49,8 @@ class WorksheetView(QTabWidget):
         self.worksheet.connect('rename-column', self.update_column_names)
 
         self.worksheet.connect('rename', self.on_rename)
+        self.worksheet.connect('fullname-changed', self.on_rename)
+
         self.setCaption(self.worksheet.fullname)
         self.setWFlags(Qt.WDestructiveClose)
 
