@@ -86,7 +86,7 @@ splash = None
 mainwin = None
 
 def getimage(name):
-    return QPixmap(resource_filename('grafity', 'data/images/'+name+'.png'))
+    return QPixmap(resource_filename('grafity', 'data/images/'+name+'.jpg'))
 
 def main():
     global splash, mainwin
