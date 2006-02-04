@@ -157,10 +157,6 @@ class Item(HasSignals):
         # We can't emit in project.add()
         self.project.emit('add-item', self)
 
-        self.parent.connect('rename', self.on_parent_renamed)
-
-    def on_parent_renamed(self, name, item):
-        self.emit('fullname-changed', self.fullname, item=self)
 
     def check_name(self, name, parent):
         if not re.match('^[a-zA-Z]\w*$', name):
@@ -209,18 +205,27 @@ class Item(HasSignals):
 
     _parent = wrap_attribute('parent')
 
+    def update_fullname(self):
+        if isinstance(self, Folder):
+            for item in list(self):
+                item.emit('fullname-changed', item.fullname, item=item)
+                item.update_fullname()
+
     def set_name(self, state, n):
         if not self.check_name(n, self.parent):
             raise StopAction
         state['new'], state['old'] = n, self._name
         self._name = n
         self.emit('rename', self._name, item=self)
+        self.update_fullname()
     def undo_set_name(self, state):
         self._name = state['old']
         self.emit('rename', self._name, item=self)
+        self.update_fullname()
     def redo_set_name(self, state):
         self._name = state['new']
         self.emit('rename', self._name, item=self)
+        self.update_fullname()
     set_name = action_from_methods2('object/rename', set_name, undo_set_name, redo=redo_set_name)
 
     def get_name(self):

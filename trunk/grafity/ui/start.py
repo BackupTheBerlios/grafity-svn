@@ -4,10 +4,8 @@ import logging
 import traceback, time
 from optparse import OptionParser
 
-from pkg_resources import require, resource_filename
+from pkg_resources import resource_filename
 from qt import *
-
-require('mimetex')
 
 class GrafitSplash(QSplashScreen):
     def __init__(self, pixmap):

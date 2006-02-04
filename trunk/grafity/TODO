@@ -1,13 +1,15 @@
 - update project explorer when folder is renamed
 - 'fullname-changed' signal and update of window captions 
 - update automatic column expr when worksheet or worksheet's parent is renamed
+- window/close and close all
+- rename in project explorer
 * do something when a function is not found
 * zoom out on log axes
 * auto zoom
-* rename in project explorer
 * rename fit function
 * hide fit function
 * update legend on column rename
 * double-click on action list to undo/redo
-* window/close and close all
 * cut/copy/paste in worksheets
+* data reader
+* screen reader

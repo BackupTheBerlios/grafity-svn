@@ -217,68 +217,45 @@ class FunctionSum(HasSignals):
             res = zeros(len(arg), 'd')
         except TypeError:
             res = 0.
+
         for func in self.terms:
             if func.enabled:
                 res += func(arg)
         return res
 
-    def fit(self, x, y, lock, maxiter):
-#        def __fitfunction(params, x):
-#            params = splitlist(params, [len(t.parameters) for t in self.terms])
-#
-#            for p, t in zip(params, self.terms):
-#                t.parameters = p
-#
-#            return self(x)
-
-        xx= x
-        yy=y
-
+    def fit(self, xx, yy, lock, maxiter):
         def __fitfunction(params, fjac=None):
-            params = splitlist(params, [len(t.parameters) for t in self.terms])
-#            print >>sys.stderr, 'CALL', params
-
+            params = splitlist(params, [len(t.parameters) for t in self.terms if t.enabled])
             for p, t in zip(params, self.terms):
                 t.parameters = p
-
             ret = Numeric.array(list(yy-self(xx)))
-
             return [0, ret]
 
-
         def __itercall(myfunct, p, iter, fnorm, functkw=None, parinfo=None, quiet=0, dof=None):
-            print >>sys.stderr, "ITER", iter, p, fnorm
-#            
-#            message  = 'Fitting: Iteration %d, xsqr=%g, reduced xsqr=%g' % (niter, wss, actred)
-#            print >>sys.stderr, "ITERCALL", beta
-#            self.emit('status-message', message)
-
-        
+            message = "Fitting: iteration %d, reduced xsqr=%g"%(iter, fnorm)
+            self.emit('status-message', message)
                 
-#        model = odr.Model(__fitfunction)
-#        data = odr.RealData(x, y)
-        initial = Numeric.array(flatten(t.parameters for t in self.terms))
-        parinfo = [{'value':par, 'fixed':0, 'limited':[True,True], 'limits':[0.,100.]} for par in initial]
-#        odrobj = odr.ODR(data, model, beta0=initial,  ifixb=[not k for k in lock], 
-#                         partol=1e-100, sstol=1e-100, maxit=maxiter)
-#        odrobj.set_job(fit_type=2)
-#        odrobj.set_iprint(iter=3, iter_step=1, itsercall=__itercall)
+        parinfo = []
+        n = 0
+        for term in self.terms:
+            if term.enabled:
+                for par in term.parameters:
+                    info =  { 'value': par,
+                              'fixed': lock[n],
+                              'limited': [True, True],
+                              'limits': [-10, 10], }
+                    parinfo.append(info)
+                    n += 1
+
         for term in self.terms:
             term.set_reg(False)
         try:
-            fit = mpfit.mpfit(__fitfunction, initial, parinfo=parinfo, iterfunct=__itercall)
-            print >>sys.stderr, fit.status, fit.fnorm, fit.covar, fit.errmsg, fit.nfev, fit.niter, fit.perror
-#            output = odrobj.run()
+            fit = mpfit.mpfit(__fitfunction, parinfo=parinfo, iterfunct=__itercall)
+            print >>sys.stderr, "Fit done", fit.status, fit.fnorm, fit.covar, fit.errmsg, fit.nfev, fit.niter, fit.perror
         finally:
             for term in self.terms:
                 term.set_reg(True)
 
-#        except:
-#            raise
-#            print >>sys.stderr, 'Fit den Vogel (but no problem)'
-            
-
-    
 class Function(HasSignals):
     def __init__(self, name='', parameters=[], text='', extra=''):
         self._name = name

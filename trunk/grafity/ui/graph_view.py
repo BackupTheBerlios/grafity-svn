@@ -22,8 +22,6 @@ from grafity.settings import USERDATADIR
 from grafity.ui.utils import getimage, connectevents, Page
 from grafity.graph import symbols, fills, colors, linetypes, linestyles, attrs
 
-from mimetex import mimetex
-
 qsymbols = {
     'none': QwtSymbol.None,
     'circle': QwtSymbol.Ellipse,
@@ -345,7 +343,8 @@ class GraphView(QTabWidget):
             x = arange(self.graph.xmin, self.graph.xmax, (self.graph.xmax-self.graph.xmin)/100)
 
         for term in self.graph.function.terms:
-            self.plot.setCurveData(term._curveid, x, term(x))
+            if term.enabled:
+                self.plot.setCurveData(term._curveid, x, term(x))
         self.plot.setCurveData(self.graph.function._curveid, x, self.graph.function(x))
         self.redraw()
 
@@ -431,7 +430,8 @@ class FunctionsWindow(FunctionsWindowUI):
             if func.tex.strip() == '':
                 pixmap = QPixmap()
             else:
-                pixmap = mimetex(func.tex)
+                pixmap = QPixmap()
+#                pixmap = mimetex(func.tex)
 
             QMimeSourceFactory.defaultFactory().setPixmap('mimetex', pixmap)
             if self.func is None or func.name != self.func.name:
@@ -593,8 +593,10 @@ class GraphFit(GraphFitUI):
         def hide(on):
             if on:
                 term._grid.hide()
+                term.enabled = False
             else:
                 term._grid.show()
+                term.enabled = True
         term._hide = hide
         return hide
 
@@ -609,7 +611,7 @@ class GraphFit(GraphFitUI):
 
     def on_fit_clicked(self):
         data = self.graph._view.datasets[0]
-        lock = [check.isOn() for term in self.function.terms for check in term._lock]
+        lock = [check.isOn() for term in self.function.terms if term.enabled for check in term._lock]
         ind = data.active_data()
         self.function.fit(data.x[ind], data.y[ind], lock, 50)
         self.function.emit('modified')

@@ -25,15 +25,15 @@ Importing the grafity module
 Creating and initializing a project
 
     >>> p = Project()
-    >>> p.set_dict(globals())
+    >>>
 
 Creating and deleting folders
 
-    >>> p.mkfolder('ass')
-    >>> ass
+    >>> p.new(Folder, 'ass')
+    >>> p.top.ass
     <Folder ass>
-    >>> p.rmfolder('ass')
-    >>> ass
+    >>> p.remove(p.top.ass.id)
+    >>> p.top.ass
     Traceback (most recent call last):
     ...
     NameError: name 'ass' is not defined

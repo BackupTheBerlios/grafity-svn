@@ -30,11 +30,12 @@ class ListViewItem(QListViewItem):
         self._object.connect('rename', self.on_object_renamed)
         self._object.connect('set-parent', self.on_object_set_parent)
 
+        self.setRenameEnabled(0, True)
+
     def on_object_renamed(self, name, item):
         self.setText(0, name)
 
     def on_object_set_parent(self, parent):
-        print >>sys.stderr, self._object, parent
         self.parent().takeItem(self)
         parent._tree_item.insertItem(self)
         
@@ -174,11 +175,9 @@ class ActionList(HasSignals, QListView):
         del action._item
 
     def on_done(self, action):
-        print >>sys.stderr, "done", action
         action._item.setText(0, str(action)+'\ndescription')
 
     def on_undone(self, action):
-        print >>sys.stderr, "undone", action
         action._item.setText(0, "(%s)"%str(action))
 
     def on_doubleclick(self, item, point, column):
@@ -228,19 +227,6 @@ class ProjectExplorer(HasSignals, QListView):
         QObject.connect(self, SIGNAL("contextMenuRequested (QListViewItem *, const QPoint &, int)"),
                       self.on_context_menu_requested)
 
-        self.wsheet_context_menu = QPopupMenu (self)
-        self.wsheet_context_menu.insertItem ('Show', self.wsheet_context_menu_show)
-        self.wsheet_context_menu.insertSeparator ()
-        self.wsheet_context_menu.insertItem ('Delete', self.wsheet_context_menu_del)
-        self.wsheet_context_menu.insertItem ('Import ASCII...', self.wsheet_context_menu_importascii)
- 
-        self.graph_context_menu = QPopupMenu (self)
-        self.graph_context_menu.insertItem ('Show', self.graph_context_menu_show)
-        self.graph_context_menu.insertSeparator ()
-        self.graph_context_menu.insertItem ('Delete', self.graph_context_menu_del)
-        self.graph_context_menu.insertItem ('Properties...', self.graph_context_menu_properties)
-        self.graph_context_menu.insertItem ('Fit...', self.graph_context_menu_startfit)
-
         self.project = None
 
         self.mousePressed = False
@@ -276,10 +262,7 @@ class ProjectExplorer(HasSignals, QListView):
         del obj._tree_item
 
     def on_rename (self, item, column, text):
-        if item.parent() == self.wsitem:
-            item.obj.name = str(text)
-        elif item.parent() == self.gritem:
-            item.obj.name = str(text)
+        item._object.name = unicode(text)
 
     def on_doubleclick(self, item, point, column):
         HasSignals.emit(self, 'activated', item._object)
@@ -291,40 +274,19 @@ class ProjectExplorer(HasSignals, QListView):
         drag = ObjDrag(items, self)
         return drag
 
+    def on_context_menu_rename(self):
+        self.context_item._tree_item.startRename(0)
+
     def on_context_menu_requested(self, item, point, column):
-        if item is None:
-            return
-        if isinstance(item._object, grafity.Worksheet):
-            self.wscontextitem = item._object
-            self.wsheet_context_menu.popup(point)
-        elif isinstance(item._object, grafity.Graph):
-            self.grcontextitem = item._object
-            self.graph_context_menu.popup(point)
-            
-    def graph_context_menu_show (self):
-        self.grcontextitem.show()
+        self.context_menu = QPopupMenu (self)
+        self.context_menu.insertItem ('Rename', self.on_context_menu_rename)
+        self.context_menu.insertSeparator ()
+#        self.context_menu.insertItem ('Delete', self.wsheet_context_menu_del)
+#        self.context_menu.insertItem ('Import ASCII...', self.wsheet_context_menu_importascii)
 
-    def graph_context_menu_del (self):
-        project.remove(self.grcontextitem)
-
-    def graph_context_menu_properties (self):
-        self.grcontextitem.properties()
-
-    def graph_context_menu_startfit (self):
-        self.grcontextitem.start_fit()
+        self.context_item = item._object
+        self.context_menu.popup(point)
  
-    def wsheet_context_menu_show (self):
-        v = WorksheetView (self.wscontextitem)
-        v.show()
-        v._table.horizontalHeader()
-
-    def wsheet_context_menu_del (self):
-        project.remove(self.wscontextitem)
-
-    def wsheet_context_menu_importascii (self):
-        # do something
-        pass
-
     def contentsDragEnterEvent(self, event):
         if not QTextDrag.canDecode(event):
             event.ignore()
@@ -381,36 +343,25 @@ class ProjectExplorer(HasSignals, QListView):
 
     def contentsMousePressEvent(self, event):
         QListView.contentsMousePressEvent(self, event)
-
-        p = self.contentsToViewport(event.pos())
-        item = self.itemAt(p)
-        if item:
-            if ((p.x() > self.header().sectionPos(self.header().mapToIndex(0)) +
-                 self.treeStepSize()*(item.depth() + int(self.rootIsDecorated())) + self.itemMargin()) or
-                 (p.x() < self.header().sectionPos(self.header().mapToIndex(0)))):
-                self.presspos = QPoint(event.pos())
-                self.mousePressed = True
+        if event.button() == Qt.LeftButton and not self.isRenaming():
+            p = self.contentsToViewport(event.pos())
+            item = self.itemAt(p)
+            if item:
+                if ((p.x() > self.header().sectionPos(self.header().mapToIndex(0)) +
+                     self.treeStepSize()*(item.depth() + int(self.rootIsDecorated())) + self.itemMargin()) or
+                     (p.x() < self.header().sectionPos(self.header().mapToIndex(0)))):
+                    self.presspos = QPoint(event.pos())
+                    self.mousePressed = True
 
     def contentsMouseMoveEvent(self, event):
-        if self.mousePressed:
+        if self.mousePressed and not self.isRenaming():
             length = (self.presspos-event.pos()).manhattanLength()
             if length > QApplication.startDragDistance():
                 self.mousePressed = False
                 item = self.itemAt(self.contentsToViewport(self.presspos))
                 if item:
                     self.dragObject().drag()
-#                source = fullPath(item);
-#                if ( QFile::exists(source) ) {
-#                    QUriDrag* ud = new QUriDrag(viewport());
-#                    ud->setFileNames( source );
-#                    if ( ud->drag() )
-#                        QMessageBox::information( this, "Drag source",
-#                        QString("Delete ") + QDir::convertSeparators(source), "Not implemented" );
-#                }
-#            }
-#        }
-#    }
-#
+
     def contentsMouseReleaseEvent(self, event):
         self.mousePressed = False
 
@@ -661,7 +612,8 @@ class MainWindow(MainWindowUI):
     def windowMenuAboutToShow(self):
         menu = self.Window
         menu.clear()
-
+        self.act_window_close.addTo(menu)
+        self.act_window_closeall.addTo(menu)
         menu.insertSeparator()
 
         for i, win in enumerate(self.workspace.windowList()):
@@ -751,6 +703,12 @@ class MainWindow(MainWindowUI):
     def on_worksheet_last(self):
         self.active.on_last_clicked()
 
+    def on_window_close(self):
+        self.active.close()
+
+    def on_window_close_all(self):
+        for win in self.workspace.windowList():
+            win.close()
 
 def splash_message(text):
     if __name__ == '__main__':
