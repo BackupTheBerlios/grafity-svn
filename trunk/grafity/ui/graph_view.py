@@ -9,6 +9,9 @@ import qwt.qplt
 from grafity.arrays import clip, nan, arange, log10
 from grafity.actions import CompositeAction, action_list
 from grafity.functions import registry, Function
+from grafity import Graph, Worksheet, Folder
+from grafity.settings import USERDATADIR
+from grafity.graph import symbols, fills, colors, linetypes, linestyles, attrs
 
 from grafity.ui.forms.graph_style import GraphStyleUI
 from grafity.ui.forms.graph_data import GraphDataUI
@@ -16,11 +19,7 @@ from grafity.ui.forms.graph_axes import GraphAxesUI
 from grafity.ui.forms.graph_fit import GraphFitUI
 from grafity.ui.forms.functions import FunctionsWindowUI
 from grafity.ui.forms.fitoptions import FitOptionsUI
-
-from grafity import Graph, Worksheet, Folder
-from grafity.settings import USERDATADIR
 from grafity.ui.utils import getimage, connectevents, Page
-from grafity.graph import symbols, fills, colors, linetypes, linestyles, attrs
 
 qsymbols = {
     'none': QwtSymbol.None,
@@ -494,6 +493,26 @@ class MyLabel(QLabel):
                 p = Page(None, ('Limits', ['From', 'To']), **{'From': 0, 'To': 5})
                 p.run()
 
+class MyButton(QPushButton):
+    def __init__(self, parent, term):
+        self.term = term
+        QPushButton.__init__(self, term.name, parent)
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.RightButton:
+            menu = QPopupMenu()
+            
+            menu.insertItem('Rename', 1)
+            id = menu.exec_loop(self.mapToGlobal(event.pos()))
+            if id == 1:
+                p = Page(None, ('Rename', ['Name']), **{'Name': self.term.name})
+                p.run()
+                self.term.name = p['Name']
+                self.setText(self.term.name)
+        else:
+            QPushButton.mousePressEvent(self, event)
+
+
 
 class GraphFit(GraphFitUI):
     def __init__(self, parent, mainwin):
@@ -537,7 +556,7 @@ class GraphFit(GraphFitUI):
         term._box = box = QVBox(self.box)
         box.setMaximumSize(QSize(135,3000))
         buttons = QHBox(box)
-        term._butt = QPushButton('function', buttons)
+        term._butt = MyButton(buttons, term)
         term._butt.setSizePolicy(QSizePolicy(QSizePolicy.Expanding,QSizePolicy.Fixed))
         term._butt.setToggleButton(True)
         self.connect(term._butt, SIGNAL("toggled(bool)"), self.on_toggle(term))

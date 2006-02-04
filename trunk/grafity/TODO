@@ -3,11 +3,11 @@
 - update automatic column expr when worksheet or worksheet's parent is renamed
 - window/close and close all
 - rename in project explorer
+- rename fit function
+- hide fit function
 * do something when a function is not found
 * zoom out on log axes
 * auto zoom
-* rename fit function
-* hide fit function
 * update legend on column rename
 * double-click on action list to undo/redo
 * cut/copy/paste in worksheets
