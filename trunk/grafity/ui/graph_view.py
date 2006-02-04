@@ -213,7 +213,7 @@ class GraphView(QTabWidget):
             current = self.legend.currentItem()
 
             self.legend.clear()
-            self.legend.insertStrList([str(d) for d in self.graph.datasets])
+            self.legend.insertStrList(["%s(%s)"%(d.y.name, d.x.name) for d in self.graph.datasets])
             for n, dset in enumerate(self.graph.datasets):
                 if hasattr(dset, '_curveid'):
                     self.legend.changeItem(self.draw_pixmap(dset), self.legend.text(n), n)

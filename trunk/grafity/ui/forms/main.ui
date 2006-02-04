@@ -23,7 +23,7 @@
     <property name="minimumSize">
         <size>
             <width>23</width>
-            <height>302</height>
+            <height>308</height>
         </size>
     </property>
     <property name="caption">
@@ -81,8 +81,12 @@
         <separator/>
     </item>
     <item text="&amp;Tools" name="Tools">
+        <action name="Action_3"/>
     </item>
     <item text="&amp;Window" name="Window">
+        <action name="act_windowclose"/>
+        <action name="act_windowcloseall"/>
+        <separator/>
     </item>
     <item text="&amp;Help" name="Help">
         <action name="helpAboutAction"/>
@@ -587,6 +591,36 @@
             <string>new item</string>
         </property>
     </action>
+    <action>
+        <property name="name">
+            <cstring>act_windowclose</cstring>
+        </property>
+        <property name="text">
+            <string>&amp;Close</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Close</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>act_windowcloseall</cstring>
+        </property>
+        <property name="text">
+            <string>Close &amp;All</string>
+        </property>
+        <property name="menuText">
+            <string>Close &amp;All</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>Action_3</cstring>
+        </property>
+        <property name="text">
+            <string>Unnamed</string>
+        </property>
+    </action>
 </actions>
 <images>
     <image name="image0">
@@ -768,6 +802,18 @@
         <receiver>MainWindowUI</receiver>
         <slot>on_worksheet_right()</slot>
     </connection>
+    <connection>
+        <sender>act_windowclose</sender>
+        <signal>activated()</signal>
+        <receiver>MainWindowUI</receiver>
+        <slot>on_window_close()</slot>
+    </connection>
+    <connection>
+        <sender>act_windowcloseall</sender>
+        <signal>activated()</signal>
+        <receiver>MainWindowUI</receiver>
+        <slot>on_window_close_all()</slot>
+    </connection>
 </connections>
 <slots>
     <slot>on_new_graph()</slot>
@@ -787,6 +833,8 @@
     <slot>on_worksheet_left()</slot>
     <slot>on_worksheet_newcolumn()</slot>
     <slot>on_worksheet_right()</slot>
+    <slot>on_window_close()</slot>
+    <slot>on_window_close_all()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>
