@@ -1,7 +1,10 @@
+
+__revision__ = "$Id"
+
 import sys
 import fnmatch
 import os.path
-from settings import USERDATADIR
+from grafity.settings import USERDATADIR
 
 def column_tool(name, image=None):
     def column_tool_dec(function):
