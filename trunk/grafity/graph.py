@@ -166,55 +166,6 @@ class Dataset(HasSignals):
         elif style == 'linetype':
             self.data.linetype = value
 
-#        self.graph.emit('style-changed', [self], [], **{style: value})
-
-class MFunctionSum(FunctionSum):
-    signals = {'add-term(term)': 'A term has been added to the function',
-               'remove-term(term)': 'A term has been removed to the function' }
-    def __init__(self, data):
-        FunctionSum.__init__(self)
-        self.data = data
-        for f in self.data:
-            if f.func in registry and not f.id.startswith('-'):
-                self.add(f.func, f.name)
-                self.terms[-1].data = f
-            elif not f.id.startswith('-'):
-                print >>sys.stderr, "function '%s' not found." %f.func, registry
-        self.connect('add-term', self.on_add_term)
-        self.connect('remove-term', self.on_remove_term)
-
-    def on_add_term(self, state, term):
-        if hasattr(term, 'data') and term.data.id.startswith('-'):
-            raise StopAction
-        row = self.data.append(id=create_id(), func=term.function.name, name=term.name)
-        term.data = self.data[row]
-        state['term'] = term
-    def undo_add_term(self, state):
-        term = state['term']
-        term.data.id = '-'+term.data.id
-        self.terms.remove(term)
-        self.emit('remove-term', term)
-    def redo_add_term(self, state):
-        term = state['term']
-        self.terms.append(term)
-        self.emit('add-term', term)
-        term.data.id = term.data.id[1:]
-    on_add_term = action_from_methods2('graph/add-function-term', on_add_term, 
-                                       undo_add_term, redo=redo_add_term)
-
-    def on_remove_term(self, state, term):
-        if hasattr(term, 'data') and term.data.id.startswith('-'):
-            raise StopAction
-        term.data.id = '-'+term.data.id
-        state['term'] = term
-    undo_remove_term = redo_add_term
-    redo_remove_term = undo_add_term
-    on_remove_term = action_from_methods2('graph/remove-function-term', on_remove_term, 
-                                          undo_remove_term, redo=redo_remove_term)
-
-
-
-
 class Graph(Item, HasSignals):
     def __init__(self, project, name=None, parent=None, location=None):
         Item.__init__(self, project, name, parent, location)
@@ -226,7 +177,7 @@ class Graph(Item, HasSignals):
                     self.datasets.append(Dataset(self, i))
                     self.datasets[-1].connect('modified', self.on_dataset_modified)
 
-        self.function = MFunctionSum(self.data.functions)
+        self.function = FunctionSum(self.data.functions)
 
         if self.xtype == '':
             self.xtype = 'linear'
@@ -523,23 +474,6 @@ class Graph(Item, HasSignals):
         f1 = a*x1 + c
         f2 = a*x2 + c
         return min(f1, f2), max(f1, f2)
-
-    def init(self):
-        glClearColor(*self.background_color)
-        glClear(GL_COLOR_BUFFER_BIT)
-
-        # enable transparency
-        glEnable (GL_BLEND)
-        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-
-        glDisable(GL_DEPTH_TEST)
-        glShadeModel(GL_FLAT)
-
-        # we need this to render pil fonts properly
-        glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
-        glPixelStorei(GL_PACK_ALIGNMENT, 1)
-
-        self.listno = glGenLists(1)
 
     _xtype = wrap_attribute('xtype')
     _ytype = wrap_attribute('ytype')
