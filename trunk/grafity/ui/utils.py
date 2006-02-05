@@ -8,6 +8,7 @@ from grafity.data import images
 
 def getimage(name, cache={}):
     if name not in cache:
+        print >>sys.stderr, name
         resource, file = images[name]
         if resource:
             file = resource_filename('grafity', file)

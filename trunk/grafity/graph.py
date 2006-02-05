@@ -492,7 +492,7 @@ graphs [
     ],
     functions [
         id:S, func:S, name:S,
-        params:S, lock:S, use:I
+        params:S, lock:S, limit:S, use:I
     ],
     lines [ id:S, position:S ],
     text [ id:S, position:S, text:S ]

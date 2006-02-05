@@ -74,7 +74,7 @@ class FunctionInstance(HasSignals):
     """
     functions [
         id:S, func:S, name:S,
-        params:S, lock:S, use:I
+        params:S, lock:S, limit:S, use:I
     ],
     """
     def __init__(self, data):
@@ -109,21 +109,19 @@ class FunctionInstance(HasSignals):
         try:
             return self.function(arg, *self.parameters)
         except (ValueError, OverflowError):
-            # If we don't catch these errors here,
-            # odr segfaults on us!
             if hasattr(arg, '__len__'):
                 return array([nan]*len(arg))
             else:
                 return nan
 
-    def set_reg(self, on):
-        if self.reg == on:
+    def set_reg(self, reg):
+        if self.reg == reg:
             return
-        elif on:
+        elif reg:
             self._old = self.__old 
         else:
             self.__old = self._parameters
-        self.reg = on
+        self.reg = reg
 
     def set_parameters(self, p):
         if self._old is not None:
@@ -169,6 +167,25 @@ class FunctionInstance(HasSignals):
         self.data.params = str(params)
     _parameters = property(_get_parameters, _set_parameters)
 
+    def _get_locks(self):
+        try:
+            return eval(self.data.lock)
+        except SyntaxError:
+            return [False]*len(self.function.parameters)
+    def _set_locks(self, lock):
+        self.data.lock = str(lock)
+    locks = property(_get_locks, _set_locks)
+
+    def _get_limits(self):
+        try:
+            return eval(self.data.limit)
+        except SyntaxError:
+            return [(None, None)]*len(self.function.parameters)
+    def _set_limits(self, limits):
+        self.data.limit = str(limits)
+    limits = property(_get_limits, _set_limits)
+
+
 
 class FunctionSum(HasSignals):
     def __init__(self, data):
@@ -185,7 +202,7 @@ class FunctionSum(HasSignals):
         self.terms.append(FunctionInstance(self.data[ind]))
         self.emit('add-term', self.terms[-1])
         self.terms[-1].connect('modified', self.on_term_modified)
-        state['term'] = terms[-1]
+        state['term'] = self.terms[-1]
     def undo_add(self, state):
         term = state['term']
         term.data.id = '-'+term.data.id
@@ -247,13 +264,19 @@ class FunctionSum(HasSignals):
         n = 0
         for term in self.terms:
             if term.enabled:
-                for par in term.parameters:
+                for par, lock, (fr, to) in zip(term.parameters, term.locks, term.limits):
+                    fm, fM = fr is not None, to is not None
+                    if fr is None:
+                        fr = 0
+                    if to is None:
+                        to = 0
                     info =  { 'value': par,
-                              'fixed': lock[n],
-                              'limited': [True, True],
-                              'limits': [-10, 10], }
+                              'fixed': lock,
+                              'limited': [fm, fM],
+                              'limits': [fr, to], }
                     parinfo.append(info)
                     n += 1
+        print >>sys.stderr, parinfo
 
         for term in self.terms:
             term.set_reg(False)

@@ -6,7 +6,7 @@ from qt import *
 from qwt import *
 import qwt.qplt
 
-from grafity.arrays import clip, nan, arange, log10
+from grafity.arrays import clip, nan, arange, log10, isnan
 from grafity.actions import CompositeAction, action_list
 from grafity.functions import registry, Function
 from grafity import Graph, Worksheet, Folder
@@ -490,8 +490,18 @@ class MyLabel(QLabel):
             menu.insertItem('Limits', 1)
             id = menu.exec_loop(self.mapToGlobal(event.pos()))
             if id == 1:
-                p = Page(None, ('Limits', ['From', 'To']), **{'From': 0, 'To': 5})
+                limits = self.term.limits
+                fr, to = limits[self.n]
+                if fr is None: fr = ''
+                if to is None: to = ''
+                p = Page(None, ('Limits', ['From', 'To']), **{'From': fr, 'To': to})
                 p.run()
+                fr, to = efloat(p['From']), efloat(p['To'])
+                if isnan(fr): fr = None
+                if isnan(to): to = None
+                limits[self.n] = (fr, to)
+                self.term.limits = limits
+
 
 class MyButton(QPushButton):
     def __init__(self, parent, term):
@@ -630,9 +640,11 @@ class GraphFit(GraphFitUI):
 
     def on_fit_clicked(self):
         data = self.graph._view.datasets[0]
-        lock = [check.isOn() for term in self.function.terms if term.enabled for check in term._lock]
+#        lock = [check.isOn() for term in self.function.terms if term.enabled for check in term._lock]
+        for term in self.function.terms:
+            term.locks = [check.isOn() for check in term._lock]
         ind = data.active_data()
-        self.function.fit(data.x[ind], data.y[ind], lock, 50)
+        self.function.fit(data.x[ind], data.y[ind], None, 50)
         self.function.emit('modified')
 
 
