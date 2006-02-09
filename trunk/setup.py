@@ -16,4 +16,9 @@ setup(
     package_data = {
         'grafity': ['data/scripts/*.py'], 
     },
+    author = "Daniel Fragiadakis",
+    author_email = "danielf@gmail.com",
+#    description = "",
+    license = "GPL",
+    url = "http://grafity.berlios.de",
 )

@@ -156,8 +156,7 @@ class ActionList(HasSignals, QListView):
         self.setSelectionMode(QListView.Extended)
         self.setSorting(-1)
 
-#        QObject.connect(self, SIGNAL("doubleClicked(QListViewItem *, const QPoint &, int)"), self.on_doubleclick)
-#        QObject.connect(self, SIGNAL("itemRenamed (QListViewItem *, int, const QString &)"), self.on_rename)
+        QObject.connect(self, SIGNAL("doubleClicked(QListViewItem *, const QPoint &, int)"), self.on_doubleclick)
 #        QObject.connect(self, SIGNAL("contextMenuRequested (QListViewItem *, const QPoint &, int)"),
 #                      self.on_context_menu_requested)
 
@@ -168,44 +167,28 @@ class ActionList(HasSignals, QListView):
 
     def on_added(self, action):
         action._item = QListViewItem(self, str(action))
-#        action._item.setMultiLinesEnabled(True)
+        action._item.setPixmap(0, getimage('command-undone'))
+        action._item._object = action
 
     def on_removed(self, action):
         self.takeItem(action._item)
         del action._item
 
     def on_done(self, action):
-        action._item.setText(0, str(action)+'\ndescription')
+        action._item.setPixmap(0, getimage('command-undone'))
 
     def on_undone(self, action):
-        action._item.setText(0, "(%s)"%str(action))
+        action._item.setPixmap(0, getimage('command-done'))
 
     def on_doubleclick(self, item, point, column):
-        HasSignals.emit(self, 'activated', item._object)
+        com = item._object
+        if com.done:
+            while com.done:
+                undo()
+        else:
+            while not com.done:
+                redo()
 
-    def graph_context_menu_show (self):
-        self.grcontextitem.show()
-
-    def graph_context_menu_del (self):
-        project.remove(self.grcontextitem)
-
-    def graph_context_menu_properties (self):
-        self.grcontextitem.properties()
-
-    def graph_context_menu_startfit (self):
-        self.grcontextitem.start_fit()
- 
-    def wsheet_context_menu_show (self):
-        v = WorksheetView (self.wscontextitem)
-        v.show()
-        v._table.horizontalHeader()
-
-    def wsheet_context_menu_del (self):
-        project.remove(self.wscontextitem)
-
-    def wsheet_context_menu_importascii (self):
-        # do something
-        pass
 
 class ObjDrag(QTextDrag):
     def __init__(self, objects, widget):
