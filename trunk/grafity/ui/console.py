@@ -122,6 +122,7 @@ class Console (QextScintilla):
             sys.ps2 = '%s .. ' % obj.name
 
         self.locals.set_lookup_object(obj)
+        self.clear()
             
 
     # Simulate stdin, stdout, and stderr.

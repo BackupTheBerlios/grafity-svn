@@ -317,7 +317,7 @@ class GraphView(QTabWidget):
         if self.mode == 'range':
             xpos = clip(x, self.range_l, self.range_r)
             self.freeze()
-            action_list.begin_composite(CompositeAction())
+            action_list.begin_composite(CompositeAction('set-range'))
             if self.moving_rangemin:
                 self.plot.setMarkerXPos(self.rangemin, xpos)
                 for d in self.datasets:
@@ -348,6 +348,7 @@ class GraphView(QTabWidget):
         self.redraw()
 
     def on_recalc(self, d, x, y):
+        print >>sys.stderr, 'on_recelc', d
         self.plot.setCurveData(d._curveid, x, y)
         self.redraw()
 

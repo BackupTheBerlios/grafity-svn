@@ -146,6 +146,19 @@ class Panel(QDockWindow):
 
         return btn2
 
+class ActionItem(QListViewItem):
+    def __init__(self, *args):
+        QListViewItem.__init__(self, *args)
+        self.bgcolor_done = QColor('wheat')
+#        self.bgcolor_undone = QColor('white')
+    def paintCell(self, p, cg, column, width, align):
+        newCg = QColorGroup(cg)
+        if self._object.done:
+            newCg.setColor(QColorGroup.Base, self.bgcolor_done)
+        QListViewItem.paintCell(self, p, newCg, column, width, align)
+        
+       
+
 class ActionList(HasSignals, QListView):
     def __init__(self, parent):
         QListView.__init__(self, parent)
@@ -166,7 +179,7 @@ class ActionList(HasSignals, QListView):
         action_list.connect('undone', self.on_undone)
 
     def on_added(self, action):
-        action._item = QListViewItem(self, str(action))
+        action._item = ActionItem(self, str(action))
         action._item.setPixmap(0, getimage('command-undone'))
         action._item._object = action
 

@@ -161,10 +161,11 @@ class HasSignals(object):
         try:
             if slot not in self._signals[signal]:
                 raise NameError, "TODO"
-            self._signals[signal].remove(slot)
-            log.debug('disconnected %s %s %s', self, signal, slot)
         except ReferenceError:
             pass
+        else:
+            self._signals[signal].remove(slot)
+            log.debug('disconnected %s %s %s', self, signal, slot)
 
     def emit(self, signal, *args, **kwds):
         """

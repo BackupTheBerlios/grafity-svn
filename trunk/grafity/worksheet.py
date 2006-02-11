@@ -146,7 +146,7 @@ class Column(MkArray, HasSignals):
         self[key] = prev
 
     def __eq__(self, other):
-        return self.id == other.id
+        return hasattr(self, 'id') and hasattr(other, 'id') and self.id == other.id
 
     __setitem__ = action_from_methods('column_change_data', __setitem__, undo_setitem)
 

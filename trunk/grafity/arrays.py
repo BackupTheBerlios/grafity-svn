@@ -1,4 +1,5 @@
 import struct
+import sys
 
 import metakit
 from numarray import *
@@ -64,12 +65,14 @@ class with_new_opers(object):
     def __pow__(self,other): return power(self, asvarray(other)) 
 
 # comparisons: should we have these?
-    def __eq__(self,other): return equal(self,other) 
-    def __ne__(self,other): return not_equal(self,asvarray(other)) 
-    def __lt__(self,other): return less(self,asvarray(other)) 
-    def __le__(self,other): return less_equal(self,asvarray(other)) 
-    def __gt__(self,other): return greater(self,asvarray(other)) 
-    def __ge__(self,other): return greater_equal(self,asvarray(other))
+#    def __eq__(self,other): return equal(self,other) 
+#    def __ne__(self,other): return not_equal(self,asvarray(other)) 
+#    def __lt__(self,other): return less(self,asvarray(other)) 
+#    def __le__(self,other): return less_equal(self,asvarray(other)) 
+#    def __gt__(self,other): 
+#        print >>sys.stderr, self, other
+#        return greater(self,asvarray(other)) 
+#    def __ge__(self,other): return greater_equal(self,asvarray(other))
         
 NumArray = type(array([0.]))
 

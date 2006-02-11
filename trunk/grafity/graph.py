@@ -85,6 +85,7 @@ class Dataset(HasSignals):
         return ind
 
     def recalculate(self):
+        print >>sys.stderr, self, 'recalculate'
         length = min(len(self.x), len(self.y))
         x = asarray(self.x)[:length]
         y = asarray(self.y)[:length]
@@ -180,9 +181,9 @@ class Graph(Item, HasSignals):
         self.function = FunctionSum(self.data.functions)
 
         if self.xtype == '':
-            self.xtype = 'linear'
+            self._xtype = 'linear'
         if self.ytype == '':
-            self.ytype = 'linear' 
+            self._ytype = 'linear' 
 
     default_name_prefix = 'graph'
 
@@ -461,18 +462,21 @@ class Graph(Item, HasSignals):
     zoom = action_from_methods2('graph-zoom', zoom_do, zoom_undo, redo=zoom_redo, combine=zoom_combine)
 
     def zoom_out(self, xmin, xmax, ymin, ymax):
-        xmin, xmax = self.zoomout(self.xmin, self.xmax, xmin, xmax)
-        ymin, ymax = self.zoomout(self.ymin, self.ymax, ymin, ymax)
+        xmin, xmax = self.zoomout(self.xmin, self.xmax, xmin, xmax, log=self.xtype=='log')
+        ymin, ymax = self.zoomout(self.ymin, self.ymax, ymin, ymax, log=self.ytype=='log')
         self.zoom(xmin, xmax, ymin, ymax)
         
- 
-    def zoomout(self,x1, x2,x3, x4):
+    def zoomout(self,x1, x2,x3, x4, log=False):
+        if log:
+            x1, x2, x3, x4 = log10(x1), log10(x2), log10(x3), log10(x4)
         if x3 == x4:
             return x1, x2
         a = (x2-x1)/(x4-x3)
         c = x1 - a*x3
         f1 = a*x1 + c
         f2 = a*x2 + c
+        if log:
+            f1, f2 = 10.**f1, 10.**f2
         return min(f1, f2), max(f1, f2)
 
     _xtype = wrap_attribute('xtype')

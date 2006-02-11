@@ -81,10 +81,11 @@ class Action(signals.HasSignals):
 
 class CompositeAction(Action):
     """A series of actions treated as a single action."""
-    def __init__(self):
+    def __init__(self, name):
         Action.__init__(self)
         self.actionlist = []
         self.state = None
+        self.name = name
 
     def add(self, action):
         """Add a action to the list."""
@@ -103,6 +104,9 @@ class CompositeAction(Action):
     def undo(self):
         for com in self.actionlist[::-1]:
             com.real_undo()
+
+    def __str__(self):
+        return self.name
 
 
 class ActionList(signals.HasSignals):

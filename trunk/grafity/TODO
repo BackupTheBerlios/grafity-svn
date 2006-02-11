@@ -5,11 +5,11 @@
 - rename in project explorer
 - rename fit function
 - hide fit function
+- zoom out on log axes
+- double-click on action list to undo/redo
 * do something when a function is not found
-* zoom out on log axes
 * auto zoom
 * update legend on column rename
-* double-click on action list to undo/redo
 * cut/copy/paste in worksheets
 * data reader
 * screen reader
