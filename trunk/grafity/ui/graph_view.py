@@ -6,7 +6,7 @@ from qt import *
 from qwt import *
 import qwt.qplt
 
-from grafity.arrays import clip, nan, arange, log10, isnan
+from grafity.arrays import clip, nan, arange, log10, isnan, asarray, Float, argmin, argmax, array
 from grafity.actions import CompositeAction, action_list
 from grafity.functions import registry, Function
 from grafity import Graph, Worksheet, Folder
@@ -20,6 +20,230 @@ from grafity.ui.forms.graph_fit import GraphFitUI
 from grafity.ui.forms.functions import FunctionsWindowUI
 from grafity.ui.forms.fitoptions import FitOptionsUI
 from grafity.ui.utils import getimage, connectevents, Page
+
+
+
+
+class ErrorBarPlotCurve(QwtPlotCurve):
+    def __init__(self, parent,
+                 x = [], y = [], dx = None, dy = None,
+                 curvePen = QPen(Qt.NoPen),
+                 curveStyle = QwtCurve.Lines,
+                 curveSymbol = QwtSymbol(),
+                 errorPen = QPen(Qt.NoPen),
+                 errorCap = 0,
+                 errorOnTop = False,
+                 ):
+        """A curve of x versus y data with error bars in dx and dy.
+
+        Horizontal error bars are plotted if dx is not None.
+        Vertical error bars are plotted if dy is not None.
+
+        x and y must be sequences with a shape (N,) and dx and dy must be
+        sequences (if not None) with a shape (), (N,), or (2, N):
+        - if dx or dy has a shape () or (N,), the error bars are given by
+          (x-dx, x+dx) or (y-dy, y+dy),
+        - if dx or dy has a shape (2, N), the error bars are given by
+          (x-dx[0], x+dx[1]) or (y-dy[0], y+dy[1]).
+
+        curvePen is the pen used to plot the curve
+        
+        curveStyle is the style used to plot the curve
+        
+        curveSymbol is the symbol used to plot the symbols
+        
+        errorPen is the pen used to plot the error bars
+        
+        errorCap is the size of the error bar caps
+        
+        errorOnTop is a boolean:
+        - if True, plot the error bars on top of the curve,
+        - if False, plot the curve on top of the error bars.
+        """
+
+        QwtPlotCurve.__init__(self, parent)
+        self.setData(x, y, dx, dy)
+        self.setPen(curvePen)
+        self.setStyle(curveStyle)
+        self.setSymbol(curveSymbol)
+        self.errorPen = errorPen
+        self.errorCap = errorCap
+        self.errorOnTop = errorOnTop
+
+    # __init__()
+
+    def setData(self, x, y, dx = None, dy = None):
+        """Set x versus y data with error bars in dx and dy.
+
+        Horizontal error bars are plotted if dx is not None.
+        Vertical error bars are plotted if dy is not None.
+
+        x and y must be sequences with a shape (N,) and dx and dy must be
+        sequences (if not None) with a shape (), (N,), or (2, N):
+        - if dx or dy has a shape () or (N,), the error bars are given by
+          (x-dx, x+dx) or (y-dy, y+dy),
+        - if dx or dy has a shape (2, N), the error bars are given by
+          (x-dx[0], x+dx[1]) or (y-dy[0], y+dy[1]).
+        """
+        
+        self.__x = asarray(x, Float)
+        if len(self.__x.shape) != 1:
+            raise RuntimeError, 'len(asarray(x).shape) != 1'
+
+        self.__y = asarray(y, Float)
+        if len(self.__y.shape) != 1:
+            raise RuntimeError, 'len(asarray(y).shape) != 1'
+        if len(self.__x) != len(self.__y):
+            raise RuntimeError, 'len(asarray(x)) != len(asarray(y))' 
+
+        if dx is None:
+            self.__dx = None
+        else:
+            self.__dx = asarray(dx, Float)
+            if len(self.__dx.shape) not in [0, 1, 2]:
+                raise RuntimeError, 'len(asarray(dx).shape) not in [0, 1, 2]'
+            
+        if dy is None:
+            self.__dy = dy
+        else:
+            self.__dy = asarray(dy, Float)
+            if len(self.__dy.shape) not in [0, 1, 2]:
+                raise RuntimeError, 'len(asarray(dy).shape) not in [1, 2]'
+        
+        QwtPlotCurve.setData(self, self.__x, self.__y)
+
+    # setData()
+        
+    def boundingRect(self):
+        """Return the bounding rectangle of the data, error bars included.
+        """
+        if self.__dx is None:
+            xmin = min(self.__x)
+            xmax = max(self.__x)
+        elif len(self.__dx.shape) in [0, 1]:
+            xmin = min(self.__x - self.__dx)
+            xmax = max(self.__x + self.__dx)
+        else:
+            xmin = min(self.__x - self.__dx[0])
+            xmax = max(self.__x + self.__dx[1])
+
+        if self.__dy is None:
+            ymin = min(self.__y)
+            ymax = max(self.__y)
+        elif len(self.__dy.shape) in [0, 1]:
+            ymin = min(self.__y - self.__dy)
+            ymax = max(self.__y + self.__dy)
+        else:
+            ymin = min(self.__y - self.__dy[0])
+            ymax = max(self.__y + self.__dy[1])
+
+        return QwtDoubleRect(xmin, xmax, ymin, ymax)
+        
+    # boundingRect()
+
+    def draw(self, painter, xMap, yMap, first, last = -1):
+        """Draw an interval of the curve, including the error bars
+
+        painter is the QPainter used to draw the curve
+
+        xMap is the QwtDiMap used to map x-values to pixels
+
+        yMap is the QwtDiMap used to map y-values to pixels
+        
+        first is the index of the first data point to draw
+
+        last is the index of the last data point to draw. If last < 0, last
+        is transformed to index the last data point
+        """
+        
+        if last < 0:
+            last = self.dataSize() - 1
+        if not self.verifyRange(first, last):
+            return
+
+        if self.errorOnTop:
+            QwtPlotCurve.draw(self, painter, xMap, yMap, first, last)
+
+        # draw the error bars
+        painter.save()
+        painter.setPen(self.errorPen)
+
+        # draw the error bars with caps in the x direction
+        if self.__dx is not None:
+            # draw the bars
+            if len(self.__dx.shape) in [0, 1]:
+                xmin = (self.__x - self.__dx)[first:last+1]
+                xmax = (self.__x + self.__dx)[first:last+1]
+            else:
+                xmin = (self.__x - self.__dx[0])[first:last+1]
+                xmax = (self.__x + self.__dx[1])[first:last+1]
+            y = self.__y[first:last+1]
+            n, i, j = len(y), 0, 0
+            lines = QPointArray(2*n)
+            while i < n:
+                yi = yMap.transform(y[i])
+                lines.setPoint(j, xMap.transform(xmin[i]), yi)
+                j += 1
+                lines.setPoint(j, xMap.transform(xmax[i]), yi)
+                j += 1; i += 1
+            painter.drawLineSegments(lines)
+            if self.errorCap > 0:
+                # draw the caps
+                cap = self.errorCap/2
+                n, i, j = len(y), 0, 0
+                lines = QPointArray(4*n)
+                while i < n:
+                    yi = yMap.transform(y[i])
+                    lines.setPoint(j, xMap.transform(xmin[i]), yi - cap)
+                    j += 1
+                    lines.setPoint(j, xMap.transform(xmin[i]), yi + cap)
+                    j += 1
+                    lines.setPoint(j, xMap.transform(xmax[i]), yi - cap)
+                    j += 1
+                    lines.setPoint(j, xMap.transform(xmax[i]), yi + cap)
+                    j += 1; i += 1
+            painter.drawLineSegments(lines)
+
+        # draw the error bars with caps in the y direction
+        if self.__dy is not None:
+            # draw the bars
+            if len(self.__dy.shape) in [0, 1]:
+                ymin = (self.__y - self.__dy)[first:last+1]
+                ymax = (self.__y + self.__dy)[first:last+1]
+            else:
+                ymin = (self.__y - self.__dy[0])[first:last+1]
+                ymax = (self.__y + self.__dy[1])[first:last+1]
+            x = self.__x[first:last+1]
+            n, i, j = len(x), 0, 0
+            lines = QPointArray(2*n)
+            while i < n:
+                xi = xMap.transform(x[i])
+                lines.setPoint(j, xi, yMap.transform(ymin[i]))
+                j += 1
+                lines.setPoint(j, xi, yMap.transform(ymax[i]))
+                j += 1; i += 1
+            painter.drawLineSegments(lines)
+            # draw the caps
+            if self.errorCap > 0:
+                cap = self.errorCap/2
+                n, i, j = len(x), 0, 0
+                lines = QPointArray(4*n)
+                while i < n:
+                    xi = xMap.transform(x[i])
+                    lines.setPoint(j, xi - cap, yMap.transform(ymin[i]))
+                    j += 1
+                    lines.setPoint(j, xi + cap, yMap.transform(ymin[i]))
+                    j += 1
+                    lines.setPoint(j, xi - cap, yMap.transform(ymax[i]))
+                    j += 1
+                    lines.setPoint(j, xi + cap, yMap.transform(ymax[i]))
+                    j += 1; i += 1
+            painter.drawLineSegments(lines)
+
+        painter.restore()
+
+        if not self.errorOnTop:
+            QwtPlotCurve.draw(self, painter, xMap, yMap, first, last)
 
 qsymbols = {
     'none': QwtSymbol.None,
@@ -72,6 +296,44 @@ def efloat(f):
     except Exception:
         return nan
 
+class ZoomTool(object):
+    def __init__(self, graph, view, plot):
+        self.graph, self.view, self.plot = graph, view, plot
+
+    def activate(self):
+        pass
+
+    def deactivate(self):
+        pass
+
+    def mouse_pressed(self, e):
+        self.xpos = self.plot.invTransform(self.plot.xBottom, e.pos().x())
+        self.ypos = self.plot.invTransform(self.plot.yLeft, e.pos().y())
+        self.plot.enableOutline(True)
+        self.plot.setOutlinePen(QPen(Qt.blue, 0, Qt.DotLine))
+        self.plot.setOutlineStyle(Qwt.Rect)
+        self.mouse_moved(e)
+
+    def mouse_released(self, e):
+        x = self.plot.invTransform(self.plot.xBottom, e.pos().x())
+        y = self.plot.invTransform(self.plot.yLeft, e.pos().y())
+        xmin, xmax, ymin, ymax = min(self.xpos, x), max(self.xpos, x), min(self.ypos, y), max(self.ypos, y)
+        if e.button() == Qt.LeftButton:
+            self.graph.zoom(xmin, xmax, ymin, ymax)
+        elif e.button() == Qt.RightButton:
+            self.graph.zoom_out(xmin, xmax, ymin, ymax)
+        elif e.button() == Qt.MidButton:
+            self.graph.autoscale()
+        self.plot.enableOutline(False)
+
+    def mouse_moved(self, e):
+        pass
+
+    def key_pressed(self, e):
+        pass
+
+
+
 class GraphView(QTabWidget):
     def __init__(self, parent, mainwin, graph):
         QTabWidget.__init__(self, parent)
@@ -90,7 +352,6 @@ class GraphView(QTabWidget):
         self.plot.setCanvasBackground (self.bg_color)
         self.plot.enableGridX(True)
         self.plot.enableGridY(True)
-        self.plot.setOutlineStyle (Qwt.Rect)
         self.plot.setAutoReplot(False)
         self.plot.canvas().setLineWidth(0)
         self.plot.axis(self.plot.xBottom).setBaselineDist(0)
@@ -98,7 +359,8 @@ class GraphView(QTabWidget):
         self.plot.axis(self.plot.yLeft).setBaselineDist(0)
         self.plot.axis(self.plot.yLeft).setBorderDist(0,0)
 
-        
+        self.plot.canvas().setFocusPolicy(QWidget.StrongFocus)
+
         self.graph.connect('style-changed', self.on_change_style)
         self.graph.connect('zoom-changed', self.on_zoom_changed)
         self.graph.connect('data-changed', self.on_recalc)
@@ -118,7 +380,6 @@ class GraphView(QTabWidget):
         self.needs_redraw = False
         self.needs_legend_update = False
 
-        connectevents(self.plot.canvas(), self.on_canvas_event)
         self.connect(self.plot, SIGNAL('plotMouseMoved(const QMouseEvent&)'), self.on_mouse_moved)
         self.connect(self.plot, SIGNAL('plotMousePressed(const QMouseEvent&)'), self.on_mouse_pressed)
         self.connect(self.plot, SIGNAL('plotMouseReleased(const QMouseEvent&)'), self.on_mouse_released)
@@ -155,7 +416,7 @@ class GraphView(QTabWidget):
         self.reader = self.plot.insertLineMarker(None, QwtPlot.xBottom)
         self.plot.setMarkerLineStyle(self.rangemin, QwtMarker.VLine)
         self.plot.setMarkerLineStyle(self.rangemax, QwtMarker.VLine)
-        self.plot.setMarkerLineStyle(self.reader, QwtMarker.NoLine)
+        self.plot.setMarkerLineStyle(self.reader, QwtMarker.Cross)
         self.moving_rangemin = self.moving_rangemax = False
 
         self.mode = 'arrow'
@@ -163,6 +424,18 @@ class GraphView(QTabWidget):
         self.setWFlags(Qt.WDestructiveClose)
 
         self.graph.project.connect('remove-item', self.on_project_remove_item)
+        connectevents(self.plot.canvas(), self.on_canvas_event)
+
+        self.tools = {}
+        self.tools['zoom'] = ZoomTool(self.graph, self, self.plot)
+
+        self.foo = self.plot.insertCurve("foo")
+        self.foo2 = self.plot.insertCurve("foo")
+        self.foom = self.plot.insertCurve("foo")
+        self.plot.setCurvePen(self.foo, QPen(Qt.darkGreen))
+        self.plot.setCurvePen(self.foo2, QPen(Qt.darkRed))
+        self.plot.setCurvePen(self.foom, QPen(Qt.darkCyan))
+
 
     def on_project_remove_item(self, item):
         if item == self.graph:
@@ -221,13 +494,15 @@ class GraphView(QTabWidget):
             self.needs_legend_update = False
 
     def on_add_function_term(self, term):
-        term._curveid = self.plot.insertCurve('')
+        term._curve = curve = ErrorBarPlotCurve(self.plot)
+        term._curveid = self.plot.insertCurve(curve)
 
     def on_remove_function_term(self, term):
         self.plot.removeCurve(term._curveid)
 
     def on_add_dataset(self, d):
-        d._curveid = self.plot.insertCurve('')
+        d._curve = curve = ErrorBarPlotCurve(self.plot, errorPen = QPen(Qt.black))
+        d._curveid = self.plot.insertCurve(curve)
         d.recalculate()
         for s in ['symbol', 'color', 'size', 'linetype', 'linestyle', 'linewidth']:
             self.on_change_style([d])#, s, d.get_style(s))
@@ -275,12 +550,7 @@ class GraphView(QTabWidget):
         x = self.plot.invTransform(self.plot.xBottom, e.pos().x())
         y = self.plot.invTransform(self.plot.yLeft, e.pos().y())
         if self.mode == 'zoom':
-            self.xpos, self.ypos = x, y
-            self.plot.enableOutline(True)
-            self.plot.setOutlinePen(QPen(Qt.blue, 0, Qt.DotLine))
-            self.plot.setOutlineStyle(Qwt.Rect)
-            self.zooming = True
-            self.on_mouse_moved(e)
+            self.tools['zoom'].mouse_pressed(e)
         elif self.mode == 'range':
             if e.button() == Qt.LeftButton:
                 self.moving_rangemin = True
@@ -291,16 +561,16 @@ class GraphView(QTabWidget):
             self.on_mouse_moved(e)
         elif self.mode == 'hand':
             pass
+        elif self.mode == 'dreader':
+            self.on_mouse_moved(e)
+        elif self.mode == 'sreader':
+            self.on_mouse_moved(e)
 
     def on_mouse_released(self, e):
         x = self.plot.invTransform(self.plot.xBottom, e.pos().x())
         y = self.plot.invTransform(self.plot.yLeft, e.pos().y())
         if self.mode == 'zoom':
-            xmin, xmax, ymin, ymax = min(self.xpos, x), max(self.xpos, x), min(self.ypos, y), max(self.ypos, y)
-            if e.button() == Qt.LeftButton:
-                self.graph.zoom(xmin, xmax, ymin, ymax)
-            elif e.button() == Qt.RightButton:
-                self.graph.zoom_out(xmin, xmax, ymin, ymax)
+            self.tools['zoom'].mouse_released(e)
         elif self.mode == 'range':
             self.moving_rangemin = self.moving_rangemax = False
             if e.button() == Qt.MidButton:
@@ -330,8 +600,61 @@ class GraphView(QTabWidget):
             self.unfreeze()
         elif self.mode == 'hand':
             self.mainwin.graph_fit.active_term.move(x, y)
+        elif self.mode == 'dreader':
+            if self.graph.datasets == []:
+                return
+            d = self.datasets[0]
+            ind = d.active_data()
+            dx, dy = d.x[ind], d.y[ind]
+            dist = (x-dx)*(x-dx)
+            arg = argmin(dist)
+            xval, yval = dx[arg], dy[arg]
+
+            from scipy.interpolate import splrep, splev
+            deriv = splev(dx, splrep(dx, dy, s=20), der=1)
+            inflarg = argmax(deriv)
+            inflx, infly = dx[inflarg], dy[inflarg]
+
+            linex = array([self.graph.xmin, self.graph.xmax])
+            liney = yval + deriv[arg]*(linex-xval)
+
+            if e.button() == Qt.LeftButton:
+                self._line = 'left'
+            elif e.button() == Qt.RightButton:
+                self._line = 'right'
+
+            if self._line == 'left':
+                self.plot.setCurveData(self.foo, linex, liney)
+            elif self._line == 'right':
+                self.plot.setCurveData(self.foo2, linex, liney)
+
+            liney = infly + deriv[inflarg]*(linex-inflx)
+            self.plot.setCurveData(self.foom, linex, liney)
+
+#            curve, dist, xval, yval, index = self.plot.closestCurve(e.pos().x(), e.pos().y())
+#            self.dr_dataset = self.graph.datasets[[d._curveid for d in self.graph.datasets].index(curve)]
+#            self.dr_point = index
+#            self.plot.setMarkerXPos (self.reader, xval)
+#            self.plot.setMarkerYPos (self.reader, yval)
+
+            self.redraw()
+        elif self.mode == 'sreader':
+            self.plot.setMarkerXPos(self.reader, x)
+            self.plot.setMarkerYPos(self.reader, y)
+#            project.mainwin.statuslabel.setText ("(%g, %g)" % (xval, yval))
+#            if e.state() & Qt.ControlButton:
+#                curve, dist, xval, yval, ind = self.plot.closestCurve (e.pos().x(), e.pos().y())
+#                dataset = self.datasets[[d.curveid for d in self.datasets].index(curve)]
+#                if dist<=2:
+#                    index = dataset.data()[2][ind]
+#                    dataset.worksheet[dataset.coly][index] = nan
+#            project.main_dict['app'].processEvents()
+            self.redraw()
+
 
     def on_canvas_event(self, event):
+        if event.type() == QEvent.KeyPress:
+            print >>sys.stderr, event, event.key()
         return False
 
     def on_function_modified(self):
@@ -348,8 +671,7 @@ class GraphView(QTabWidget):
         self.redraw()
 
     def on_recalc(self, d, x, y):
-        print >>sys.stderr, 'on_recelc', d
-        self.plot.setCurveData(d._curveid, x, y)
+        d._curve.setData(x, y)#, [1]*len(x), [1]*len(y))
         self.redraw()
 
     def on_change_style(self, datasets):

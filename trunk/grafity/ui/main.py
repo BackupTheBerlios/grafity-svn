@@ -466,6 +466,14 @@ class MainWindow(MainWindowUI):
         self.menubar.removeItem(self.menubar.idAt(2))
 
         self.active = None
+        self.worksheet_toolbar.addSeparator()
+        btn = QToolButton(self.graph_toolbar)
+        btn.setToggleButton(True)
+        btn.setTextLabel('...')
+        btn.setUsesTextLabel(True)
+        cm = QPopupMenu (self)
+        cm.insertItem ('Rename', None)
+        btn.setPopup(cm)
 
     def on_column_tool(self, tool):
         worksheet = self.active.worksheet

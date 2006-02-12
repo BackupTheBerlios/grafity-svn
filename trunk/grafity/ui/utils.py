@@ -33,10 +33,17 @@ class Page(object):
 
         ok = QPushButton('OK', self.win)
         self.win.connect(ok, SIGNAL('clicked()'), self.win.close)
+        self.win.connect(ok, SIGNAL('clicked()'), self.on_close)
         layout.addWidget(ok)
 
         for item, value in kwds.iteritems():
             self[item] = value
+        
+        self.callable = None
+
+    def on_close(self):
+        if self.callable:
+            self.callable(self)
  
     def addgroup(self, name, items):
         self.win.layout().addWidget(QLabel('<b>'+name+'</b>', self.win))
@@ -98,8 +105,14 @@ class Page(object):
         else:
             raise IndexError
 
+    def run_bg(self, callable):
+        self.callable = callable
+        self.win.setModal(False)
+        self.win.show()
+
     def run(self):
-        return self.win.exec_loop()
+        self.win.setModal(True)
+        self.win.exec_loop()
         
 def test_page():
         app = QApplication(sys.argv)

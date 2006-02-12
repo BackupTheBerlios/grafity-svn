@@ -85,7 +85,6 @@ class Dataset(HasSignals):
         return ind
 
     def recalculate(self):
-        print >>sys.stderr, self, 'recalculate'
         length = min(len(self.x), len(self.y))
         x = asarray(self.x)[:length]
         y = asarray(self.y)[:length]
@@ -391,7 +390,6 @@ class Graph(Item, HasSignals):
         # (see Dataset.__eq__)
         # TODO: why bother? just keep the object itself in the state
         ind = self.datasets.index(dataset)
-        print 'removing dataset, index %d, position %d' % (dataset.ind, ind)
         dataset.id = '-'+dataset.id
         self.datasets.remove(dataset)
         try:
@@ -403,7 +401,6 @@ class Graph(Item, HasSignals):
 
     def undo_remove(self, data):
         ind, pos = data
-        print 'undoing removal of dataset, index %d, position %d' % (ind, pos)
         dataset = Dataset(self, ind)
         dataset.id = dataset.id[1:]
         self.on_dataset_modified(dataset)
