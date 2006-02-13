@@ -6,7 +6,7 @@ from qt import *
 from qwt import *
 import qwt.qplt
 
-from grafity.arrays import clip, nan, arange, log10, isnan, asarray, Float, argmin, argmax, array
+from grafity.arrays import clip, nan, arange, log10, isnan, asarray, Float, argmin, argmax, array, ones, sqrt
 from grafity.actions import CompositeAction, action_list
 from grafity.functions import registry, Function
 from grafity import Graph, Worksheet, Folder
@@ -611,7 +611,9 @@ class GraphView(QTabWidget):
             xval, yval = dx[arg], dy[arg]
 
             from scipy.interpolate import splrep, splev
-            deriv = splev(dx, splrep(dx, dy, s=20), der=1)
+            w = ones(len(dx))*50./(max(dy)-min(dy))
+            spl = splrep(dx, dy, w, s=20)
+            deriv = splev(dx, spl, der=1)
             inflarg = argmax(deriv)
             inflx, infly = dx[inflarg], dy[inflarg]
 
