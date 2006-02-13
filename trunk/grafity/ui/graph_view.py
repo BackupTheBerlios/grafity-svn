@@ -22,8 +22,6 @@ from grafity.ui.forms.fitoptions import FitOptionsUI
 from grafity.ui.utils import getimage, connectevents, Page
 
 
-
-
 class ErrorBarPlotCurve(QwtPlotCurve):
     def __init__(self, parent,
                  x = [], y = [], dx = None, dy = None,
@@ -419,6 +417,10 @@ class GraphView(QTabWidget):
         self.plot.setMarkerLineStyle(self.reader, QwtMarker.Cross)
         self.moving_rangemin = self.moving_rangemax = False
 
+        self.texte = self.plot.insertMarker()
+        self.plot.setMarkerLabel(self.texte, "Poutsa")
+        self.plot.setMarkerPos(self.texte, 0, 0)
+
         self.mode = 'arrow'
         self.setCaption(self.graph.fullname)
         self.setWFlags(Qt.WDestructiveClose)
@@ -618,7 +620,8 @@ class GraphView(QTabWidget):
             inflx, infly = dx[inflarg], dy[inflarg]
 
             linex = array([self.graph.xmin, self.graph.xmax])
-            liney = yval + deriv[arg]*(linex-xval)
+
+            #liney = yval + deriv[arg]*(linex-xval)
 
             if e.button() == Qt.LeftButton:
                 self._line = 'left'
@@ -626,12 +629,29 @@ class GraphView(QTabWidget):
                 self._line = 'right'
 
             if self._line == 'left':
+                self.A1 = deriv[arg]
+                self.B1 = yval-self.A1*xval
+                liney = self.A1*linex + self.B1
+
                 self.plot.setCurveData(self.foo, linex, liney)
             elif self._line == 'right':
+                self.A3 = deriv[arg]
+                self.B3 = yval-self.A3*xval
+                liney = self.A3*linex + self.B3
                 self.plot.setCurveData(self.foo2, linex, liney)
 
-            liney = infly + deriv[inflarg]*(linex-inflx)
+            self.A2 = deriv[inflarg]
+            self.B2 = infly-self.A2*inflx
+
+            liney = self.A2*linex + self.B2
+
+            #liney = infly + deriv[inflarg]*(linex-inflx)
             self.plot.setCurveData(self.foom, linex, liney)
+            if hasattr(self, 'A3') and hasattr(self, 'A1'):
+                Ton = -(self.B2-self.B1)/(self.A2-self.A1)
+                Tend = -(self.B3-self.B2)/(self.A3-self.A2)
+                self.plot.setMarkerLabel(self.texte, 
+                "T<sub>f</sub>=%f<br>T<sub>on</sub>=%f, T<sub>end</sub>=%f<br>"%(inflx,Ton,Tend))
 
 #            curve, dist, xval, yval, index = self.plot.closestCurve(e.pos().x(), e.pos().y())
 #            self.dr_dataset = self.graph.datasets[[d._curveid for d in self.graph.datasets].index(curve)]
