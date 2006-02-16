@@ -3,13 +3,6 @@ Worksheets
 
 .. contents::
 
-.. sidebar:: Sidebar Title
-   :subtitle: Optional Sidebar Subtitle
-
-   Subsequent indented lines comprise
-   the body of the sidebar, and are
-   interpreted as body elements.
-
 .. sectnum::
 
 Introduction
@@ -36,10 +29,11 @@ columns, and to insert and delete rows. Additionally, you can transpose the colu
 Adding Columns
 ~~~~~~~~~~~~~~
 To add columns to the worksheet, perform one of the following operations: 
-1) Select Column:Add New Columns. 
-2) Click the Add New Columns button on the Standard toolbar. 
-3) Right-click inside the worksheet window but to the right of the worksheet grid. Select Add New Column from
-the shortcut menu. 
+
+  1. Select Column:Add New Columns. 
+  2. Click the Add Column button on the Worksheet toolbar. 
+  3. Right-click inside the worksheet window but to the right of the worksheet grid. Select Add New Column from
+
 The Column:Add New Columns menu command opens the Add New Columns dialog box in which you specify the number of
 columns to add to the worksheet. The Add New Columns button on the Standard toolbar and the Add New Column
 shortcut menu command add one column to the worksheet. Each method adds the Y column(s) to the right of the
