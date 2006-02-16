@@ -342,6 +342,9 @@ class GraphView(QTabWidget):
         self.setIcon(getimage('graph'))
         self.mainpage = QSplitter(QSplitter.Horizontal, self)
         self.addTab(self.mainpage, 'graph')
+        
+        self.gri = QTextEdit(self)
+        self.addTab(self.gri, 'gri')
 
         self.bg_color = QColor('white')
 

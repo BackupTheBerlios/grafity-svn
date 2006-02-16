@@ -3,7 +3,7 @@ import sys, os
 sys.modules['grafity.ui.start'].splash.message('loading ui_worksheet_view')
 from qt import *
 from qttable import *
-from grafity.arrays import clip, nan, arange, log10, isnan
+from grafity.arrays import clip, nan, arange, log10, isnan, array
 from grafity.ui.utils import getimage
 
 from grafity import Worksheet
@@ -59,6 +59,13 @@ class WorksheetView(QTabWidget):
         self.resize(400, 400)
     
         self.worksheet.project.connect('remove-item', self.on_project_remove_item)
+
+    def get_selection(self):
+        sel = self.table.selection(0)
+        t, b, l, r = sel.topRow(), sel.bottomRow(), sel.leftCol(), sel.rightCol()
+        a = array([self.worksheet[c][t:b+1] for c in range(l, r+1)])
+        return a
+    selection = property(get_selection)
 
     def on_project_remove_item(self, item):
         if item == self.worksheet:
@@ -181,6 +188,7 @@ class GTable(QTable):
 
         self.horizontalHeader().installEventFilter(HeaderEventHandler(self))
         self.hh = self.horizontalHeader()
+        self.setSelectionMode(QTable.Single)
 
         self.editor = None
 
