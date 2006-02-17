@@ -5,6 +5,7 @@ from grafity.signals import HasSignals
 from grafity.project import Item, wrap_attribute, register_class, create_id
 from grafity.actions import action_from_methods, action_from_methods2, StopAction
 from grafity.functions import FunctionSum, registry
+import pyx
 
 symbols = ['none', 'square', 'circle', 'diamond', 
            'triangleup', 'triangledown', 'triangleleft', 'triangleright', '+', 'x', ]
@@ -166,6 +167,23 @@ class Dataset(HasSignals):
         elif style == 'linetype':
             self.data.linetype = value
 
+
+#! /usr/bin/env python
+
+from pyx import *
+
+# The new symbol: just a vertical line
+#
+# Note that, as for all internal PyX methods, coordinates are passed in PS
+# points, and we hence have to use the corresponding path classes.
+def _linesymbol(c, x_pt, y_pt, size_pt, attrs):
+    c.draw(path.line_pt(x_pt, y_pt-0.5*size_pt, x_pt, y_pt+0.5*size_pt), attrs)
+
+# the symbol style expects a changeable attribute as argument, 
+# so we create a dummy one consisting of a single symbol
+linesymbol = pyx.attr.changelist([_linesymbol])
+
+
 class Graph(Item, HasSignals):
     def __init__(self, project, name=None, parent=None, location=None):
         Item.__init__(self, project, name, parent, location)
@@ -185,6 +203,39 @@ class Graph(Item, HasSignals):
             self._ytype = 'linear' 
 
     default_name_prefix = 'graph'
+
+    def topyx(self, name=None):
+        if name is None:
+            name = self.name
+        xaxis = pyx.graph.axis.linear(min=self.xmin, max=self.xmax, title=self.xtitle)
+        yaxis = pyx.graph.axis.linear(min=self.ymin, max=self.ymax, title=self.ytitle)
+        g = pyx.graph.graphxy(width=8, x=xaxis, y=yaxis)
+
+        pyx_symbols = [ None, 'square', 'circle', 'diamond',
+                        'triangle', 'triangle', 'triangle', 'triangle',  
+                        'plus', 'cross' ]
+        pyx_symbols = dict(zip(symbols, pyx_symbols))
+
+        for ds in self.datasets:
+            active = ds.active_data()
+            data = pyx.graph.data.list(sorted(zip(ds.x[active], ds.y[active])), x=1, y=2)
+            line = pyx.graph.style.line([pyx.style.linewidth.Thin, pyx.style.linestyle.solid])
+            color = pyx.color.rgb(*[int(s, 16)/256. for s in (ds.style.color[a:b] for a,b in ((1,3),(3,5),(5,7)))])
+
+#            symbol = pyx.graph.style.symbol(symbol=linesymbol, size=0.1,
+#                                            symbolattrs=[pyx.deco.filled([color]), pyx.deco.stroked([color]),],)
+            if ds.style.symbol != 'none':
+                symbol = pyx.graph.style.symbol(getattr(pyx.graph.style.symbol, pyx_symbols[ds.style.symbol]), size=0.1,
+                                                symbolattrs=[
+                                                pyx.deco.filled([color]), 
+                                                pyx.deco.stroked([color, pyx.style.linewidth.Thin,]),],
+                                                )
+                g.plot(data, [symbol])
+            if ds.style.linetype != 'none':
+                g.plot(data, [line])
+
+        g.writeEPSfile(name)
+
 
     def togri(self):
         gri_symbols_open = [ None, 'box', 'circ', 'diamond',

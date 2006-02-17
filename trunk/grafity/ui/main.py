@@ -123,14 +123,20 @@ class Panel(QDockWindow):
         bgcolor = cg.color(QColorGroup.Background)
 
         p = QPixmap()
-        if orientation == '-':
-            p.resize (90, 20)
-        elif orientation == '|':
-            p.resize (20, 90)
-        p.fill (bgcolor)
-
+        p.resize (20, 20)
+        
         paint = QPainter()
         paint.begin(p)
+        width = paint.fontMetrics().width(label) + 30
+        paint.end()
+
+        if orientation == '-':
+            p.resize (width, 20)
+        elif orientation == '|':
+            p.resize (20, width)
+
+        paint.begin(p)
+        p.fill (bgcolor)
         paint.drawPixmap (0, 0, pixmap)
         r = QRect()
         if orientation == '|':

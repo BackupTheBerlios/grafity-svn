@@ -8,7 +8,7 @@ This is an example text file in reStructuredText format.  First import
 ``factorial`` from the ``example`` module:
 
     >>> from grafity import Project, Worksheet, Folder
-    >>> from grafity.commands import undo, redo
+    >>> from grafity import undo, redo
     >>> p = Project()
 
 Now use it:

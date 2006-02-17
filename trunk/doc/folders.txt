@@ -20,7 +20,7 @@ with ``project.top.contents()``.
 Importing the grafity module
 
     >>> from grafity import *
-    >>> from grafity.commands import undo, redo
+    >>> from grafity import undo, redo
 
 Creating and initializing a project
 
@@ -29,7 +29,7 @@ Creating and initializing a project
 
 Creating and deleting folders
 
-    >>> p.new(Folder, 'ass')
+    >>> f = p.new(Folder, 'ass')
     >>> p.top.ass
     <Folder ass>
     >>> p.remove(p.top.ass.id)

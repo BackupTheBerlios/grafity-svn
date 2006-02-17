@@ -93,17 +93,27 @@ def main():
 
     parser = OptionParser()
     parser.add_option('-l', '--log', dest='log', help='Log program events')
-    parser.add_option('-d', '--set-data-dir', dest='datadir', help='Set grafity data directory')
+    parser.add_option('-x', '--export', dest='export', help='Export graph or worksheet')
+#    parser.add_option('-d', '--set-data-dir', dest='datadir', help='Set grafity data directory')
     options, args = parser.parse_args()
 
-    if options.datadir is not None:
-        configdir = os.path.normpath(os.path.abspath(os.path.dirname(sys.argv[0]))+'/../') + '/'
-        open(configdir+'config.py', 'w').write('datadir="%s"'%options.datadir)
-        sys.exit(0)
+#    if options.datadir is not None:
+#        configdir = os.path.normpath(os.path.abspath(os.path.dirname(sys.argv[0]))+'/../') + '/'
+#        open(configdir+'config.py', 'w').write('datadir="%s"'%options.datadir)
+#        sys.exit(0)
 
     if options.log is not None:
         for l in options.log.split(','):
             logging.getLogger(l).setLevel(logging.DEBUG)
+
+    if options.export is not None:
+        sys.excepthook = sys.__excepthook__
+        import grafity
+        p = grafity.Project(args[0])
+        obj = p.top[options.export]
+        obj.topyx(obj.name)
+        sys.exit(0)
+
 
     logging.basicConfig(format="%(asctime)s [%(name)s] %(message)s")
 
