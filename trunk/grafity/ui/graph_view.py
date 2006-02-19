@@ -368,6 +368,9 @@ class GraphView(QTabWidget):
         self.graph.connect('data-changed', self.on_recalc)
         self.graph.connect('rename', self.on_rename)
         self.graph.connect('fullname-changed', self.on_rename)
+        self.graph.connect('new-object', self.on_new_object)
+        self.graph.connect('remove-object', self.on_remove_object)
+        self.graph.connect('text-changed', self.on_text_changed)
 
         self.graph.connect('add-dataset', self.on_add_dataset)
         self.graph.connect('remove-dataset', self.on_remove_dataset)
@@ -422,11 +425,6 @@ class GraphView(QTabWidget):
         self.moving_rangemin = self.moving_rangemax = False
         self.moving_marker = None
 
-        self.texte = self.plot.insertMarker()
-        self.plot.setMarkerLabel(self.texte, "Poutsa")
-        self.plot.setMarkerPos(self.texte, 0, 0)
-        self.plot.setMarkerLabelAlign(self.texte, Qt.AlignTop|Qt.AlignRight)
-
         self.mode = 'arrow'
         self.setCaption(self.graph.fullname)
         self.setWFlags(Qt.WDestructiveClose)
@@ -444,6 +442,25 @@ class GraphView(QTabWidget):
         self.plot.setCurvePen(self.foo2, QPen(Qt.darkRed))
         self.plot.setCurvePen(self.foom, QPen(Qt.darkCyan))
 
+        self.text = {}
+
+    def on_new_object(self, obj):
+        mark = self.plot.insertMarker()
+        self.plot.setMarkerPos(mark, 0, 0)
+        self.plot.setMarkerLabel(mark, "Poutsa")
+        self.plot.setMarkerLabelAlign(mark, Qt.AlignTop|Qt.AlignRight)
+        self.text[mark] = obj
+        obj._marker = mark
+        self.redraw()
+
+    def on_remove_object(self, obj):
+        del self.text[obj._marker]
+        self.plot.removeMarker(obj._marker)
+        self.redraw()
+
+    def on_text_changed(self, obj):
+        self.plot.setMarkerLabel(obj._marker, obj.text)
+        self.redraw()
 
     def on_project_remove_item(self, item):
         if item == self.graph:
@@ -574,22 +591,23 @@ class GraphView(QTabWidget):
         elif self.mode == 'sreader':
             self.on_mouse_moved(e)
         elif self.mode == 'arrow':
-            marker = self.plot.marker(self.texte)
-            if self.hittest(marker, e.pos().x(), e.pos().y()):
-                if e.button() == Qt.LeftButton:
-                    mx, my = self.plot.markerPos(self.texte)
-                    self.moving_marker = self.texte, e.pos().x(), e.pos().y(), mx, my
-                elif e.button() == Qt.RightButton:
-                    menu = QPopupMenu()
-                    
-                    menu.insertItem('Edit...', 1)
-                    id = menu.exec_loop(self.plot.canvas().mapToGlobal(e.pos()))
-                    if id == 1:
-                        e = TextOptions(self.mainwin)
-                        e.text.setText(self.plot.markerLabel(self.texte))
-                        if e.exec_loop():
-                            self.plot.setMarkerLabel(self.texte, e.text.text())
-                            self.redraw()
+            for mark in self.text:
+#                marker = self.plot.marker(mark)
+                if self.hittest(mark, e.pos().x(), e.pos().y()):
+                    if e.button() == Qt.LeftButton:
+                        mx, my = self.plot.markerPos(mark)
+                        self.moving_marker = mark, e.pos().x(), e.pos().y(), mx, my
+                    elif e.button() == Qt.RightButton:
+                        menu = QPopupMenu()
+                        
+                        menu.insertItem('Edit...', 1)
+                        id = menu.exec_loop(self.plot.canvas().mapToGlobal(e.pos()))
+                        if id == 1:
+                            e = TextOptions(self.mainwin)
+                            e.text.setText(self.plot.markerLabel(mark))
+                            if e.exec_loop():
+                                self.text[mark].text = unicode(e.text.text())
+                    return
 
 
     def on_mouse_released(self, e):
@@ -711,10 +729,10 @@ class GraphView(QTabWidget):
 
     def hittest(self, marker, x, y):
         """Check if the point (x,y) in pixel coordinates is on the marker label"""
-        text = marker.label()
-        metrics = QFontMetrics(marker.font())
+        text = self.plot.markerLabel(marker)
+        metrics = QFontMetrics(self.plot.markerFont(marker))
         size = metrics.size(0, text)
-        mx, my = self.plot.markerPos(self.texte)
+        mx, my = self.plot.markerPos(marker)
         mx, my = self.plot.transform(self.plot.xBottom, mx), self.plot.transform(self.plot.yLeft, my)
 
         return mx <= x <= mx+size.width() and my-size.height() <= y <= my

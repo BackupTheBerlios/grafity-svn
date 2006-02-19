@@ -197,16 +197,13 @@ class Text(HasSignals):
         state['old'] = self.data.text
         self.data.text = value.encode('utf-8')
         state['new'] = self.data.text
-        self.emit('modified')
-        self.graph.emit('redraw')
+        self.graph.emit('text-changed', self)
     def undo_set_text(self, state):
         self.data.text = state['old']
-        self.emit('modified')
-        self.graph.emit('redraw')
+        self.graph.emit('text-changed', self)
     def redo_set_text(self, state):
         self.data.text = state['new']
-        self.emit('modified')
-        self.graph.emit('redraw')
+        self.graph.emit('text-changed', self)
     set_text = action_from_methods2('graph/text/set-text', set_text, undo_set_text, redo=redo_set_text)
 
     text = property(get_text, set_text)
@@ -425,6 +422,7 @@ class Graph(Item, HasSignals):
         ind = location.append(id=create_id())
         obj = typ(self, location[ind])
         self.graph_objects.append(obj)
+        self.emit('new-object', obj)
         state['obj'] = obj
         return obj
 
@@ -432,12 +430,14 @@ class Graph(Item, HasSignals):
         obj = state['obj']
         self.graph_objects.remove(obj)
         obj.id = '-'+obj.id
+        self.emit('remove-object', obj)
 
     def redo_new_object(self, state):
         obj = state['obj']
         self.graph_objects.append(obj)
         location =  { Line: self.data.lines, Text: self.data.text }[type(obj)]
         obj.id = obj.id[1:]
+        self.emit('new-object', obj)
 
     new_object = action_from_methods2('graph/new-object', new_object, undo_new_object, 
                                        redo=redo_new_object)
@@ -445,6 +445,7 @@ class Graph(Item, HasSignals):
         obj.id = '-'+obj.id
         self.graph_objects.remove(obj)
         state['obj'] = obj
+        self.emit('remove-object', obj)
     delete_object = action_from_methods2('graph/delete-object', delete_object, redo_new_object,
                                           redo=undo_new_object)
 
