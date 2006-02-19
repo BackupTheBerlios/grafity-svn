@@ -183,17 +183,50 @@ def _linesymbol(c, x_pt, y_pt, size_pt, attrs):
 # so we create a dummy one consisting of a single symbol
 linesymbol = pyx.attr.changelist([_linesymbol])
 
+class Line:
+    pass
+
+class Text(HasSignals):
+    def __init__(self, graph, data):
+        self.graph, self.data = graph, data
+        
+    def get_text(self): 
+        return self.data.text.decode('utf-8')
+
+    def set_text(self, state, value):
+        state['old'] = self.data.text
+        self.data.text = value.encode('utf-8')
+        state['new'] = self.data.text
+        self.emit('modified')
+        self.graph.emit('redraw')
+    def undo_set_text(self, state):
+        self.data.text = state['old']
+        self.emit('modified')
+        self.graph.emit('redraw')
+    def redo_set_text(self, state):
+        self.data.text = state['new']
+        self.emit('modified')
+        self.graph.emit('redraw')
+    set_text = action_from_methods2('graph/text/set-text', set_text, undo_set_text, redo=redo_set_text)
+
+    text = property(get_text, set_text)
+
+
 
 class Graph(Item, HasSignals):
     def __init__(self, project, name=None, parent=None, location=None):
         Item.__init__(self, project, name, parent, location)
     
         self.datasets = []
+        self.graph_objects = []
         if location is not None:
             for i, l in enumerate(self.data.datasets):
                 if not l.id.startswith('-'):
                     self.datasets.append(Dataset(self, i))
                     self.datasets[-1].connect('modified', self.on_dataset_modified)
+            for l in self.data.text:
+                if not l.id.startswith('-'):
+                    self.graph_objects.append(Text(self, l))
 
         self.function = FunctionSum(self.data.functions)
 
@@ -318,6 +351,7 @@ class Graph(Item, HasSignals):
     xmax = property(get_xmax, set_xmax)
     ymin = property(get_ymin, set_ymin)
     ymax = property(get_ymax, set_ymax)
+
 
     # axis scales
 
@@ -604,7 +638,7 @@ graphs [
         params:S, lock:S, limit:S, use:I
     ],
     lines [ id:S, position:S ],
-    text [ id:S, position:S, text:S ]
+    text [ id:S, x:D, y:D, text:S ]
 ]
 """
 register_class(Graph, desc)

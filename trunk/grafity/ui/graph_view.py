@@ -18,6 +18,7 @@ from grafity.ui.forms.graph_data import GraphDataUI
 from grafity.ui.forms.graph_axes import GraphAxesUI
 from grafity.ui.forms.graph_fit import GraphFitUI
 from grafity.ui.forms.functions import FunctionsWindowUI
+from grafity.ui.forms.text import TextUI 
 from grafity.ui.forms.fitoptions import FitOptionsUI
 from grafity.ui.utils import getimage, connectevents, Page
 
@@ -419,10 +420,12 @@ class GraphView(QTabWidget):
         self.plot.setMarkerLineStyle(self.rangemax, QwtMarker.VLine)
         self.plot.setMarkerLineStyle(self.reader, QwtMarker.Cross)
         self.moving_rangemin = self.moving_rangemax = False
+        self.moving_marker = None
 
         self.texte = self.plot.insertMarker()
         self.plot.setMarkerLabel(self.texte, "Poutsa")
         self.plot.setMarkerPos(self.texte, 0, 0)
+        self.plot.setMarkerLabelAlign(self.texte, Qt.AlignTop|Qt.AlignRight)
 
         self.mode = 'arrow'
         self.setCaption(self.graph.fullname)
@@ -570,6 +573,24 @@ class GraphView(QTabWidget):
             self.on_mouse_moved(e)
         elif self.mode == 'sreader':
             self.on_mouse_moved(e)
+        elif self.mode == 'arrow':
+            marker = self.plot.marker(self.texte)
+            if self.hittest(marker, e.pos().x(), e.pos().y()):
+                if e.button() == Qt.LeftButton:
+                    mx, my = self.plot.markerPos(self.texte)
+                    self.moving_marker = self.texte, e.pos().x(), e.pos().y(), mx, my
+                elif e.button() == Qt.RightButton:
+                    menu = QPopupMenu()
+                    
+                    menu.insertItem('Edit...', 1)
+                    id = menu.exec_loop(self.plot.canvas().mapToGlobal(e.pos()))
+                    if id == 1:
+                        e = TextOptions(self.mainwin)
+                        e.text.setText(self.plot.markerLabel(self.texte))
+                        if e.exec_loop():
+                            self.plot.setMarkerLabel(self.texte, e.text.text())
+                            self.redraw()
+
 
     def on_mouse_released(self, e):
         x = self.plot.invTransform(self.plot.xBottom, e.pos().x())
@@ -585,6 +606,8 @@ class GraphView(QTabWidget):
                     self.plot.setMarkerXPos(self.rangemax, max(d.range[1] for d in self.datasets))
         elif self.mode == 'hand':
             self.mainwin.graph_fit.active_term.move(x, y)
+        elif self.mode == 'arrow':
+            self.moving_marker = None
 
     def on_mouse_moved(self, e):
         x = self.plot.invTransform(self.plot.xBottom, e.pos().x())
@@ -675,7 +698,26 @@ class GraphView(QTabWidget):
 #                    dataset.worksheet[dataset.coly][index] = nan
 #            project.main_dict['app'].processEvents()
             self.redraw()
+        elif self.mode == 'arrow':
+            if self.moving_marker is not None:
+                marker, ix, iy, mx, my = self.moving_marker
+                mx, my = self.plot.transform(self.plot.xBottom, mx), self.plot.transform(self.plot.yLeft, my)
+                mx += e.pos().x() - ix
+                my += e.pos().y() - iy
+                mx, my = self.plot.invTransform(self.plot.xBottom, mx), self.plot.invTransform(self.plot.yLeft, my)
+                self.plot.setMarkerPos(marker, mx, my)
 
+                self.redraw()
+
+    def hittest(self, marker, x, y):
+        """Check if the point (x,y) in pixel coordinates is on the marker label"""
+        text = marker.label()
+        metrics = QFontMetrics(marker.font())
+        size = metrics.size(0, text)
+        mx, my = self.plot.markerPos(self.texte)
+        mx, my = self.plot.transform(self.plot.xBottom, mx), self.plot.transform(self.plot.yLeft, my)
+
+        return mx <= x <= mx+size.width() and my-size.height() <= y <= my
 
     def on_canvas_event(self, event):
         if event.type() == QEvent.KeyPress:
@@ -731,6 +773,9 @@ class GraphView(QTabWidget):
         self.mainwin.graph_style.on_selection_changed()
 
 class FitOptions(FitOptionsUI):
+    pass
+
+class TextOptions(TextUI):
     pass
 
 class FunctionsWindow(FunctionsWindowUI):
