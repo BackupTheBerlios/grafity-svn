@@ -1,5 +1,5 @@
 """
-grafity.data
+grafity.resources
 """
 __revision__ = "$Id$"
 

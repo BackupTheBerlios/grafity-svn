@@ -4,7 +4,7 @@ sys.modules['grafity.ui.start'].splash.message('loading main')
 
 from qt import *
 
-from grafity.data import column_tools
+from grafity.resources import column_tools
 from grafity.ui.utils import getimage
 from grafity.signals import HasSignals, global_connect
 from grafity.actions import undo, redo, action_list

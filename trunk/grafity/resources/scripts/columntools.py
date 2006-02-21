@@ -1,4 +1,4 @@
-from grafity.data import column_tool
+from grafity.resources import column_tool
 from grafity.arrays import *
 
 @column_tool('Sort Column/Ascending', image='sort-column-ascending')

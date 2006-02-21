@@ -3,7 +3,7 @@ import sys
 from qt import *
 from pkg_resources import resource_filename
 
-from grafity.data import images
+from grafity.resources import images
 
 
 def getimage(name, cache={}):
