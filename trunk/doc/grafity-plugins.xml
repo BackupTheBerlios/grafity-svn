@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<grafity-plugins>
+  <plugin name="Dielectric" version="0.1">
+    <download url="http://grafity.berlios.de/plugins/dielectric-0.1.zip"/>
+  </plugin>
+  <plugin name="DSC" version="0.1">
+    <download url="http://grafity.berlios.de/plugins/dsc-0.1.zip"/>
+  </plugin>
+</grafity-plugins>
