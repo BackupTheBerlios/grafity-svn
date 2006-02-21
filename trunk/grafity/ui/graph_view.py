@@ -450,6 +450,15 @@ class GraphView(QTabWidget):
 
         self.text = {}
 
+
+    def Print(self):
+        printer = QPrinter()
+        printer.setOutputToFile(True)
+        printer.setOutputFileName('mikou.ps')
+        printer.setup()
+        printer.newPage()
+        self.plot.printPlot(printer)
+
     def on_new_object(self, obj):
         mark = self.plot.insertMarker()
         self.plot.setMarkerPos(mark, 0, 0)
