@@ -32,7 +32,7 @@ def scan_functions_dir(functions, dirs):
     for dir in dirs:
         os.path.walk(dir, walk_functions, functions)
 
-def scan_functions_resource(functions, start='data'):
+def scan_functions_resource(functions, start='resources'):
     for name in resource_listdir('grafity', start):
         full = os.path.join(start, name)
         if resource_isdir('grafity', full):
@@ -54,7 +54,7 @@ def scan_plugins_dir():
                 execfile(full, {})
     os.path.walk(USERDATADIR, walk_plugins, None)
 
-def scan_plugins_resource(start='data'):
+def scan_plugins_resource(start='resources'):
     for name in resource_listdir('grafity', start):
         full = os.path.join(start, name)
         if resource_isdir('grafity', full):
@@ -67,7 +67,7 @@ images = {}
 
 from pkg_resources import resource_isdir, resource_listdir, resource_filename
 
-def scan_images_resource(start='data'):
+def scan_images_resource(start='resources'):
     for name in resource_listdir('grafity', start):
         full = os.path.join(start, name)
         if resource_isdir('grafity', full):

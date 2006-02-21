@@ -18,7 +18,7 @@ Grafity: User manual
     - Controlling style 
     - Axes
     - Fitting
-    - gri
+    - Making figures
 
 + Scripts
     - project/folder api    
@@ -26,6 +26,7 @@ Grafity: User manual
     - graph api
 
 + Extending grafity
+    - The resources directory
     - Writing worksheet and column tools
     - Writing graph tools
     - Plugins

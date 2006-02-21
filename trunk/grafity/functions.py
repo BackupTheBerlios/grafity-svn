@@ -10,7 +10,7 @@ from grafity.actions import action_from_methods, StopAction, action_from_methods
 from grafity.settings import USERDATADIR
 from grafity.project import create_id, wrap_attribute
 from grafity.mpfit import mpfit
-from grafity.data import scan_functions
+from grafity.resources import scan_functions
 
 def splitlist(seq, sizes):
     "Split list into list of lists with specified sizes"
