@@ -1,6 +1,6 @@
 import urllib
 import sys
-import ElementTree
+from elementtree import ElementTree
 
 url = "http://grafity.berlios.de/grafity-plugins.xml"
 
