@@ -494,3 +494,4 @@ class Project(HasSignals):
 # import only in order to register object types
 import grafity.worksheet
 import grafity.graph
+import grafity.script

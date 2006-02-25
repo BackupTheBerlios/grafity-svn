@@ -10,6 +10,7 @@ from grafity.signals import HasSignals, global_connect
 from grafity.actions import undo, redo, action_list
 from grafity.ui.graph_view import GraphView, GraphStyle, GraphData, GraphAxes, GraphFit
 from grafity.ui.worksheet_view import WorksheetView
+from grafity.ui.script_view import ScriptView
 from grafity.ui.console import Console
 
 from grafity.ui.forms.main import MainWindowUI
@@ -24,7 +25,8 @@ class ListViewItem(QListViewItem):
 
         pixmap = getimage({grafity.Worksheet: 'worksheet', 
                             grafity.Graph: 'graph', 
-                            grafity.Folder: 'folder'}[type(obj)])
+                            grafity.Folder: 'folder',
+                            grafity.Script: 'script'}[type(obj)])
         self.setPixmap (0, pixmap)
 
         self._object.connect('rename', self.on_object_renamed)
@@ -271,7 +273,7 @@ class ProjectExplorer(HasSignals, QListView):
 
     def dragObject(self, *args, **kwds):
         items = [i for i in self.project.items.values() 
-                   if isinstance(i, (grafity.Worksheet, grafity.Graph, grafity.Folder))
+                   if isinstance(i, (grafity.Worksheet, grafity.Graph, grafity.Folder, grafity.Script))
                       and self.isSelected(i._tree_item)]
         drag = ObjDrag(items, self)
         return drag
@@ -444,6 +446,7 @@ class MainWindow(MainWindowUI):
 
         self.worksheet_toolbar.hide()
         self.graph_toolbar.hide()
+        self.script_toolbar.hide()
         self.rpanel.hide()
 
         self.column_tool_submenus = {'': self.Column}
@@ -493,6 +496,9 @@ class MainWindow(MainWindowUI):
                 obj._view.show()
             elif isinstance(obj, grafity.Worksheet):
                 obj._view = WorksheetView(self.workspace, self, obj)
+                obj._view.show()
+            elif isinstance(obj, grafity.Script):
+                obj._view = ScriptView(self.workspace, self, obj)
                 obj._view.show()
         else:
             obj._view.hide()
@@ -598,6 +604,9 @@ class MainWindow(MainWindowUI):
     def on_new_worksheet(self):
         self.project.new(grafity.Worksheet)
 
+    def on_new_script(self):
+        self.project.new(grafity.Script)
+
     def on_new_graph(self):
         self.project.new(grafity.Graph)
 
@@ -664,6 +673,10 @@ class MainWindow(MainWindowUI):
             self.worksheet_toolbar.show()
             self.menubar.insertItem('&Column', self.Column, -1, 2)
             self.menubar.insertItem('&Worksheet', self.Worksheet, -1, 2)
+
+        elif isinstance(window, ScriptView):
+            self.script_toolbar.show()
+#            self.menubar.insertItem('&Script', self.Column, -1, 2)
 
     def clear (self):
         aw = self.workspace.activeWindow()

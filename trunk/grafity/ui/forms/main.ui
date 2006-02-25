@@ -84,6 +84,8 @@
         <separator/>
     </item>
     <item text="&amp;Tools" name="Tools">
+        <action name="toolsPluginsAction"/>
+        <action name="toolsSettingsAction"/>
     </item>
     <item text="&amp;Window" name="Window">
         <action name="act_window_close"/>
@@ -113,6 +115,7 @@
         <action name="act_new_worksheet"/>
         <action name="act_new_graph"/>
         <action name="act_new_folder"/>
+        <action name="act_new_script"/>
         <separator/>
         <action name="act_cut"/>
         <action name="act_copy"/>
@@ -168,6 +171,21 @@
         <action name="act_worksheet_right"/>
         <action name="act_worksheet_first"/>
         <action name="act_worksheet_last"/>
+    </toolbar>
+    <toolbar dock="5">
+        <property name="name">
+            <cstring>script_toolbar</cstring>
+        </property>
+        <property name="movingEnabled">
+            <bool>false</bool>
+        </property>
+        <property name="newLine">
+            <bool>true</bool>
+        </property>
+        <property name="label">
+            <string>Toolbar</string>
+        </property>
+        <action name="act_script_run"/>
     </toolbar>
 </toolbars>
 <actions>
@@ -662,6 +680,61 @@
             <string>Unnamed</string>
         </property>
     </action>
+    <action>
+        <property name="name">
+            <cstring>act_new_script</cstring>
+        </property>
+        <property name="iconSet">
+            <iconset>image29</iconset>
+        </property>
+        <property name="text">
+            <string>Action_4</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>toolsPluginsAction</cstring>
+        </property>
+        <property name="text">
+            <string>Plu&amp;gins...</string>
+        </property>
+        <property name="menuText">
+            <string>Plu&amp;gins...</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>toolsSettingsAction</cstring>
+        </property>
+        <property name="text">
+            <string>&amp;Preferences...</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Preferences...</string>
+        </property>
+    </action>
+    <actiongroup>
+        <property name="name">
+            <cstring>act_script</cstring>
+        </property>
+        <property name="text">
+            <string>ActionGroup</string>
+        </property>
+        <property name="usesDropDown">
+            <bool>false</bool>
+        </property>
+        <action>
+            <property name="name">
+                <cstring>act_script_run</cstring>
+            </property>
+            <property name="iconSet">
+                <iconset>image30</iconset>
+            </property>
+            <property name="text">
+                <string>Action_4</string>
+            </property>
+        </action>
+    </actiongroup>
 </actions>
 <images>
     <image name="image0">
@@ -750,6 +823,12 @@
     </image>
     <image name="image28">
         <data format="PNG" length="443">89504e470d0a1a0a0000000d4948445200000018000000180806000000e0773df800000182494441544889d595cf6ac24010c67fd9e424eda5176f457a2c08822039f8103df812be45dfc2838fa09482258f108204f1203d0af6a621154cc9ada407c936c9aeae523df4838199d961bef993ddc07f87056457ca7d0ba40220cb3229a3d1a8649f2bcbe5322768033527b756ab15005114495d69d7b2a454ed5cd2342d76603bda4c86e455022144492fc201188fc74451249d9ee769935775dd5992242a41afd79363f13c8f6eb76bec2808025cd755fc711c976ca1449c886217c7707582d2921b8d0683c100dff76512ddec733d0c43e54cbb836245fd7e9fcff7676365afc13d4fee87e28fe2af922d4764dbb674de3d9a09aa9fe3c1b85c29cef4940e4e8532a2e170c88bafce3daff8f742c15bf8a0ec66b7dbe9098410acd76b2693099d4ec758d97c3ea7d56a29fe83f7a0fa0c9870f63db816416907f9a3359bcd4aa487f4c562a19c6977b0d96cd86eb7f2b16a369bc6caa6d3a97657f57a5d25a83a2f0987fd8fa10ddcb0ff855e0a09f06db15f740db08fc79f8d6f203546fd153f3fc2a02f1e7bdfa20000000049454e44ae426082</data>
+    </image>
+    <image name="image29">
+        <data format="PNG" length="978">89504e470d0a1a0a0000000d4948445200000018000000180806000000e0773df800000399494441544889ad95cf4f1c6518c73f33bb2cb32b2c8b78f14720b1172e4221a1e16062f0d7a5e2850b5e4cf81bb8a83144624c4c34bd688d9a68ac866837c11e3854392887629b2a4ad88bb6c6f2632ac502e5c7eeecececbcefe36166979dddc5d2c42779f2be79e67dbfdfe7e73bf03fc8f8f8b8799273af00f200ea0007e9745a7a7b7b656262e2266001c6710492cbe5c4711cb99f944a2529955c29955cd9dcdc14dbb6656969497a7a7a6ce011a0694427023f2271e5debd5db974e95bd9dada121191b9b939191e1e5640ba4212614a2693c7e64f44aaabd63adc43a150a0b5b51580919111262727cd969696f7802460c48f45ac010e54631826229a908b783c8ee795c96432f5d79e0132806744b1a429b0087504c1b972d96775f516b73736b8fecbcf18c0dff63a1f7df2990d3c07ac3544d00cb862338c604504c33411ad686b6be3d4a927e9ec7a98eded6d7677ee023c04c49aa6486bd5004c65358cc086a03d1fad35998e3400c9540aafe4d2d16e01745608ea9c17f1bca0055db7286ed191a25310c7c94b217f288e9397f3e73f3ce99cf403c92611e8aac78220fa68ffe5e75fd16a5994cb651cc7c175ddc85dcbb2c866b3ccccccb0b0b0b00ca41a8a5c740a556020d887841d1d9dd43642bde47239fafafa6a4da9a61154f31ceecd30f7008671e4d3ecec2c8383032081cd342263350170df39084323d3d905c06fbf5e076060f00c63636300acadad831174568ddc85266f86af7c7ce5a39442b446b46671711180d5d55b5cbbbac8fcf79739f7fe3bbcfdd66b005cb8f0053133462c16813b6c4aa094422b85f20312ad35675f7a19804f3ffe80e5e5652e7f37cf8d1b7f52f23c00a6a6a688c56298d108fca6045a29fc10dcf77d7cbfcc9d4d1b80f6f634f1780bc3670628160bfcfec74d00e6e7e7b12c8b44a2a5162a09d1411011e1cea64dfd9361008f3dd103c0b3234f03f0c38f57aa670ef60f00616f7f9feeeeee8af979e0a748049ee7a1940ad5472b8588c6573e1beb7f55812be0df5cbc483e9f2716373163710a85422d9cdb10c1cece0ef9c3bde01d3602ef4dd36466e66b7676f748241298a6599f6b00a6a7a7595959a1bfbfbf627a11b8126953dbb6c9a453e1601dfd035e7fe34d94520da0d5b78aa0d0a3a3a3b59f35d4cdc1b5ab0ba412060695c112c060f4ec0b64b3598686861a486ac93636d6e9e97e9cb5f5db0007f5675ee5c17efaffa5ef024f01566d0de24057a8917e035a81470987271445b486a7010fc801fbc03fc0f6bf87dca59e280a58200000000049454e44ae426082</data>
+    </image>
+    <image name="image30">
+        <data format="PNG" length="371">89504e470d0a1a0a0000000d4948445200000018000000180806000000e0773df80000013a494441544889d595416a83401440df1f7a006f10cfd02bf40a594b20fb40bd843b83b87153f002c613f42ebd400864111114bb6895e964c6742229f4c32c9cefbc37ff3b32f0e010e339045e16f0de810f57720b3c2f80f3bd7e6b4b841a3c05863b46aa4942dbee01d2a22886b66d079f381e8f431445ba64aa42b4893760389d4eb46dcbf97cfe7a41641a4aa9abb971f47dcf6ab51a99230f6596120481375c2945d775b6d65f0ba6d23ce022e661bc21b0c1e338f686033ccd09f49dd7758d889065d9157c4ee214986d01381c0e8808799eff807bb7c8d6f331aaaa62b7db39f3bf12988b75c07abd9e2a70bd7353e05aec828f15df2d504acdc2171f53fdc3da72770bcca3e80bb70a2e978b375c44689ac62a30ff837d9224af9bcdc6b933dbbc88509625c0de5549c883ef0378d08df6a777f2ff8c4f446396b2f127bf010000000049454e44ae426082</data>
     </image>
 </images>
 <connections>
@@ -867,6 +946,12 @@
         <receiver>MainWindowUI</receiver>
         <slot>on_window_close_all()</slot>
     </connection>
+    <connection>
+        <sender>act_new_script</sender>
+        <signal>activated()</signal>
+        <receiver>MainWindowUI</receiver>
+        <slot>on_new_script()</slot>
+    </connection>
 </connections>
 <slots>
     <slot>on_new_graph()</slot>
@@ -888,6 +973,7 @@
     <slot>on_worksheet_right()</slot>
     <slot>on_window_close()</slot>
     <slot>on_window_close_all()</slot>
+    <slot>on_new_script()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>
