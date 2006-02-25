@@ -11,7 +11,7 @@ from grafity.actions import CompositeAction, action_list
 from grafity.functions import registry, Function
 from grafity import Graph, Worksheet, Folder
 from grafity.settings import USERDATADIR
-from grafity.graph import symbols, fills, colors, linetypes, linestyles, attrs
+from grafity.graph import symbols, fills, colors, linetypes, linestyles, attrs, Text
 
 from grafity.ui.forms.graph_style import GraphStyleUI
 from grafity.ui.forms.graph_data import GraphDataUI
@@ -333,19 +333,20 @@ class ZoomTool(object):
 
 
 
-class GraphView(QTabWidget):
+class GraphView(QVBox):
     def __init__(self, parent, mainwin, graph):
-        QTabWidget.__init__(self, parent)
+#        QTabWidget.__init__(self, parent)
+        QVBox.__init__(self, parent)
         self.graph = graph
         self.mainwin = mainwin
-        self.setTabShape(self.Triangular)
-        self.setTabPosition(self.Bottom)
+#        self.setTabShape(self.Triangular)
+#        self.setTabPosition(self.Bottom)
         self.setIcon(getimage('graph'))
         self.mainpage = QSplitter(QSplitter.Horizontal, self)
-        self.addTab(self.mainpage, 'graph')
+#        self.addTab(self.mainpage, 'graph')
         
-        self.gri = QTextEdit(self)
-        self.addTab(self.gri, 'gri')
+#        self.gri = QTextEdit(self)
+#        self.addTab(self.gri, 'gri')
 
         self.bg_color = QColor('white')
 
@@ -399,7 +400,7 @@ class GraphView(QTabWidget):
         pal = QPalette(self.legend.palette())
         cg = QColorGroup(pal.active())
         self.legend_background_color = cg.color(QColorGroup.Background)
-        cg.setColor(QColorGroup.Base, self.legend_background_color)
+        cg.setColor(QColorGroup.Base, Qt.white)#self.legend_background_color)
         pal.setActive(cg)
         self.legend.setPalette(pal)
         self.legend.setFrameShape(QFrame.NoFrame)
@@ -450,6 +451,9 @@ class GraphView(QTabWidget):
 
         self.text = {}
 
+    def on_text_clicked(self):
+        text = self.graph.new_object(Text)
+        text.text = 'foo'
 
     def Print(self):
         printer = QPrinter()

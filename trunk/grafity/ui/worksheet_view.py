@@ -29,16 +29,17 @@ class HeaderToolTip(QToolTip):
 
 
 
-class WorksheetView(QTabWidget):
+class WorksheetView(QVBox):
     def __init__(self, parent, mainwin, worksheet):
-        QTabWidget.__init__(self, parent)
+#        QTabWidget.__init__(self, parent)
+        QVBox.__init__(self, parent)
         self.mainwin, self.worksheet = mainwin, worksheet
 
-        self.setTabShape(self.Triangular)
-        self.setTabPosition(self.Bottom)
+#        self.setTabShape(self.Triangular)
+#        self.setTabPosition(self.Bottom)
 
         self.table = GTable(self.worksheet, self)
-        self.addTab(self.table, 'worksheet')
+#        self.addTab(self.table, 'worksheet')
 
         self.frozen = False
 
@@ -66,6 +67,10 @@ class WorksheetView(QTabWidget):
         a = array([self.worksheet[c][t:b+1] for c in range(l, r+1)])
         return a
     selection = property(get_selection)
+
+    def put(self, col, row, data):
+        for n, column in enumerate(data):
+            self.worksheet[col+n][row:row+len(column)] = column
 
     def on_project_remove_item(self, item):
         if item == self.worksheet:

@@ -958,6 +958,12 @@
         <receiver>MainWindowUI</receiver>
         <slot>on_script_run()</slot>
     </connection>
+    <connection>
+        <sender>graph_text</sender>
+        <signal>activated()</signal>
+        <receiver>MainWindowUI</receiver>
+        <slot>on_graph_text()</slot>
+    </connection>
 </connections>
 <slots>
     <slot>on_new_graph()</slot>
@@ -981,6 +987,7 @@
     <slot>on_window_close_all()</slot>
     <slot>on_new_script()</slot>
     <slot>on_script_run()</slot>
+    <slot>on_graph_text()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

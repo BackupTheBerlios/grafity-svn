@@ -713,6 +713,9 @@ class MainWindow(MainWindowUI):
         h = HelpWidget(self)
         h.show()
 
+    def on_graph_text(self):
+        self.active.on_text_clicked()
+
     def on_worksheet_newcolumn(self):
         self.active.on_newcolumn_clicked()
     def on_worksheet_delcolumn(self):
