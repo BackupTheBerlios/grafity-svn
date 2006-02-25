@@ -726,6 +726,9 @@ class MainWindow(MainWindowUI):
     def on_worksheet_last(self):
         self.active.on_last_clicked()
 
+    def on_script_run(self):
+        self.active.on_run()
+
     def on_window_close(self):
         self.active.close()
 

@@ -9,4 +9,8 @@ class Script(Item, HasSignals):
     default_name_prefix = 'script'
     text = wrap_attribute('text')
 
+    def run(self):
+        code = compile(self.text, self.fullname, 'exec')
+        exec code
+
 register_class(Script, 'scripts[name:S,id:S,parent:S,text:S]')

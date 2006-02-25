@@ -7,7 +7,7 @@ import sets
 sys.modules['grafity.ui.start'].splash.message('loading ui_console')
 
 from qt import *
-from qtext import QextScintilla,QextScintillaLexerPython, QextScintillaAPIs
+from qtext import QextScintilla,QextScintillaLexerPython
 from grafity.settings import settings
 
 import compiler

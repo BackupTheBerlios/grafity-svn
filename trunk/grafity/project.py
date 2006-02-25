@@ -356,7 +356,8 @@ class Project(HasSignals):
         self.this = None
 
         # create objects
-        for cls, desc in [(i, storage_desc[i]) for i in (Folder, grafity.worksheet.Worksheet, grafity.graph.Graph)]:
+        for cls, desc in [(i, storage_desc[i]) for i in (Folder, grafity.worksheet.Worksheet, 
+                                                                    grafity.script.Script, grafity.graph.Graph)]:
             view = self.db.getas(desc)
             for i, row in enumerate(view):
                 if row.id != self.top.id:
