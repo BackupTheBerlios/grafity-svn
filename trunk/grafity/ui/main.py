@@ -4,7 +4,7 @@ sys.modules['grafity.ui.start'].splash.message('loading main')
 
 from qt import *
 
-from grafity.resources import column_tools
+from grafity.resources import column_tools, graph_modes
 from grafity.ui.utils import getimage
 from grafity.signals import HasSignals, global_connect
 from grafity.actions import undo, redo, action_list
@@ -476,13 +476,17 @@ class MainWindow(MainWindowUI):
 
         self.active = None
         self.worksheet_toolbar.addSeparator()
-        btn = QToolButton(self.graph_toolbar)
+        self.btn = btn = QToolButton(self.graph_toolbar)
         btn.setToggleButton(True)
-        btn.setTextLabel('...')
-        btn.setUsesTextLabel(True)
         cm = QPopupMenu (self)
-        cm.insertItem ('Rename', None)
+        self.connect(cm, SIGNAL('activated(int)'), self.on_mode_btn)
+        for i, tool in enumerate(graph_modes):
+            cm.insertItem(QIconSet(getimage(tool.image)), tool.name, i)
         btn.setPopup(cm)
+        btn.setPopupDelay(0)
+
+    def on_mode_btn(self, i):
+        self.btn.setPixmap(getimage(graph_modes[i].image))
 
     def on_column_tool(self, tool):
         worksheet = self.active.worksheet
@@ -656,6 +660,7 @@ class MainWindow(MainWindowUI):
 
         self.worksheet_toolbar.hide()
         self.graph_toolbar.hide()
+        self.script_toolbar.hide()
         self.rpanel.hide()
 
         if isinstance(window, GraphView):

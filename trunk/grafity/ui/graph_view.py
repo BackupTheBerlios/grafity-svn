@@ -17,7 +17,6 @@ from grafity.ui.forms.graph_data import GraphDataUI
 from grafity.ui.forms.graph_axes import GraphAxesUI
 from grafity.ui.forms.graph_fit import GraphFitUI
 from grafity.ui.forms.functions import FunctionsWindowUI
-from grafity.ui.forms.text import TextUI 
 from grafity.ui.forms.fitoptions import FitOptionsUI
 from grafity.ui.utils import getimage, connectevents, Page
 from grafity.ui.graph_tools import ZoomTool, RangeTool, ArrowTool, HandTool
@@ -699,8 +698,6 @@ class GraphView(QVBox):
 class FitOptions(FitOptionsUI):
     pass
 
-class TextOptions(TextUI):
-    pass
 
 class FunctionsWindow(FunctionsWindowUI):
     def __init__(self, parent, fitwin):

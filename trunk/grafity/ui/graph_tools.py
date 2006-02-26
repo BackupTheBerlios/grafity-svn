@@ -4,24 +4,29 @@ from qt import *
 from grafity.arrays import clip
 from grafity.actions import CompositeAction, action_list
 
+from grafity.ui.forms.text import TextUI 
+class TextOptions(TextUI):
+    pass
+
 class GraphTool(object):
     def activate(self):
-        pass
+        """Called when the tool is activated"""
 
     def deactivate(self):
-        pass
+        """Called when the tool is deactivated"""
 
     def mouse_moved(self, e):
-        pass
+        """Handle mouse motion events"""
 
     def mouse_pressed(self, e):
-        pass
+        """Handle mouse press events"""
 
     def mouse_released(self, e):
-        pass
+        """Handle mouse release events"""
 
     def key_pressed(self, e):
-        pass
+        """Handle key press events"""
+
 
 class RangeTool(GraphTool):
     def __init__(self, graph, view, plot):
@@ -113,8 +118,7 @@ class ArrowTool(GraphTool):
 
     def mouse_pressed(self, e):
         for mark in self.view.text:
-#                marker = self.plot.marker(mark)
-            if self.hittest(mark, e.pos().x(), e.pos().y()):
+            if self.view.hittest(mark, e.pos().x(), e.pos().y()):
                 if e.button() == Qt.LeftButton:
                     mx, my = self.plot.markerPos(mark)
                     self.moving_marker = mark, e.pos().x(), e.pos().y(), mx, my
@@ -124,10 +128,10 @@ class ArrowTool(GraphTool):
                     menu.insertItem('Edit...', 1)
                     id = menu.exec_loop(self.plot.canvas().mapToGlobal(e.pos()))
                     if id == 1:
-                        e = TextOptions(self.mainwin)
+                        e = TextOptions(self.view.mainwin)
                         e.text.setText(self.plot.markerLabel(mark))
                         if e.exec_loop():
-                            self.text[mark].text = unicode(e.text.text())
+                            self.view.text[mark].text = unicode(e.text.text())
                 return
 
     def mouse_released(self, e):
@@ -142,7 +146,7 @@ class ArrowTool(GraphTool):
             mx, my = self.plot.invTransform(self.plot.xBottom, mx), self.plot.invTransform(self.plot.yLeft, my)
             self.plot.setMarkerPos(marker, mx, my)
 
-            self.redraw()
+            self.view.redraw()
 
 class DataReaderTool(GraphTool):
     def __init__(self, graph, view, plot):
@@ -159,11 +163,14 @@ class DataReaderTool(GraphTool):
         self.mouse_moved(e)
 
     def mouse_moved(self, e):
+        x = self.plot.invTransform(self.plot.xBottom, e.pos().x())
+        y = self.plot.invTransform(self.plot.yLeft, e.pos().y())
         curve, dist, xval, yval, index = self.plot.closestCurve(e.pos().x(), e.pos().y())
         self.dr_dataset = self.graph.datasets[[d._curveid for d in self.graph.datasets].index(curve)]
         self.dr_point = index
         self.plot.setMarkerXPos (self.reader, xval)
         self.plot.setMarkerYPos (self.reader, yval)
+        self.view.mainwin.statuslabel.setText("(%g, %g)" % (x, y))
 
         self.view.redraw()
 
@@ -187,7 +194,7 @@ class ScreenReaderTool(GraphTool):
         y = self.plot.invTransform(self.plot.yLeft, e.pos().y())
         self.plot.setMarkerXPos(self.reader, x)
         self.plot.setMarkerYPos(self.reader, y)
-#        project.mainwin.statuslabel.setText ("(%g, %g)" % (xval, yval))
+        self.view.mainwin.statuslabel.setText("(%g, %g)" % (x, y))
 #        if e.state() & Qt.ControlButton:
 #            curve, dist, xval, yval, ind = self.plot.closestCurve (e.pos().x(), e.pos().y())
 #            dataset = self.datasets[[d.curveid for d in self.datasets].index(curve)]

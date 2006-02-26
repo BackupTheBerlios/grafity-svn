@@ -5,6 +5,7 @@ __revision__ = "$Id$"
 
 import fnmatch
 import os.path
+import sys
 from grafity.settings import USERDATADIR
 
 def column_tool(name, image=None):
@@ -22,6 +23,12 @@ def dataset_tool(name, image=None):
     return dataset_tool_dec
 
 dataset_tools = []
+
+def register_graph_mode(mode):
+    print >>sys.stderr, "registering graph mode", mode.name
+    graph_modes.append(mode)
+
+graph_modes = []
 
 def scan_functions_dir(functions, dirs):
     def walk_functions(functions, folder, files):

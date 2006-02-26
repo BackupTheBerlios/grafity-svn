@@ -17,8 +17,11 @@ Grafity: User manual
     - Adding and removing datasets
     - Controlling style 
     - Axes
-    - Fitting
     - Making figures
+
++ Fitting
+    - Fit Functions
+    - Fit Options
 
 + Scripts
     - project/folder api    
