@@ -6,8 +6,7 @@ from qt import *
 from qwt import *
 import qwt.qplt
 
-from grafity.arrays import clip, nan, arange, log10, isnan, asarray, Float, argmin, argmax, array, ones, sqrt
-from grafity.actions import CompositeAction, action_list
+from grafity.arrays import nan, arange, log10, isnan, asarray, Float, argmin, argmax, array, ones, sqrt
 from grafity.functions import registry, Function
 from grafity import Graph, Worksheet, Folder
 from grafity.settings import USERDATADIR
@@ -21,7 +20,8 @@ from grafity.ui.forms.functions import FunctionsWindowUI
 from grafity.ui.forms.text import TextUI 
 from grafity.ui.forms.fitoptions import FitOptionsUI
 from grafity.ui.utils import getimage, connectevents, Page
-
+from grafity.ui.graph_tools import ZoomTool, RangeTool, ArrowTool, HandTool
+from grafity.ui.graph_tools import DataReaderTool, ScreenReaderTool
 
 class ErrorBarPlotCurve(QwtPlotCurve):
     def __init__(self, parent,
@@ -295,59 +295,14 @@ def efloat(f):
     except Exception:
         return nan
 
-class ZoomTool(object):
-    def __init__(self, graph, view, plot):
-        self.graph, self.view, self.plot = graph, view, plot
-
-    def activate(self):
-        pass
-
-    def deactivate(self):
-        pass
-
-    def mouse_pressed(self, e):
-        self.xpos = self.plot.invTransform(self.plot.xBottom, e.pos().x())
-        self.ypos = self.plot.invTransform(self.plot.yLeft, e.pos().y())
-        self.plot.enableOutline(True)
-        self.plot.setOutlinePen(QPen(Qt.blue, 0, Qt.DotLine))
-        self.plot.setOutlineStyle(Qwt.Rect)
-        self.mouse_moved(e)
-
-    def mouse_released(self, e):
-        x = self.plot.invTransform(self.plot.xBottom, e.pos().x())
-        y = self.plot.invTransform(self.plot.yLeft, e.pos().y())
-        xmin, xmax, ymin, ymax = min(self.xpos, x), max(self.xpos, x), min(self.ypos, y), max(self.ypos, y)
-        if e.button() == Qt.LeftButton:
-            self.graph.zoom(xmin, xmax, ymin, ymax)
-        elif e.button() == Qt.RightButton:
-            self.graph.zoom_out(xmin, xmax, ymin, ymax)
-        elif e.button() == Qt.MidButton:
-            self.graph.autoscale()
-        self.plot.enableOutline(False)
-
-    def mouse_moved(self, e):
-        pass
-
-    def key_pressed(self, e):
-        pass
-
-
-
 class GraphView(QVBox):
     def __init__(self, parent, mainwin, graph):
-#        QTabWidget.__init__(self, parent)
         QVBox.__init__(self, parent)
         self.graph = graph
         self.mainwin = mainwin
-#        self.setTabShape(self.Triangular)
-#        self.setTabPosition(self.Bottom)
         self.setIcon(getimage('graph'))
         self.mainpage = QSplitter(QSplitter.Horizontal, self)
-#        self.addTab(self.mainpage, 'graph')
         
-#        self.gri = QTextEdit(self)
-#        self.addTab(self.gri, 'gri')
-
         self.bg_color = QColor('white')
 
         self.plot = QwtPlot()
@@ -362,9 +317,7 @@ class GraphView(QVBox):
         self.plot.canvas().setLineWidth(1)
         self.plot.canvas().setFrameStyle(QFrame.Box|QFrame.Plain)
         self.plot.axis(self.plot.xBottom).setBaselineDist(0)
-#        self.plot.axis(self.plot.xBottom).setBorderDist(0,0)
         self.plot.axis(self.plot.yLeft).setBaselineDist(0)
-#        self.plot.axis(self.plot.yLeft).setBorderDist(0,0)
         self.plot.axis(self.plot.yLeft).scaleDraw().setOptions(QwtScaleDraw.None)
         self.plot.axis(self.plot.xBottom).scaleDraw().setOptions(QwtScaleDraw.None)
 
@@ -387,7 +340,6 @@ class GraphView(QVBox):
         self.graph.function.connect('remove-term', self.on_remove_function_term)
         self.graph.function.connect('modified', self.on_function_modified)
 
-#        self.graph.connect('add-function', self.on_modified)
         self.frozen = False
         self.needs_redraw = False
         self.needs_legend_update = False
@@ -423,15 +375,18 @@ class GraphView(QVBox):
         self.on_zoom_changed(self.graph.xmin, self.graph.xmax, self.graph.ymin, self.graph.ymax)
         self.unfreeze()
 
-        self.rangemin = self.plot.insertLineMarker(None, QwtPlot.xBottom)
-        self.rangemax = self.plot.insertLineMarker(None, QwtPlot.xBottom)
-        self.reader = self.plot.insertLineMarker(None, QwtPlot.xBottom)
-        self.plot.setMarkerLineStyle(self.rangemin, QwtMarker.VLine)
-        self.plot.setMarkerLineStyle(self.rangemax, QwtMarker.VLine)
-        self.plot.setMarkerLineStyle(self.reader, QwtMarker.Cross)
-        self.moving_rangemin = self.moving_rangemax = False
         self.moving_marker = None
 
+        self.tools = {}
+        self.tools['zoom'] = ZoomTool(self.graph, self, self.plot)
+        self.tools['range'] = RangeTool(self.graph, self, self.plot)
+        self.tools['hand'] = HandTool(self.graph, self, self.plot)
+        self.tools['sreader'] = ScreenReaderTool(self.graph, self, self.plot)
+        self.tools['dreader'] = DataReaderTool(self.graph, self, self.plot)
+        self.tools['arrow'] = ArrowTool(self.graph, self, self.plot)
+
+        self.tool = None
+        self._mode = None
         self.mode = 'arrow'
         self.setCaption(self.graph.fullname)
         self.setWFlags(Qt.WDestructiveClose)
@@ -439,29 +394,50 @@ class GraphView(QVBox):
         self.graph.project.connect('remove-item', self.on_project_remove_item)
         connectevents(self.plot.canvas(), self.on_canvas_event)
 
-        self.tools = {}
-        self.tools['zoom'] = ZoomTool(self.graph, self, self.plot)
+#        self.foo = self.plot.insertCurve("foo")
+#        self.foo2 = self.plot.insertCurve("foo")
+#        self.foom = self.plot.insertCurve("foo")
+#        self.plot.setCurvePen(self.foo, QPen(Qt.darkGreen))
+#        self.plot.setCurvePen(self.foo2, QPen(Qt.darkRed))
+#        self.plot.setCurvePen(self.foom, QPen(Qt.darkCyan))
 
-        self.foo = self.plot.insertCurve("foo")
-        self.foo2 = self.plot.insertCurve("foo")
-        self.foom = self.plot.insertCurve("foo")
-        self.plot.setCurvePen(self.foo, QPen(Qt.darkGreen))
-        self.plot.setCurvePen(self.foo2, QPen(Qt.darkRed))
-        self.plot.setCurvePen(self.foom, QPen(Qt.darkCyan))
+        self.plot.plotLayout().setAlignCanvasToScales(True)
 
         self.text = {}
+
+    def set_mode(self, mode):
+        if mode == self._mode:
+            return
+        if self.tool is not None:
+            self.tool.deactivate()
+        self._mode = mode
+        if mode in self.tools:
+            self.tool = self.tools[self.mode]
+            self.tool.activate()
+        else:
+            self.tool = None
+    def get_mode(self):
+        return self._mode
+    mode = property(get_mode, set_mode)
 
     def on_text_clicked(self):
         text = self.graph.new_object(Text)
         text.text = 'foo'
 
     def Print(self):
+        line = self.plot.insertCurve('frame')
+        self.plot.setCurvePen(line, QPen(Qt.black))
+        self.plot.setCurveData(line,
+         [self.graph.xmin, self.graph.xmax, self.graph.xmax, self.graph.xmin, self.graph.xmin],
+         [self.graph.ymin, self.graph.ymin, self.graph.ymax, self.graph.ymax, self.graph.ymin])
+
         printer = QPrinter()
         printer.setOutputToFile(True)
         printer.setOutputFileName('mikou.ps')
         printer.setup()
         printer.newPage()
         self.plot.printPlot(printer)
+        self.plot.removeCurve(line)
 
     def on_new_object(self, obj):
         mark = self.plot.insertMarker()
@@ -591,81 +567,21 @@ class GraphView(QVBox):
         self.redraw()
 
     def on_mouse_pressed(self, e):
+        if self.tool is not None:
+            return self.tool.mouse_pressed(e)
+
         x = self.plot.invTransform(self.plot.xBottom, e.pos().x())
         y = self.plot.invTransform(self.plot.yLeft, e.pos().y())
-        if self.mode == 'zoom':
-            self.tools['zoom'].mouse_pressed(e)
-        elif self.mode == 'range':
-            if e.button() == Qt.LeftButton:
-                self.moving_rangemin = True
-            elif e.button() == Qt.RightButton:
-                self.moving_rangemax = True
-            self.range_l = min(d.minx for d in self.datasets)
-            self.range_r = max(d.maxx for d in self.datasets)
-            self.on_mouse_moved(e)
-        elif self.mode == 'hand':
-            pass
-        elif self.mode == 'dreader':
-            self.on_mouse_moved(e)
-        elif self.mode == 'sreader':
-            self.on_mouse_moved(e)
-        elif self.mode == 'arrow':
-            for mark in self.text:
-#                marker = self.plot.marker(mark)
-                if self.hittest(mark, e.pos().x(), e.pos().y()):
-                    if e.button() == Qt.LeftButton:
-                        mx, my = self.plot.markerPos(mark)
-                        self.moving_marker = mark, e.pos().x(), e.pos().y(), mx, my
-                    elif e.button() == Qt.RightButton:
-                        menu = QPopupMenu()
-                        
-                        menu.insertItem('Edit...', 1)
-                        id = menu.exec_loop(self.plot.canvas().mapToGlobal(e.pos()))
-                        if id == 1:
-                            e = TextOptions(self.mainwin)
-                            e.text.setText(self.plot.markerLabel(mark))
-                            if e.exec_loop():
-                                self.text[mark].text = unicode(e.text.text())
-                    return
-
 
     def on_mouse_released(self, e):
-        x = self.plot.invTransform(self.plot.xBottom, e.pos().x())
-        y = self.plot.invTransform(self.plot.yLeft, e.pos().y())
-        if self.mode == 'zoom':
-            self.tools['zoom'].mouse_released(e)
-        elif self.mode == 'range':
-            self.moving_rangemin = self.moving_rangemax = False
-            if e.button() == Qt.MidButton:
-                for d in self.datasets:
-                    d.range = (self.range_l, self.range_r)
-                    self.plot.setMarkerXPos(self.rangemin, min(d.range[0] for d in self.datasets))
-                    self.plot.setMarkerXPos(self.rangemax, max(d.range[1] for d in self.datasets))
-        elif self.mode == 'hand':
-            self.mainwin.graph_fit.active_term.move(x, y)
-        elif self.mode == 'arrow':
-            self.moving_marker = None
+        if self.tool is not None:
+            return self.tool.mouse_released(e)
 
     def on_mouse_moved(self, e):
-        x = self.plot.invTransform(self.plot.xBottom, e.pos().x())
-        y = self.plot.invTransform(self.plot.yLeft, e.pos().y())
-        if self.mode == 'range':
-            xpos = clip(x, self.range_l, self.range_r)
-            self.freeze()
-            action_list.begin_composite(CompositeAction('set-range'))
-            if self.moving_rangemin:
-                self.plot.setMarkerXPos(self.rangemin, xpos)
-                for d in self.datasets:
-                    d.range = (xpos, d.range[1])
-            elif self.moving_rangemax:
-                self.plot.setMarkerXPos(self.rangemax, xpos)
-                for d in self.datasets:
-                    d.range = (d.range[0], xpos)
-            action_list.end_composite().register()
-            self.unfreeze()
-        elif self.mode == 'hand':
-            self.mainwin.graph_fit.active_term.move(x, y)
-        elif self.mode == 'dreader':
+        if self.tool is not None:
+            return self.tool.mouse_moved(e)
+
+        if self.mode == 'dreader':
             if self.graph.datasets == []:
                 return
             d = self.datasets[0]
@@ -716,36 +632,7 @@ class GraphView(QVBox):
                 self.plot.setMarkerLabel(self.texte, 
                 "T<sub>f</sub>=%f<br>T<sub>on</sub>=%f, T<sub>end</sub>=%f<br>"%(inflx,Ton,Tend))
 
-#            curve, dist, xval, yval, index = self.plot.closestCurve(e.pos().x(), e.pos().y())
-#            self.dr_dataset = self.graph.datasets[[d._curveid for d in self.graph.datasets].index(curve)]
-#            self.dr_point = index
-#            self.plot.setMarkerXPos (self.reader, xval)
-#            self.plot.setMarkerYPos (self.reader, yval)
-
             self.redraw()
-        elif self.mode == 'sreader':
-            self.plot.setMarkerXPos(self.reader, x)
-            self.plot.setMarkerYPos(self.reader, y)
-#            project.mainwin.statuslabel.setText ("(%g, %g)" % (xval, yval))
-#            if e.state() & Qt.ControlButton:
-#                curve, dist, xval, yval, ind = self.plot.closestCurve (e.pos().x(), e.pos().y())
-#                dataset = self.datasets[[d.curveid for d in self.datasets].index(curve)]
-#                if dist<=2:
-#                    index = dataset.data()[2][ind]
-#                    dataset.worksheet[dataset.coly][index] = nan
-#            project.main_dict['app'].processEvents()
-            self.redraw()
-        elif self.mode == 'arrow':
-            if self.moving_marker is not None:
-                marker, ix, iy, mx, my = self.moving_marker
-                mx, my = self.plot.transform(self.plot.xBottom, mx), self.plot.transform(self.plot.yLeft, my)
-                mx += e.pos().x() - ix
-                my += e.pos().y() - iy
-                mx, my = self.plot.invTransform(self.plot.xBottom, mx), self.plot.invTransform(self.plot.yLeft, my)
-                self.plot.setMarkerPos(marker, mx, my)
-
-                self.redraw()
-
     def hittest(self, marker, x, y):
         """Check if the point (x,y) in pixel coordinates is on the marker label"""
         text = self.plot.markerLabel(marker)
