@@ -4,3 +4,8 @@
 * cut/copy/paste in worksheets
 * data reader
 * screen reader
+
+from grafity.extend import extension
+
+@extension('column_tool')
+@parameters(name='Differentiate', image='diff')

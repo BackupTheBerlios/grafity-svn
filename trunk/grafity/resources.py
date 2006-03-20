@@ -111,8 +111,8 @@ def resource_walk(res):
 
 def resource_process(res):
     for pattern, function in processors:
-        if fnmatch.fnmatch(os.path.basename(r), pattern):
-            function(r)
+        if fnmatch.fnmatch(os.path.basename(res), pattern):
+            function(res)
 
 images = {}
 
@@ -125,6 +125,5 @@ def resource_search(pattern):
 start_res = [ 'resource:resources', 'file:%s'%USERDATADIR ]
 
 for start in start_res:
-    for start in start_res:
-        for res in resource_walk(start):
-            resource_process(res)
+    for res in resource_walk(start):
+        resource_process(res)
