@@ -3,7 +3,35 @@ import sys
 from qt import *
 #from pkg_resources import resource_filename
 
-from grafity.resources import images, resource_data
+from grafity.resources import images, resource_data, extension_type
+
+
+column_tools = []
+
+@extension_type('column-tool')
+def column_tool_dec(function):
+    print >>sys.stderr, "registering column tool", function.name
+    if hasattr(function, 'image'):
+        img = function.image
+    else:
+        img = None
+    column_tools.append((function.name, function, img))
+    return function
+
+
+def dataset_tool(name, image=None):
+    def dataset_tool_dec(function):
+        dataset_tools.append((name, function, image))
+        return function
+    return dataset_tool_dec
+
+dataset_tools = []
+
+def register_graph_mode(mode):
+    print >>sys.stderr, "registering graph mode", mode.name
+    graph_modes.append(mode)
+
+graph_modes = []
 
 
 def getimage(name, cache={}):

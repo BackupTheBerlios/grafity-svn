@@ -1168,6 +1168,7 @@ class GraphData(GraphDataUI):
         self.worksheet_list.header().hide()
         self.mainwin = mainwin
         self.project = None
+        self.splitter.setSizes([100,100,100])
 
     def set_graph(self, graph):
         self.graph = graph

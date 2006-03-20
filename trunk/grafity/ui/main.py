@@ -4,8 +4,7 @@ sys.modules['grafity.ui.start'].splash.message('loading main')
 
 from qt import *
 
-from grafity.resources import column_tools, graph_modes
-from grafity.ui.utils import getimage
+from grafity.ui.utils import getimage, column_tools, graph_modes
 from grafity.signals import HasSignals, global_connect
 from grafity.actions import undo, redo, action_list
 from grafity.ui.graph_view import GraphView, GraphStyle, GraphData, GraphAxes, GraphFit
@@ -476,15 +475,24 @@ class MainWindow(MainWindowUI):
         self.menubar.removeItem(self.menubar.idAt(2))
 
         self.active = None
-        self.worksheet_toolbar.addSeparator()
-        self.btn = btn = QToolButton(self.graph_toolbar)
-        btn.setToggleButton(True)
+
+        self.ac = QAction(self.act_graph, 'act_extra')
+        self.ac.setToggleAction(1)
+        self.ac.addTo(self.graph_toolbar)
+
+        self.btn = btn = self.graph_toolbar.queryList('QToolButton')[-1]
+
+#        self.btn = btn = QToolButton(self.graph_toolbar)
+#        btn.setToggleButton(True)
         cm = QPopupMenu (self)
         self.connect(cm, SIGNAL('activated(int)'), self.on_mode_btn)
         for i, tool in enumerate(graph_modes):
             cm.insertItem(QIconSet(getimage(tool.image)), tool.name, i)
         btn.setPopup(cm)
         btn.setPopupDelay(0)
+
+        self.graph_toolbar.addSeparator()
+        self.graph_text.addTo(self.graph_toolbar)
 
     def on_mode_btn(self, i):
         self.btn.setPixmap(getimage(graph_modes[i].image))

@@ -100,13 +100,16 @@
         </widget>
         <widget class="QSplitter">
             <property name="name">
-                <cstring>splitter1</cstring>
+                <cstring>splitter</cstring>
             </property>
             <property name="orientation">
                 <enum>Vertical</enum>
             </property>
             <property name="opaqueResize">
                 <bool>true</bool>
+            </property>
+            <property name="childrenCollapsible">
+                <bool>false</bool>
             </property>
             <widget class="QLayoutWidget">
                 <property name="name">
@@ -126,6 +129,14 @@
                         <property name="name">
                             <cstring>textLabel1</cstring>
                         </property>
+                        <property name="sizePolicy">
+                            <sizepolicy>
+                                <hsizetype>5</hsizetype>
+                                <vsizetype>0</vsizetype>
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                            </sizepolicy>
+                        </property>
                         <property name="text">
                             <string>&lt;b&gt;worksheet&lt;/b&gt;</string>
                         </property>
@@ -144,6 +155,14 @@
                         </column>
                         <property name="name">
                             <cstring>worksheet_list</cstring>
+                        </property>
+                        <property name="sizePolicy">
+                            <sizepolicy>
+                                <hsizetype>7</hsizetype>
+                                <vsizetype>7</vsizetype>
+                                <horstretch>0</horstretch>
+                                <verstretch>1</verstretch>
+                            </sizepolicy>
                         </property>
                         <property name="resizePolicy">
                             <enum>AutoOneFit</enum>
@@ -172,6 +191,14 @@
                         <property name="name">
                             <cstring>textLabel2</cstring>
                         </property>
+                        <property name="sizePolicy">
+                            <sizepolicy>
+                                <hsizetype>5</hsizetype>
+                                <vsizetype>0</vsizetype>
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                            </sizepolicy>
+                        </property>
                         <property name="text">
                             <string>&lt;b&gt;x axis&lt;/b&gt;</string>
                         </property>
@@ -179,6 +206,14 @@
                     <widget class="QListBox">
                         <property name="name">
                             <cstring>x_list</cstring>
+                        </property>
+                        <property name="sizePolicy">
+                            <sizepolicy>
+                                <hsizetype>7</hsizetype>
+                                <vsizetype>7</vsizetype>
+                                <horstretch>0</horstretch>
+                                <verstretch>1</verstretch>
+                            </sizepolicy>
                         </property>
                         <property name="selectionMode">
                             <enum>Extended</enum>
@@ -204,6 +239,14 @@
                         <property name="name">
                             <cstring>textLabel3</cstring>
                         </property>
+                        <property name="sizePolicy">
+                            <sizepolicy>
+                                <hsizetype>5</hsizetype>
+                                <vsizetype>0</vsizetype>
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                            </sizepolicy>
+                        </property>
                         <property name="text">
                             <string>&lt;b&gt;y axis&lt;/b&gt;</string>
                         </property>
@@ -211,6 +254,14 @@
                     <widget class="QListBox">
                         <property name="name">
                             <cstring>y_list</cstring>
+                        </property>
+                        <property name="sizePolicy">
+                            <sizepolicy>
+                                <hsizetype>7</hsizetype>
+                                <vsizetype>7</vsizetype>
+                                <horstretch>0</horstretch>
+                                <verstretch>1</verstretch>
+                            </sizepolicy>
                         </property>
                         <property name="selectionMode">
                             <enum>Extended</enum>

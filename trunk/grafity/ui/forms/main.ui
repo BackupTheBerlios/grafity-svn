@@ -149,8 +149,6 @@
         <action name="act_graph_range"/>
         <action name="act_graph_dreader"/>
         <action name="act_graph_sreader"/>
-        <separator/>
-        <action name="graph_text"/>
     </toolbar>
     <toolbar dock="5">
         <property name="name">

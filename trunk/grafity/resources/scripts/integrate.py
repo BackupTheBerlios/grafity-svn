@@ -1,5 +1,5 @@
 from grafity.arrays import *
-from grafity.resources import register_graph_mode
+from grafity.ui.utils import register_graph_mode
 from grafity.ui.graph_tools import GraphTool
 
 def integrate(x, y):
