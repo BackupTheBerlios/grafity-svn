@@ -11,6 +11,7 @@ from grafity.actions import undo, redo, action_list
 from grafity.ui.graph_view import GraphView, GraphStyle, GraphData, GraphAxes, GraphFit
 from grafity.ui.worksheet_view import WorksheetView
 from grafity.ui.script_view import ScriptView
+from grafity.import_ascii import import_ascii
 from grafity.ui.console import Console
 
 from grafity.ui.forms.main import MainWindowUI
@@ -743,6 +744,14 @@ class MainWindow(MainWindowUI):
     def on_window_close_all(self):
         for win in self.workspace.windowList():
             win.close()
+
+    def on_import_ascii(self):
+        qfd = QFileDialog(self)
+        qfd.setMode(QFileDialog.ExistingFiles)
+        if qfd.exec_loop() == 1:
+            for f in qfd.selectedFiles():
+                w = self.project.new(grafity.Worksheet, os.path.splitext(os.path.split(str(f))[1])[0])
+                w.array, w._header = import_ascii(str(f))
 
 def splash_message(text):
     if __name__ == '__main__':

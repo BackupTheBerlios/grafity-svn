@@ -7,19 +7,19 @@ from grafity.actions import action_from_methods, action_from_methods2, StopActio
 from grafity.functions import FunctionSum, registry
 import pyx
 
-symbols = ['none', 'square', 'circle', 'diamond', 
+symbols = ['none', 'square', 'circle', 'diamond',
            'triangleup', 'triangledown', 'triangleleft', 'triangleright', '+', 'x', ]
 fills = ['filled', 'open']
-colors = ['#000000', '#ff0000', '#8b0000', '#00ff00', '#006400', '#0000ff', '#00008b', 
-          '#00ffff', '#008b8b', '#ff00ff', '#8b008b', '#ffff00', '#bebebe', 
-          '#a9a9a9', '#d3d3d3', '#7ac5cd', '#6495ed', '#ffb90f', '#bcee68', '#ff7f00', 
-          '#e9967a', '#00ced1', '#ee1289', '#00bfff', '#1874cd', '#ff69b4', '#cd6090', 
+colors = ['#000000', '#ff0000', '#8b0000', '#00ff00', '#006400', '#0000ff', '#00008b',
+          '#00ffff', '#008b8b', '#ff00ff', '#8b008b', '#ffff00', '#bebebe',
+          '#a9a9a9', '#d3d3d3', '#7ac5cd', '#6495ed', '#ffb90f', '#bcee68', '#ff7f00',
+          '#e9967a', '#00ced1', '#ee1289', '#00bfff', '#1874cd', '#ff69b4', '#cd6090',
           '#cd5c5c', '#90ee90', '#5d478b', ]
 
 linetypes = ['none', 'straight', 'spline']
 linestyles = ['solid', 'dash', 'dot', 'dashdot', 'dashdotdot']
 
-attr_values = {'color': colors, 'symbol': symbols, 'fill': fills, 
+attr_values = {'color': colors, 'symbol': symbols, 'fill': fills,
                'linetype': linetypes, 'linestyle': linestyles }
 
 attrs = ['symbol', 'fill', 'size', 'color', 'linestyle', 'linewidth', 'linetype']
@@ -179,7 +179,7 @@ from pyx import *
 def _linesymbol(c, x_pt, y_pt, size_pt, attrs):
     c.draw(path.line_pt(x_pt, y_pt-0.5*size_pt, x_pt, y_pt+0.5*size_pt), attrs)
 
-# the symbol style expects a changeable attribute as argument, 
+# the symbol style expects a changeable attribute as argument,
 # so we create a dummy one consisting of a single symbol
 linesymbol = pyx.attr.changelist([_linesymbol])
 
@@ -189,8 +189,8 @@ class Line:
 class Text(HasSignals):
     def __init__(self, graph, data):
         self.graph, self.data = graph, data
-        
-    def get_text(self): 
+
+    def get_text(self):
         return self.data.text.decode('utf-8')
 
     def set_text(self, state, value):
@@ -213,7 +213,7 @@ class Text(HasSignals):
 class Graph(Item, HasSignals):
     def __init__(self, project, name=None, parent=None, location=None):
         Item.__init__(self, project, name, parent, location)
-    
+
         self.datasets = []
         self.graph_objects = []
         if location is not None:
@@ -230,7 +230,7 @@ class Graph(Item, HasSignals):
         if self.xtype == '':
             self._xtype = 'linear'
         if self.ytype == '':
-            self._ytype = 'linear' 
+            self._ytype = 'linear'
 
     default_name_prefix = 'graph'
 
@@ -242,7 +242,7 @@ class Graph(Item, HasSignals):
         g = pyx.graph.graphxy(width=8, x=xaxis, y=yaxis)
 
         pyx_symbols = [ None, 'square', 'circle', 'diamond',
-                        'triangle', 'triangle', 'triangle', 'triangle',  
+                        'triangle', 'triangle', 'triangle', 'triangle',
                         'plus', 'cross' ]
         pyx_symbols = dict(zip(symbols, pyx_symbols))
 
@@ -257,7 +257,7 @@ class Graph(Item, HasSignals):
             if ds.style.symbol != 'none':
                 symbol = pyx.graph.style.symbol(getattr(pyx.graph.style.symbol, pyx_symbols[ds.style.symbol]), size=0.1,
                                                 symbolattrs=[
-                                                pyx.deco.filled([color]), 
+                                                pyx.deco.filled([color]),
                                                 pyx.deco.stroked([color, pyx.style.linewidth.Thin,]),],
                                                 )
                 g.plot(data, [symbol])
@@ -269,15 +269,15 @@ class Graph(Item, HasSignals):
 
     def togri(self):
         gri_symbols_open = [ None, 'box', 'circ', 'diamond',
-                             'triangleup', 'triangledown', 'triangleleft', 'triangleright',  
+                             'triangleup', 'triangledown', 'triangleleft', 'triangleright',
                              'plus', 'times' ]
-        gri_symbols_filled = [ None, 'filledbox', 'bullet', 'filleddiamond', 
-                             'filledtriangleup', 'filledtriangledown', 'filledtriangleleft', 'filledtriangleright',  
+        gri_symbols_filled = [ None, 'filledbox', 'bullet', 'filleddiamond',
+                             'filledtriangleup', 'filledtriangledown', 'filledtriangleleft', 'filledtriangleright',
                              'plus', 'times' ]
 
         gri_symbols = {'open' : dict(zip(symbols, gri_symbols_open)),
                        'filled' : dict(zip(symbols, gri_symbols_open)) }
-                              
+
         gri_linestyles = dict(zip(linestyles, [ 'off', '', '14', '0.5 0.1 0.1 0.1', '0.5 0.1 0.1 0.1 0.1 0.1']))
 
 
@@ -304,11 +304,11 @@ class Graph(Item, HasSignals):
             gri.append('read columns x y')
             active = ds.active_data()
             for x, y in sorted(zip(ds.x[active], ds.y[active])):
-                 gri.append('%g %g' %(x, y))
+                gri.append('%g %g' %(x, y))
             gri.append('')
 
             gri.append('set symbol size %g' % (ds.style.size / 30.))
-            gri.append('set color rgb %f %f %f' % tuple([int(s, 16)/256. for s in 
+            gri.append('set color rgb %f %f %f' % tuple([int(s, 16)/256. for s in
                                                           (ds.style.color[a:b] for a,b in ((1,3),(3,5),(5,7)))]))
             shape = gri_symbols[ds.style.fill][ds.style.symbol]
             if shape is not None:
@@ -324,25 +324,25 @@ class Graph(Item, HasSignals):
         gricode = '\n'.join(gri)
         return gricode
 
-    def get_xmin(self): 
+    def get_xmin(self):
         try: return float(self._zoom.split()[0])
         except IndexError: return 0.0
-    def get_xmax(self): 
+    def get_xmax(self):
         try: return float(self._zoom.split()[1])
         except IndexError: return 1.0
-    def get_ymin(self): 
+    def get_ymin(self):
         try: return float(self._zoom.split()[2])
         except IndexError: return 0.0
-    def get_ymax(self): 
+    def get_ymax(self):
         try: return float(self._zoom.split()[3])
         except IndexError: return 1.0
-    def set_xmin(self, value): 
+    def set_xmin(self, value):
         self._zoom = ' '.join([str(f) for f in [value, self.xmax, self.ymin, self.ymax]])
-    def set_xmax(self, value): 
+    def set_xmax(self, value):
         self._zoom = ' '.join([str(f) for f in [self.xmin, value, self.ymin, self.ymax]])
-    def set_ymin(self, value): 
+    def set_ymin(self, value):
         self._zoom = ' '.join([str(f) for f in [self.xmin, self.xmax, value, self.ymax]])
-    def set_ymax(self, value): 
+    def set_ymax(self, value):
         self._zoom = ' '.join([str(f) for f in [self.xmin, self.xmax, self.ymin, value]])
     xmin = property(get_xmin, set_xmin)
     xmax = property(get_xmax, set_xmax)
@@ -439,7 +439,7 @@ class Graph(Item, HasSignals):
         obj.id = obj.id[1:]
         self.emit('new-object', obj)
 
-    new_object = action_from_methods2('graph/new-object', new_object, undo_new_object, 
+    new_object = action_from_methods2('graph/new-object', new_object, undo_new_object,
                                        redo=redo_new_object)
     def delete_object(self, state, obj):
         obj.id = '-'+obj.id
@@ -454,7 +454,7 @@ class Graph(Item, HasSignals):
             state[d] = dict((attr, d.get_style(attr)) for attr in kwds)
         if series is None:
             series = []
-        for attr in ['color', 'symbol', 'fill', 
+        for attr in ['color', 'symbol', 'fill',
                      'linestyle', 'linetype']:
             if attr in kwds:
                 if attr in series:
@@ -484,12 +484,12 @@ class Graph(Item, HasSignals):
         self.emit('style-changed', state.keys())
 
     set_style = action_from_methods2('graph_set_style', set_style, undo_set_style)
-        
+
 
 
     # add and remove datasets
     def add(self, state, x, y):
-        ind = self.data.datasets.append(worksheet=x.worksheet.id, id=create_id(), 
+        ind = self.data.datasets.append(worksheet=x.worksheet.id, id=create_id(),
                                         x=x.name.encode('utf-8'), y=y.name.encode('utf-8'))
 
         d = Dataset(self, ind)
@@ -605,7 +605,7 @@ class Graph(Item, HasSignals):
         xmin, xmax = self.zoomout(self.xmin, self.xmax, xmin, xmax, log=self.xtype=='log')
         ymin, ymax = self.zoomout(self.ymin, self.ymax, ymin, ymax, log=self.ytype=='log')
         self.zoom(xmin, xmax, ymin, ymax)
-        
+
     def zoomout(self,x1, x2,x3, x4, log=False):
         if log:
             x1, x2, x3, x4 = log10(x1), log10(x2), log10(x3), log10(x4)
@@ -627,12 +627,12 @@ class Graph(Item, HasSignals):
 
 desc="""
 graphs [
-    name:S, id:S, parent:S, zoom:S, 
+    name:S, id:S, parent:S, zoom:S,
     xtype:S, ytype:S, xtitle:S, ytitle:S,
     datasets [
         id:S, worksheet:S, x:S, y:S,
         symbol:S, fill:S, color:I, size:I, linetype:S, linestyle:S, linewidth:I,
-        xfrom:D, xto:D 
+        xfrom:D, xto:D
     ],
     functions [
         id:S, func:S, name:S,
@@ -643,4 +643,3 @@ graphs [
 ]
 """
 register_class(Graph, desc)
-

@@ -1,12 +1,15 @@
 """
 grafity.resources
 """
+__author__ = "Daniel Fragiadakis <dfragi@gmail.com>"
 __revision__ = "$Id$"
 
 import fnmatch
 import os.path
+import zipfile
 import sys
 from grafity.settings import USERDATADIR
+import pkg_resources
 
 def column_tool(name, image=None):
     def column_tool_dec(function):
@@ -30,22 +33,24 @@ def register_graph_mode(mode):
 
 graph_modes = []
 
-def scan_functions_dir(functions, dirs):
-    def walk_functions(functions, folder, files):
-        for fn  in files:
-            full = os.path.join(folder, fn)
-            if os.path.isfile(full) and fnmatch.fnmatch(fn, "*.function"):
-                functions.append((False, full))
-    for dir in dirs:
-        os.path.walk(dir, walk_functions, functions)
+processors = []
 
-def scan_functions_resource(functions, start='resources'):
-    for name in resource_listdir('grafity', start):
-        full = os.path.join(start, name)
-        if resource_isdir('grafity', full):
-            scan_functions_resource(functions, full)
-        elif fnmatch.fnmatch(name, "*.function"):
-            functions.append((True, full))
+def processes_resource(pattern):
+    def pres(fcn):
+        processors.append((pattern, fcn))
+    return pres
+
+@processes_resource('*.png')
+def process_image(res):
+    images[os.path.splitext(os.path.basename(res))[0]] = res
+
+@processes_resource('*.py')
+def process_script(res):
+    exec resource_data(res)
+
+#@processes_resource('*.function')
+def process_function(res):
+    functions.append(res)
 
 def scan_functions(dirs):
     functions = []
@@ -53,44 +58,73 @@ def scan_functions(dirs):
     scan_functions_resource(functions)
     return functions
 
-def scan_plugins_dir():
-    def walk_plugins(_, folder, files):
-        for f in files:
-            full = os.path.join(folder, f)
-            if os.path.isfile(full) and fnmatch.fnmatch(f, "*.py"):
-                execfile(full, {})
-    os.path.walk(USERDATADIR, walk_plugins, None)
+def resource_data(res):
+    protocol, path = res.split(':')
+    if protocol == 'file':
+        if '|' in path:
+            zipname, zippath = path.split('|')
+            zip = zipfile.ZipFile(zipname)
+            return zip.read(zippath)
+        else:
+            return open(path).read()
+    elif protocol == 'resource':
+        if '|' in path:
+            zipname, zippath = path.split('|')
+            zip = zipfile.ZipFile(pkg_resources.resource_stream('grafity', zipname))
+            return zip.read(zippath)
+        else:
+            return pkg_resources.resource_string('grafity', path)
+    else:
+        raise ValueError, "Unknown protocol: %s" % protocol
 
-def scan_plugins_resource(start='resources'):
-    for name in resource_listdir('grafity', start):
-        full = os.path.join(start, name)
-        if resource_isdir('grafity', full):
-            scan_plugins_resource(full)
-        elif fnmatch.fnmatch(name, "*.py"):
-            execfile(resource_filename('grafity', full), {})
+def resource_isdir(res):
+    protocol, path = res.split(':')
+    if protocol == 'file':
+        return os.path.isdir(path) or path.endswith('.zip')
+    elif protocol == 'resource':
+        return pkg_resources.resource_isdir('grafity', path) or path.endswith('zip')
 
+def resource_children(res):
+    protocol, path = res.split(':')
+    if protocol == 'file':
+        if os.path.isdir(path):
+            return ['file:'+os.path.join(path, f) for f in os.listdir(path)]
+        elif path.endswith('.zip'):
+            zip = zipfile.ZipFile(path)
+            return ['file:'+path+'|'+f for f in zip.namelist()]
+    elif protocol == 'resource':
+        if pkg_resources.resource_isdir('grafity', path):
+            return ['resource:'+os.path.join(path, f) 
+                            for f in pkg_resources.resource_listdir('grafity', path)]
+        elif path.endswith('.zip'):
+            zip = zipfile.ZipFile(pkg_resources.resource_stream('grafity', path))
+            return ['resource:'+path+'|'+f for f in zip.namelist()]
+
+
+def resource_walk(res):
+    if resource_isdir(res):
+        for child in resource_children(res):
+            for r in resource_walk(child):
+                yield r
+    else:
+        yield res
+
+def resource_process(res):
+    for pattern, function in processors:
+        if fnmatch.fnmatch(os.path.basename(r), pattern):
+            function(r)
 
 images = {}
 
-from pkg_resources import resource_isdir, resource_listdir, resource_filename
+def resource_search(pattern):
+    for start in start_res:
+        for res in resource_walk(start):
+            if fnmatch.fnmatch(res, pattern):
+                yield res
 
-def scan_images_resource(start='resources'):
-    for name in resource_listdir('grafity', start):
-        full = os.path.join(start, name)
-        if resource_isdir('grafity', full):
-            scan_images_resource(full)
-        elif fnmatch.fnmatch(name, "*.png"):
-            images[name[:-4]] = (True, full)
+start_res = [ 'resource:resources', 'file:%s'%USERDATADIR ]
 
-def scan_images_dir():
-    def walk_images(_, folder, files):
-        for f in files:
-            full = os.path.join(folder, f)
-            if os.path.isfile(full) and fnmatch.fnmatch(f, "*.png"):
-                images[f[:-4]] = (False, full)
-    os.path.walk(USERDATADIR, walk_images, None)
-
-scan_images_resource()
-scan_images_dir()
-scan_plugins_resource()
-scan_plugins_dir()
+for start in start_res:
+    for start in start_res:
+        for res in resource_walk(start):
+            resource_process(res)

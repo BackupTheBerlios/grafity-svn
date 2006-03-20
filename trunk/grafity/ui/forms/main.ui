@@ -86,6 +86,7 @@
     <item text="&amp;Tools" name="Tools">
         <action name="toolsPluginsAction"/>
         <action name="toolsSettingsAction"/>
+        <action name="act_import_ascii"/>
     </item>
     <item text="&amp;Window" name="Window">
         <action name="act_window_close"/>
@@ -735,6 +736,25 @@
             </property>
         </action>
     </actiongroup>
+    <action>
+        <property name="name">
+            <cstring>act_import_ascii</cstring>
+        </property>
+        <property name="text">
+            <string>&amp;Import ASCII...</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Import ASCII...</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>Action_4</cstring>
+        </property>
+        <property name="text">
+            <string>Action_4</string>
+        </property>
+    </action>
 </actions>
 <images>
     <image name="image0">
@@ -964,6 +984,12 @@
         <receiver>MainWindowUI</receiver>
         <slot>on_graph_text()</slot>
     </connection>
+    <connection>
+        <sender>act_import_ascii</sender>
+        <signal>activated()</signal>
+        <receiver>MainWindowUI</receiver>
+        <slot>on_import_ascii()</slot>
+    </connection>
 </connections>
 <slots>
     <slot>on_new_graph()</slot>
@@ -988,6 +1014,7 @@
     <slot>on_new_script()</slot>
     <slot>on_script_run()</slot>
     <slot>on_graph_text()</slot>
+    <slot>on_import_ascii()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

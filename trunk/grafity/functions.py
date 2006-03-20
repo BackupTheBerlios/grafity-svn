@@ -10,7 +10,7 @@ from grafity.actions import action_from_methods, StopAction, action_from_methods
 from grafity.settings import USERDATADIR
 from grafity.project import create_id, wrap_attribute
 from grafity.mpfit import mpfit
-from grafity.resources import scan_functions
+from grafity.resources import resource_search, resource_data
 
 def splitlist(seq, sizes):
     "Split list into list of lists with specified sizes"
@@ -28,17 +28,13 @@ class FunctionsRegistry(HasSignals):
     def rescan(self):
         """Rescan the directory and check for changed functions"""
         names = []
-        for res, f in scan_functions(self.dirs):
+        for res in resource_search("*.function"):
             try:
                 func = Function()
-                if res:
-                    func.fromstring(resource_string('grafity', f))
-                    func.filename = None
-                else:
-                    func.fromstring(open(f).read())
-                    func.filename = f
+                func.fromstring(resource_data(res))
+                func.filename = res
                 names.append(func.name)
-            except IOError, s:
+            except IOError:
                 continue
 
             if func.name not in [f.name for f in self.functions]:
