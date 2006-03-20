@@ -11,3 +11,12 @@ def extension_type(extname):
 
 def extension(extname):
     return extension_types[extname]
+
+def options(**kwds):
+    def dec(func):
+        for key, value in kwds.iteritems():
+            setattr(func, key, value)
+        return func
+    return dec
+
+

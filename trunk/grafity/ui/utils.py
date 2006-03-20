@@ -1,17 +1,17 @@
 import sys
 
 from qt import *
-from pkg_resources import resource_filename
+#from pkg_resources import resource_filename
 
-from grafity.resources import images
+from grafity.resources import images, resource_data
 
 
 def getimage(name, cache={}):
     if name not in cache:
-        resource, file = images[name]
-        if resource:
-            file = resource_filename('grafity', file)
-        cache[name] = QPixmap(file)
+        resource = images[name]
+        pix = QPixmap()
+        pix.loadFromData(resource_data(resource))
+        cache[name] =  pix
     return cache[name]
 
 

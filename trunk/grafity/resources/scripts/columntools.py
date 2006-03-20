@@ -1,31 +1,36 @@
-from grafity.resources import column_tool
 from grafity.arrays import *
+from grafity.extend import extension, options
 
-@column_tool('Sort Column/Ascending', image='sort-column-ascending')
+@extension('column-tool')
+@options(name='Sort Column/Ascending', image='sort-column-ascending')
 def sortcol_asc(worksheet, col):
     col = col[0]
     notnan = ~isnan(col)
     col[notnan] = sorted(col[notnan])
 
-@column_tool('Sort Column/Descending')
+@extension('column-tool')
+@options(name='Sort Column/Descending')
 def sortcol_desc(worksheet, col):
     col = col[0]
     notnan = ~isnan(col)
     col[notnan] = sorted(col[notnan], reverse=True)
 
-@column_tool('Normalize/Sum=1')
+@extension('column-tool')
+@options(name='Normalize/Sum=1')
 def sortcol_asc(worksheet, col):
     col = col[0]
     notnan = ~isnan(col)
     col[:] = col/sum(col[notnan])
 
-@column_tool('Normalize/Max=1')
+@extension('column-tool')
+@options(name='Normalize/Max=1')
 def sortcol_desc(worksheet, col):
     col = col[0]
     notnan = ~isnan(col)
     col[:] = col/max(col[notnan])
 
-@column_tool('Squeeze')
+@extension('column-tool')
+@options(name='Squeeze')
 def squeeze(worksheet, col):
     col = col[0]
     col[:] = col[~isnan(col)]

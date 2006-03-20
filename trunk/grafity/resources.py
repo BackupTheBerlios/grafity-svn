@@ -10,14 +10,20 @@ import zipfile
 import sys
 from grafity.settings import USERDATADIR
 import pkg_resources
-
-def column_tool(name, image=None):
-    def column_tool_dec(function):
-        column_tools.append((name, function, image))
-        return function
-    return column_tool_dec
+from grafity.extend import extension_type
 
 column_tools = []
+
+@extension_type('column-tool')
+def column_tool_dec(function):
+    print >>sys.stderr, "registering column tool", function.name
+    if hasattr(function, 'image'):
+        img = function.image
+    else:
+        img = None
+    column_tools.append((function.name, function, img))
+    return function
+
 
 def dataset_tool(name, image=None):
     def dataset_tool_dec(function):
