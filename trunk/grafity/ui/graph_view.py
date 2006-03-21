@@ -404,7 +404,6 @@ class GraphView(QVBox):
         self.text = {}
 
     def set_mode(self, mode):
-        print >>sys.stderr, mode
         if mode == self._mode:
             return
         if self.tool is not None:

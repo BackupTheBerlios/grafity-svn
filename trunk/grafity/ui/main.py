@@ -480,18 +480,22 @@ class MainWindow(MainWindowUI):
 
         self.active = None
 
-        self.act_graph_extra = QAction(self.act_graph, 'act_extra')
-        self.act_graph_extra.setToggleAction(1)
-        self.act_graph_extra.addTo(self.graph_toolbar)
+        if len(graph_modes):
+            self.act_graph_extra = QAction(self.act_graph, 'act_extra')
+            self.act_graph_extra.setToggleAction(1)
+            self.act_graph_extra.addTo(self.graph_toolbar)
 
-        self.btn = btn = self.graph_toolbar.queryList('QToolButton')[-1]
+            self.btn = btn = self.graph_toolbar.queryList('QToolButton')[-1]
 
-        cm = QPopupMenu (self)
-        self.connect(cm, SIGNAL('activated(int)'), self.on_mode_btn)
-        for i, tool in enumerate(graph_modes):
-            cm.insertItem(QIconSet(getimage(tool.image)), tool.name, i)
-        btn.setPopup(cm)
-        btn.setPopupDelay(0)
+            cm = QPopupMenu (self)
+            self.connect(cm, SIGNAL('activated(int)'), self.on_mode_btn)
+            for i, tool in enumerate(graph_modes):
+                cm.insertItem(QIconSet(getimage(tool.image)), tool.name, i)
+            btn.setPopup(cm)
+            btn.setPopupDelay(0)
+
+            self.on_mode_btn(0)
+
 
         self.graph_toolbar.addSeparator()
         self.graph_text.addTo(self.graph_toolbar)
