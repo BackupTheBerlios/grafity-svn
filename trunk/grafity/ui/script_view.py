@@ -1,5 +1,8 @@
 import sys
-sys.modules['grafity.ui.start'].splash.message('loading ui_script_view')
+try:
+    sys.modules['grafity.ui.start'].splash.message('loading ui_script_view')
+except:
+    pass
 
 from qt import *
 from qtext import QextScintilla, QextScintillaLexerPython

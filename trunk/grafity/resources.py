@@ -8,9 +8,13 @@ import fnmatch
 import os.path
 import zipfile
 import sys
-from grafity.settings import USERDATADIR
+import new
+
 import pkg_resources
+
+from grafity.settings import USERDATADIR
 from grafity.extend import extension_type
+import grafity
 
 processors = []
 
@@ -25,17 +29,15 @@ def process_image(res):
 
 @processes_resource('*.py')
 def process_script(res):
-    exec resource_data(res)
+    mod = new.module("")
+    mod.grafity = grafity
+    print >>sys.stderr, "running script", res
+    exec resource_data(res) in mod.__dict__
+    sys.modules[res] = mod
 
 #@processes_resource('*.function')
 def process_function(res):
     functions.append(res)
-
-def scan_functions(dirs):
-    functions = []
-    scan_functions_dir(functions, dirs)
-    scan_functions_resource(functions)
-    return functions
 
 def resource_data(res):
     protocol, path = res.split(':')
@@ -103,6 +105,7 @@ def resource_search(pattern):
 
 start_res = [ 'resource:resources', 'file:%s'%USERDATADIR ]
 
-for start in start_res:
-    for res in resource_walk(start):
-        resource_process(res)
+def process_resources():
+    for start in start_res:
+        for res in resource_walk(start):
+            resource_process(res)

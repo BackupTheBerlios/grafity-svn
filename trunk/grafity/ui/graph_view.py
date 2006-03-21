@@ -1,6 +1,9 @@
 import os
 import sys
-sys.modules['grafity.ui.start'].splash.message('loading ui_graph_view')
+try:
+    sys.modules['grafity.ui.start'].splash.message('loading ui_graph_view')
+except:
+    pass
 
 from qt import *
 from qwt import *
@@ -19,6 +22,7 @@ from grafity.ui.forms.graph_fit import GraphFitUI
 from grafity.ui.forms.functions import FunctionsWindowUI
 from grafity.ui.forms.fitoptions import FitOptionsUI
 from grafity.ui.utils import getimage, connectevents, Page
+from grafity.extend import graph_modes
 from grafity.ui.graph_tools import ZoomTool, RangeTool, ArrowTool, HandTool
 from grafity.ui.graph_tools import DataReaderTool, ScreenReaderTool
 
@@ -384,6 +388,9 @@ class GraphView(QVBox):
         self.tools['dreader'] = DataReaderTool(self.graph, self, self.plot)
         self.tools['arrow'] = ArrowTool(self.graph, self, self.plot)
 
+        for tool in graph_modes:
+            self.tools[tool.name] = tool(self.graph, self, self.plot)
+
         self.tool = None
         self._mode = None
         self.mode = 'arrow'
@@ -392,19 +399,12 @@ class GraphView(QVBox):
 
         self.graph.project.connect('remove-item', self.on_project_remove_item)
         connectevents(self.plot.canvas(), self.on_canvas_event)
-
-#        self.foo = self.plot.insertCurve("foo")
-#        self.foo2 = self.plot.insertCurve("foo")
-#        self.foom = self.plot.insertCurve("foo")
-#        self.plot.setCurvePen(self.foo, QPen(Qt.darkGreen))
-#        self.plot.setCurvePen(self.foo2, QPen(Qt.darkRed))
-#        self.plot.setCurvePen(self.foom, QPen(Qt.darkCyan))
-
         self.plot.plotLayout().setAlignCanvasToScales(True)
 
         self.text = {}
 
     def set_mode(self, mode):
+        print >>sys.stderr, mode
         if mode == self._mode:
             return
         if self.tool is not None:
@@ -580,58 +580,7 @@ class GraphView(QVBox):
         if self.tool is not None:
             return self.tool.mouse_moved(e)
 
-        if self.mode == 'dreader':
-            if self.graph.datasets == []:
-                return
-            d = self.datasets[0]
-            ind = d.active_data()
-            dx, dy = d.x[ind], d.y[ind]
-            dist = (x-dx)*(x-dx)
-            arg = argmin(dist)
-            xval, yval = dx[arg], dy[arg]
 
-            from scipy.interpolate import splrep, splev
-            w = ones(len(dx))*50./(max(dy)-min(dy))
-            spl = splrep(dx, dy, w, s=20)
-            deriv = splev(dx, spl, der=1)
-            inflarg = argmax(deriv)
-            inflx, infly = dx[inflarg], dy[inflarg]
-
-            linex = array([self.graph.xmin, self.graph.xmax])
-
-            #liney = yval + deriv[arg]*(linex-xval)
-
-            if e.button() == Qt.LeftButton:
-                self._line = 'left'
-            elif e.button() == Qt.RightButton:
-                self._line = 'right'
-
-            if self._line == 'left':
-                self.A1 = deriv[arg]
-                self.B1 = yval-self.A1*xval
-                liney = self.A1*linex + self.B1
-
-                self.plot.setCurveData(self.foo, linex, liney)
-            elif self._line == 'right':
-                self.A3 = deriv[arg]
-                self.B3 = yval-self.A3*xval
-                liney = self.A3*linex + self.B3
-                self.plot.setCurveData(self.foo2, linex, liney)
-
-            self.A2 = deriv[inflarg]
-            self.B2 = infly-self.A2*inflx
-
-            liney = self.A2*linex + self.B2
-
-            #liney = infly + deriv[inflarg]*(linex-inflx)
-            self.plot.setCurveData(self.foom, linex, liney)
-            if hasattr(self, 'A3') and hasattr(self, 'A1'):
-                Ton = -(self.B2-self.B1)/(self.A2-self.A1)
-                Tend = -(self.B3-self.B2)/(self.A3-self.A2)
-                self.plot.setMarkerLabel(self.texte, 
-                "T<sub>f</sub>=%f<br>T<sub>on</sub>=%f, T<sub>end</sub>=%f<br>"%(inflx,Ton,Tend))
-
-            self.redraw()
     def hittest(self, marker, x, y):
         """Check if the point (x,y) in pixel coordinates is on the marker label"""
         text = self.plot.markerLabel(marker)

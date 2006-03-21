@@ -118,11 +118,17 @@ def main():
     logging.basicConfig(format="%(asctime)s [%(name)s] %(message)s")
 
     app = QApplication(sys.argv)
+
+    from grafity.resources import process_resources
+
     splash = GrafitSplash(getimage('logos/grafity'))
     splash.show()
     splash.message('')
 
     from grafity.ui.main import MainWindow
+    splash.message('loading resources')
+
+    process_resources()
 
     splash.message('building user interface')
 

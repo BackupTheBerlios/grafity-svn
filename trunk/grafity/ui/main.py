@@ -1,10 +1,14 @@
 import os
 import sys
-sys.modules['grafity.ui.start'].splash.message('loading main')
+try:
+    sys.modules['grafity.ui.start'].splash.message('loading main')
+except:
+    pass
 
 from qt import *
 
-from grafity.ui.utils import getimage, column_tools, graph_modes
+from grafity.ui.utils import getimage
+from grafity.extend import column_tools, graph_modes
 from grafity.signals import HasSignals, global_connect
 from grafity.actions import undo, redo, action_list
 from grafity.ui.graph_view import GraphView, GraphStyle, GraphData, GraphAxes, GraphFit
@@ -476,14 +480,12 @@ class MainWindow(MainWindowUI):
 
         self.active = None
 
-        self.ac = QAction(self.act_graph, 'act_extra')
-        self.ac.setToggleAction(1)
-        self.ac.addTo(self.graph_toolbar)
+        self.act_graph_extra = QAction(self.act_graph, 'act_extra')
+        self.act_graph_extra.setToggleAction(1)
+        self.act_graph_extra.addTo(self.graph_toolbar)
 
         self.btn = btn = self.graph_toolbar.queryList('QToolButton')[-1]
 
-#        self.btn = btn = QToolButton(self.graph_toolbar)
-#        btn.setToggleButton(True)
         cm = QPopupMenu (self)
         self.connect(cm, SIGNAL('activated(int)'), self.on_mode_btn)
         for i, tool in enumerate(graph_modes):
@@ -496,11 +498,16 @@ class MainWindow(MainWindowUI):
 
     def on_mode_btn(self, i):
         self.btn.setPixmap(getimage(graph_modes[i].image))
+        self.extra_mode = graph_modes[i]
+        if self.btn.isOn():
+            self.active.mode = self.extra_mode.name
 
     def on_column_tool(self, tool):
         worksheet = self.active.worksheet
         columns = [worksheet[col] for col in worksheet._view.selected_columns]
         column_tools[tool][1](worksheet, columns)
+        func = column_tools[tool][1]
+        print >>sys.stderr, func, func.func_globals
 
     def on_activated(self, obj):
         if not hasattr(obj, '_view') or obj._view is None:
@@ -565,8 +572,11 @@ class MainWindow(MainWindowUI):
     # Menu and toolbar actions
 
     def on_graph_mode(self):
-        modes = ['arrow', 'hand', 'zoom', 'range', 'dreader', 'sreader']
-        self.active.mode = modes[[getattr(self, 'act_graph_%s'%a).isOn() for a in modes].index(True)]
+        modes = ['arrow', 'hand', 'zoom', 'range', 'dreader', 'sreader', 'extra']
+        m = modes[[getattr(self, 'act_graph_%s'%a).isOn() for a in modes].index(True)]
+        if m == 'extra':
+            m = self.extra_mode.name
+        self.active.mode = m
 
     def on_project_open(self):
         """File/Open"""

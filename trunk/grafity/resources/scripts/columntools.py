@@ -1,5 +1,6 @@
+import sys
 from grafity.arrays import *
-from grafity.extend import extension, options
+from grafity.extend import extension, options, extension_types
 
 @extension('column-tool')
 @options(name='Sort Column/Ascending', image='sort-column-ascending')
