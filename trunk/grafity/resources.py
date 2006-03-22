@@ -31,7 +31,6 @@ def process_image(res):
 def process_script(res):
     mod = new.module("")
     mod.grafity = grafity
-    print >>sys.stderr, "running script", res
     exec resource_data(res) in mod.__dict__
     sys.modules[res] = mod
 

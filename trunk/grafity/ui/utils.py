@@ -5,6 +5,35 @@ from qt import *
 from grafity.resources import images, resource_data, extension_type
 
 
+
+@extension_type('column-tool')
+def column_tool_dec(function):
+    print >>sys.stderr, "registering column tool", function.name
+    if hasattr(function, 'image'):
+        img = function.image
+    else:
+        img = None
+    column_tools.append((function.name, function, img))
+    return function
+
+column_tools = []
+
+
+@extension_type('dataset-tool')
+def dataset_tool(name, image=None):
+    def dataset_tool_dec(function):
+        dataset_tools.append((name, function, image))
+        return function
+    return dataset_tool_dec
+
+dataset_tools = []
+
+@extension_type('graph-mode')
+def register_graph_mode(mode):
+    print >>sys.stderr, "registering graph mode", mode.name
+    graph_modes.append(mode)
+
+graph_modes = []
 def getimage(name, cache={}):
     if name not in cache:
         resource = images[name]

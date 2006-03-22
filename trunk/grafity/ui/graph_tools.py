@@ -50,11 +50,11 @@ class RangeTool(GraphTool):
         action_list.begin_composite(CompositeAction('set-range'))
         if self.moving_rangemin:
             self.plot.setMarkerXPos(self.rangemin, xpos)
-            for d in self.graph.datasets:
+            for d in self.view.datasets:
                 d.range = (xpos, d.range[1])
         elif self.moving_rangemax:
             self.plot.setMarkerXPos(self.rangemax, xpos)
-            for d in self.graph.datasets:
+            for d in self.view.datasets:
                 d.range = (d.range[0], xpos)
         action_list.end_composite().register()
         self.view.unfreeze()
@@ -64,16 +64,16 @@ class RangeTool(GraphTool):
         if e.button() == Qt.MidButton:
             for d in self.view.datasets:
                 d.range = (self.range_l, self.range_r)
-                self.plot.setMarkerXPos(self.rangemin, min(d.range[0] for d in self.graph.datasets))
-                self.plot.setMarkerXPos(self.rangemax, max(d.range[1] for d in self.graph.datasets))
+                self.plot.setMarkerXPos(self.rangemin, min(d.range[0] for d in self.view.datasets))
+                self.plot.setMarkerXPos(self.rangemax, max(d.range[1] for d in self.view.datasets))
 
     def mouse_pressed(self, e):
         if e.button() == Qt.LeftButton:
             self.moving_rangemin = True
         elif e.button() == Qt.RightButton:
             self.moving_rangemax = True
-        self.range_l = min(d.minx for d in self.graph.datasets)
-        self.range_r = max(d.maxx for d in self.graph.datasets)
+        self.range_l = min(d.minx for d in self.view.datasets)
+        self.range_r = max(d.maxx for d in self.view.datasets)
         self.mouse_moved(e)
 
 class HandTool(GraphTool):

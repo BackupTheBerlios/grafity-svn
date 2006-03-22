@@ -7,8 +7,7 @@ except:
 
 from qt import *
 
-from grafity.ui.utils import getimage
-from grafity.extend import column_tools, graph_modes
+from grafity.ui.utils import getimage, column_tools, graph_modes
 from grafity.signals import HasSignals, global_connect
 from grafity.actions import undo, redo, action_list
 from grafity.ui.graph_view import GraphView, GraphStyle, GraphData, GraphAxes, GraphFit

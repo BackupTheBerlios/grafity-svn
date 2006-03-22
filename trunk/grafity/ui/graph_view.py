@@ -21,8 +21,7 @@ from grafity.ui.forms.graph_axes import GraphAxesUI
 from grafity.ui.forms.graph_fit import GraphFitUI
 from grafity.ui.forms.functions import FunctionsWindowUI
 from grafity.ui.forms.fitoptions import FitOptionsUI
-from grafity.ui.utils import getimage, connectevents, Page
-from grafity.extend import graph_modes
+from grafity.ui.utils import getimage, connectevents, Page, graph_modes
 from grafity.ui.graph_tools import ZoomTool, RangeTool, ArrowTool, HandTool
 from grafity.ui.graph_tools import DataReaderTool, ScreenReaderTool
 
