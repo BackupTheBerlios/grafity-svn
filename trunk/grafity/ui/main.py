@@ -284,9 +284,13 @@ class ProjectExplorer(HasSignals, QListView):
     def on_context_menu_rename(self):
         self.context_item._tree_item.startRename(0)
 
+    def on_context_menu_delete(self):
+        self.project.remove(self.context_item.id)
+
     def on_context_menu_requested(self, item, point, column):
-        self.context_menu = QPopupMenu (self)
-        self.context_menu.insertItem ('Rename', self.on_context_menu_rename)
+        self.context_menu = QPopupMenu(self)
+        self.context_menu.insertItem('Rename', self.on_context_menu_rename)
+        self.context_menu.insertItem('Delete', self.on_context_menu_delete)
         self.context_menu.insertSeparator ()
 #        self.context_menu.insertItem ('Delete', self.wsheet_context_menu_del)
 #        self.context_menu.insertItem ('Import ASCII...', self.wsheet_context_menu_importascii)

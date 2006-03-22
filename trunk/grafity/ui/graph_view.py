@@ -360,6 +360,8 @@ class GraphView(QVBox):
         self.legend.setFrameShape(QFrame.NoFrame)
         self.legend.setSelectionMode(QListBox.Extended)
         self.connect(self.legend, SIGNAL('selectionChanged()'), self.on_legend_select)
+        self.connect(self.legend, SIGNAL('contextMenuRequested(QListBoxItem *, const QPoint &)'), 
+                     self.on_legend_cmenu)
 
         self.freeze()
         for d in self.graph.datasets:
@@ -431,7 +433,7 @@ class GraphView(QVBox):
         printer = QPrinter()
         printer.setOutputToFile(True)
         printer.setOutputFileName('mikou.ps')
-        printer.setup()
+#        printer.setup()
         printer.newPage()
         self.plot.printPlot(printer)
         self.plot.removeCurve(line)
@@ -510,6 +512,30 @@ class GraphView(QVBox):
             self.legend.setCurrentItem(current)
             self.needs_legend_update = False
 
+    def on_legend_select(self):
+        self.datasets = [self.graph.datasets[n] for n in range(self.legend.count())
+                                                if self.legend.isSelected(n)]
+        self.graph.emit('selection-changed', self.datasets)
+
+        pass
+
+    def on_context_menu_rename(self):
+        self.context_item._tree_item.startRename(0)
+
+    def on_context_menu_delete(self):
+        self.project.remove(self.context_item.id)
+
+    def on_legend_cmenu(item, point):
+        self.context_menu = QPopupMenu(self)
+        self.context_menu.insertItem('Rename', self.on_context_menu_rename)
+        self.context_menu.insertItem('Delete', self.on_context_menu_delete)
+        self.context_menu.insertSeparator ()
+#        self.context_menu.insertItem ('Delete', self.wsheet_context_menu_del)
+#        self.context_menu.insertItem ('Import ASCII...', self.wsheet_context_menu_importascii)
+
+#        self.context_item = item._object
+        self.context_menu.popup(point)
+ 
     def on_add_function_term(self, term):
         term._curve = curve = ErrorBarPlotCurve(self.plot)
         term._curveid = self.plot.insertCurve(curve)
@@ -530,11 +556,6 @@ class GraphView(QVBox):
         self.plot.removeCurve(d._curveid)
         self.redraw()
         self.update_legend()
-
-    def on_legend_select(self):
-        self.datasets = [self.graph.datasets[n] for n in range(self.legend.count())
-                                                if self.legend.isSelected(n)]
-        self.graph.emit('selection-changed', self.datasets)
 
     def draw_pixmap(self, dataset):
         p = QPixmap()

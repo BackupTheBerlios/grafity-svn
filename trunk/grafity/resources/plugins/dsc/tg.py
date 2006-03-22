@@ -22,14 +22,15 @@ class AnalyzeGlassTransition(GraphTool):
         self.plot.setCurvePen(self.foo2, QPen(Qt.darkRed))
         self.plot.setCurvePen(self.foom, QPen(Qt.darkCyan))
 
-#        self.texte = self.plot.insertMarker()
-#        self.plot.setMarkerPos(self.texte, 0, 0)
+        self.texte = self.plot.insertMarker()
+        self.plot.setMarkerLabelAlign(self.texte, Qt.AlignTop|Qt.AlignLeft)
+        self.plot.setMarkerPos(self.texte, self.graph.xmax, self.graph.ymin)
 
     def deactivate(self):
         self.plot.removeCurve(self.foo)
         self.plot.removeCurve(self.foo2)
         self.plot.removeCurve(self.foom)
-#        self.plot.removeMarker(self.texte)
+        self.plot.removeMarker(self.texte)
 
     def mouse_released(self, e):
         self.button = None
@@ -88,9 +89,9 @@ class AnalyzeGlassTransition(GraphTool):
         if hasattr(self, 'A3') and hasattr(self, 'A1'):
             Ton = -(self.B2-self.B1)/(self.A2-self.A1)
             Tend = -(self.B3-self.B2)/(self.A3-self.A2)
-#            self.plot.setMarkerLabel(self.texte, 
             st = "T<sub>f</sub>=%f<br>T<sub>on</sub>=%f, T<sub>end</sub>=%f<br>"%(inflx,Ton,Tend)
-            print >>sys.stderr, st
+            self.plot.setMarkerLabel(self.texte, st)
+#            print >>sys.stderr, st
 
 
         self.view.redraw()
