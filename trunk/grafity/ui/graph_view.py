@@ -297,6 +297,43 @@ def efloat(f):
     except Exception:
         return nan
 
+superscripts = {
+    '-': u'\u00AF',
+#    '-': u'\u207B',
+    '0': u'\u2070',
+    '1': u'\u00B9',
+    '2': u'\u00B2',
+    '3': u'\u00B3',
+    '4': u'\u2074',
+    '5': u'\u2075',
+    '6': u'\u2076',
+    '7': u'\u2077',
+    '8': u'\u2078',
+    '9': u'\u2079',
+    }
+
+class ScaleDraw(QwtScaleDraw):
+    def __init__(self):
+        QwtScaleDraw.__init__(self)
+
+    def label(self, value):
+        label = '%.3e' % value
+        mant, exp = label.split('e')
+        exp = str(int(exp))
+        exp = ''.join([superscripts[s] for s in exp])
+#        label = unicode(QwtScaleDraw.label(self, value))
+        return mant+'x10'+exp
+
+class LVI(QListViewItem):
+    def __init__(self, *args):
+        QListView.__init__(self, *args)
+
+    def paintCell(self, painter, cg, column, width, align):
+        cg = QColorGroup(cg)
+        cg.setColor(QColorGroup.Base, cg.color(QColorGroup.Background))#self.legend_background_color)
+        QListViewItem.paintCell(self, painter, cg, column, width, align)
+
+
 class GraphView(QVBox):
     def __init__(self, parent, mainwin, graph):
         QVBox.__init__(self, parent)
@@ -311,6 +348,7 @@ class GraphView(QVBox):
         self.plot.reparent(self.mainpage, 0, QPoint(0,0))
         self.plot.setCanvasBackground(self.bg_color)
         self.plot.setPaletteBackgroundColor(self.bg_color)
+        self.plot.setAxisFont(self.plot.xBottom, QFont('Times New Roman'))
         self.plot.enableGridX(True)
         self.plot.enableGridY(True)
         self.plot.setGridPen(QPen(QColor('gray'), 0, Qt.DotLine))
@@ -318,6 +356,7 @@ class GraphView(QVBox):
         self.plot.setAutoReplot(False)
         self.plot.canvas().setLineWidth(1)
         self.plot.canvas().setFrameStyle(QFrame.Box|QFrame.Plain)
+        self.plot.setAxisScaleDraw(QwtPlot.xBottom, ScaleDraw())
         self.plot.axis(self.plot.xBottom).setBaselineDist(0)
         self.plot.axis(self.plot.yLeft).setBaselineDist(0)
         self.plot.axis(self.plot.yLeft).scaleDraw().setOptions(QwtScaleDraw.None)
@@ -350,17 +389,26 @@ class GraphView(QVBox):
         self.connect(self.plot, SIGNAL('plotMousePressed(const QMouseEvent&)'), self.on_mouse_pressed)
         self.connect(self.plot, SIGNAL('plotMouseReleased(const QMouseEvent&)'), self.on_mouse_released)
 
-        self.legend = QListBox(self.mainpage)
-        pal = QPalette(self.legend.palette())
-        cg = QColorGroup(pal.active())
-        self.legend_background_color = cg.color(QColorGroup.Background)
-        cg.setColor(QColorGroup.Base, Qt.white)#self.legend_background_color)
-        pal.setActive(cg)
-        self.legend.setPalette(pal)
+        self.legend = QListView(self.mainpage)
+        self.legend.addColumn('foo')
+        self.legend.setColumnWidthMode(0, QListView.Maximum)
+        self.legend.setSelectionMode(QListView.Extended)
+
+#        pal = QPalette(self.legend.palette())
+#        cg = QColorGroup(pal.active())
+        self.legend_background_color = Qt.white
+#cg.color(QColorGroup.Background)
+#        cg.setColor(QColorGroup.Base, Qt.white)#self.legend_background_color)
+#        pal.setActive(cg)
+#        self.legend.setPalette(pal)
         self.legend.setFrameShape(QFrame.NoFrame)
-        self.legend.setSelectionMode(QListBox.Extended)
+        f = QFont()
+        f.setPointSize(9)
+        self.legend.setFont(f)
+        self.legend.setTreeStepSize(5)
+        self.legend.header().hide()
         self.connect(self.legend, SIGNAL('selectionChanged()'), self.on_legend_select)
-        self.connect(self.legend, SIGNAL('contextMenuRequested(QListBoxItem *, const QPoint &)'), 
+        self.connect(self.legend, SIGNAL('contextMenuRequested(QListViewItem *, const QPoint &, int)'), 
                      self.on_legend_cmenu)
 
         self.freeze()
@@ -498,26 +546,50 @@ class GraphView(QVBox):
         if self.frozen:
             self.needs_legend_update = True
         else:
-            selected = [self.legend.isSelected(it) for it in range(self.legend.numRows())]
-            current = self.legend.currentItem()
+#            selected = [self.legend.isSelected(it) for it in range(self.legend.numRows())]
+#            current = self.legend.currentItem()
+
+            selected = [d for d in self.graph.datasets if hasattr(d, '_item') and d._item.isSelected()]
+
+            worksheets = set(d.worksheet for d in self.graph.datasets)
 
             self.legend.clear()
-            self.legend.insertStrList(["%s(%s)"%(d.y.name, d.x.name) for d in self.graph.datasets])
-            for n, dset in enumerate(self.graph.datasets):
-                if hasattr(dset, '_curveid'):
-                    self.legend.changeItem(self.draw_pixmap(dset), self.legend.text(n), n)
 
-            for i,on in enumerate(selected):
-                self.legend.setSelected(i, on)
-            self.legend.setCurrentItem(current)
+            for w in worksheets:
+                strings = ["%s(%s)"%(d.y.name, d.x.name) for d in self.graph.datasets if d.worksheet == w]
+
+                item = LVI(self.legend, w.name)
+                item.setOpen(True)
+                item.setSelectable(False)
+
+                for d in self.graph.datasets:
+                    if d.worksheet == w:
+                        d._item = QListViewItem(item, "%s(%s)"%(d.y.name, d.x.name))
+                        d._item.setPixmap(0, self.draw_pixmap(d))
+                    
+                for d in selected:
+                    d._item.setSelected(True)
+
+#                item = QListBoxItem()
+#                item.setSelectable(False)
+#                item.setText('<'+w.name+'>')
+#                self.legend.insertItem(item)
+
+#                self.legend.insertStrList(strings)
+#                for n, dset in enumerate(self.graph.datasets):
+#                    if hasattr(dset, '_curveid'):
+#                        self.legend.changeItem(self.draw_pixmap(dset), self.legend.text(n), n)
+
+#            for i,on in enumerate(selected):
+#                self.legend.setSelected(i, on)
+#            self.legend.setCurrentItem(current)
             self.needs_legend_update = False
 
     def on_legend_select(self):
-        self.datasets = [self.graph.datasets[n] for n in range(self.legend.count())
-                                                if self.legend.isSelected(n)]
+#        self.datasets = [self.graph.datasets[n] for n in range(self.legend.count())
+#                                                if self.legend.isSelected(n)]
+        self.datasets = [d for d in self.graph.datasets if hasattr(d, '_item') and d._item.isSelected()]
         self.graph.emit('selection-changed', self.datasets)
-
-        pass
 
     def on_context_menu_rename(self):
         self.context_item._tree_item.startRename(0)
