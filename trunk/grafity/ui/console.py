@@ -79,9 +79,13 @@ class Console (QextScintilla):
         self.resize(500, 300)
 
         lex = QextScintillaLexerPython()
-        lex.setDefaultFont(QApplication.font())
-        lex.setFont(QApplication.font(), -2)
+#        font = QFont(QApplication.font())
+#        font.setPointSize(.8*font.pointSize())
+#        lex.setDefaultFont(font)
+#        lex.setFont(font, 0)
         self.setLexer(lex)
+        self.zoomOut()
+        self.zoomOut()
 
 #        self.SendScintilla(self.SCI_SETHSCROLLBAR, False)
         self.SendScintilla(self.SCI_SETSCROLLWIDTH, 100)

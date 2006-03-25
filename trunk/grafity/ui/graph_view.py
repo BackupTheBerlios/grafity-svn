@@ -298,8 +298,8 @@ def efloat(f):
         return nan
 
 superscripts = {
-    '-': u'\u00AF',
-#    '-': u'\u207B',
+#    '-': u'\u00AF',
+    '-': u'\u207B',
     '0': u'\u2070',
     '1': u'\u00B9',
     '2': u'\u00B2',
@@ -313,16 +313,171 @@ superscripts = {
     }
 
 class ScaleDraw(QwtScaleDraw):
+    """A version of QwtScaleDraw that supports rich text in tick labels.
+    """
     def __init__(self):
         QwtScaleDraw.__init__(self)
+        self.font = QFont('Times New Roman')
 
-    def label(self, value):
-        label = '%.3e' % value
-        mant, exp = label.split('e')
-        exp = str(int(exp))
-        exp = ''.join([superscripts[s] for s in exp])
-#        label = unicode(QwtScaleDraw.label(self, value))
-        return mant+'x10'+exp
+    def draw(self, p):
+        scldiv = self.scaleDiv()
+        minLen, medLen, majLen = self.tickLength()
+        step_eps = 1.e-6
+
+        for i in range(scldiv.majCnt()):
+            val = scldiv.majMark(i)
+            self.drawTick(p, val, majLen)
+            self.drawLabel(p, val)
+
+        if scldiv.logScale():
+            for i in range(scldiv.minCnt()):
+                self.drawTick(p, scldiv.minMark(i), minLen)
+        else:
+            kmax = scldiv.majCnt() - 1
+            if kmax>0:
+                majTick = scldiv.majMark(0)
+                hval = majTick - 0.5 * scldiv.majStep()
+
+                k = 0
+                for i in range(scldiv.minCnt()):
+                    val = scldiv.minMark(i)
+                    if val > majTick:
+                        if k < kmax:
+                            k+=1
+                            majTick = scldiv.majMark(k)
+                        else:
+                            majTick = scldiv.majMark(kmax) + scldiv.majStep()
+                        hval = majTick - 0.5 * scldiv.majStep()
+                    if abs(val-hval) < step_eps*scldiv.majStep():
+                        self.drawTick(p, val, medLen)
+                    else:
+                        self.drawTick(p, val, minLen)
+
+            if self.options() & QwtScaleDraw.Backbone:
+                self.drawBackbone(p)
+
+    def maxLabelHeight(self, fm):
+        scldiv = self.scaleDiv()
+        step_eps = 1e-6
+
+        maxHeight = 0
+
+        for i in range(scldiv.majCnt()):
+            val = scldiv.majMark(i)
+
+            # correct rounding errors if val = 0
+            if not scldiv.logScale() and abs(val)<step_eps*abs(scldiv.majStep()):
+                val = 0.
+
+            h = self.labelBoundingRect(fm, val).height()
+            if h>maxHeight:
+                maxHeight = h
+
+        return maxHeight
+
+    def maxLabelWidth(self, fm):
+        scldiv = self.scaleDiv()
+        step_eps = 1e-6
+
+        maxWidth = 0
+
+        for i in range(scldiv.majCnt()):
+            val = scldiv.majMark(i)
+
+            # correct rounding errors if val = 0
+            if not scldiv.logScale() and abs(val)<step_eps*abs(scldiv.majStep()):
+                val = 0.
+
+            h = self.labelBoundingRect(fm, val).width()
+            if h>maxWidth:
+                maxWidth = h
+
+        return maxWidth
+
+    def drawLabel(self, p, val):
+        pos = QPoint()
+        alignment, rotation = self.labelPlacement(QFontMetrics(self.font), val, pos)
+
+        if alignment:
+            txt = QString(self.label(val, True))
+            if not txt.isEmpty():
+                m = self.labelWorldMatrix(QFontMetrics(self.font), pos, alignment, rotation, txt)
+                p.save()
+                p.setWorldMatrix(m, True)
+#                QwtPainter.drawText(p, 0, 0, txt)
+                qwtxt = QwtText.makeText(txt, alignment, self.font)
+                br = qwtxt.boundingRect()
+                qwtxt.draw(p, QRect(0, 0, br.width(), br.height()))
+                p.restore()
+
+    def qtxt(self, val):
+        lbl = self.label(val, True)
+        return QwtText.makeText(lbl, self.labelAlignment(), self.font)
+
+    def labelWorldMatrix(self, fm, pos, alignment, rotation, txt):
+        ltxt = QwtText.makeText(txt, alignment, self.font)
+        br = ltxt.boundingRect()
+        w, h = br.width(), br.height()
+
+        if alignment & Qt.AlignLeft: x = -w
+        elif alignment & Qt.AlignRight: x = 0 - w%2
+        else: x = -w/2
+        
+        if alignment & Qt.AlignTop: y = -h
+        elif alignment & Qt.AlignBottom: y = 0
+        else: y = -h/2
+
+        m = QWMatrix()
+        m.translate(pos.x(), pos.y())
+        m.rotate(rotation)
+        m.translate(x, y)
+
+        return m
+
+    def minBorderDist(self, fm):
+        print >>sys.stderr, "her"
+
+    def labelBoundingRect(self, fm, val):
+        f, prec, fieldwidth = self.labelFormat()
+        zeroString = QString()
+        zeroString.fill(QChar('0'), fieldwidth)
+
+        lbl = QString(self.label(val, True))
+
+        if fm.width(zeroString) > fm.width(lbl):
+            txt = zeroString
+        else:
+            txt = lbl
+
+        if txt.isEmpty():
+            return QRect(0, 0, 0, 0)
+
+        ltxt = self.qtxt(val)
+        pos = QPoint()
+
+        alignment, rotation = self.labelPlacement(fm, val, pos)
+        if alignment:
+            r = ltxt.boundingRect()
+            w, h = r.width(), r.height()
+
+            m = self.labelWorldMatrix(fm, pos, alignment, rotation, lbl)
+
+            br = QwtMetricsMap.translate(m, QRect(0, 0, w, h))
+            br.moveBy(-pos.x(), -pos.y())
+        return br;
+
+    def label(self, value, rich=False):
+        mant, exp = ('%e'%value).split('e')
+        if float(mant) == 1.:
+            mant = ''
+        else:
+            mant = unicode(QwtScaleDraw.label(self, float(mant)))
+        exp = unicode(int(exp))
+        if rich:
+            return (mant+'x')*bool(mant)+'10<sup>'+exp+'</sup>'
+        else:
+            return (mant+'x')*bool(mant)+'10'+exp
+
 
 class LVI(QListViewItem):
     def __init__(self, *args):
@@ -348,7 +503,11 @@ class GraphView(QVBox):
         self.plot.reparent(self.mainpage, 0, QPoint(0,0))
         self.plot.setCanvasBackground(self.bg_color)
         self.plot.setPaletteBackgroundColor(self.bg_color)
-        self.plot.setAxisFont(self.plot.xBottom, QFont('Times New Roman'))
+#        font = QFont('/home/daniel/grafito/data/fonts/bakoma-cm/cmr10.ttf')
+#        font = QFont('FreeMono',9)
+        font = QFont('GentiumAlt')
+        self.plot.setAxisFont(self.plot.xBottom, font)
+        self.plot.setAxisFont(self.plot.yLeft, font)
         self.plot.enableGridX(True)
         self.plot.enableGridY(True)
         self.plot.setGridPen(QPen(QColor('gray'), 0, Qt.DotLine))
@@ -357,6 +516,7 @@ class GraphView(QVBox):
         self.plot.canvas().setLineWidth(1)
         self.plot.canvas().setFrameStyle(QFrame.Box|QFrame.Plain)
         self.plot.setAxisScaleDraw(QwtPlot.xBottom, ScaleDraw())
+        self.plot.setAxisScaleDraw(QwtPlot.yLeft, ScaleDraw())
         self.plot.axis(self.plot.xBottom).setBaselineDist(0)
         self.plot.axis(self.plot.yLeft).setBaselineDist(0)
         self.plot.axis(self.plot.yLeft).scaleDraw().setOptions(QwtScaleDraw.None)
@@ -597,10 +757,11 @@ class GraphView(QVBox):
     def on_context_menu_delete(self):
         self.project.remove(self.context_item.id)
 
-    def on_legend_cmenu(item, point):
+    def on_legend_cmenu(self, item, point):
         self.context_menu = QPopupMenu(self)
-        self.context_menu.insertItem('Rename', self.on_context_menu_rename)
-        self.context_menu.insertItem('Delete', self.on_context_menu_delete)
+        self.context_menu.insertItem('Hide', self.on_context_menu_delete)
+        self.context_menu.insertItem('Full range', self.on_context_menu_delete)
+        self.context_menu.insertItem('Show only', self.on_context_menu_rename)
         self.context_menu.insertSeparator ()
 #        self.context_menu.insertItem ('Delete', self.wsheet_context_menu_del)
 #        self.context_menu.insertItem ('Import ASCII...', self.wsheet_context_menu_importascii)
