@@ -21,7 +21,7 @@ from grafity.ui.forms.graph_axes import GraphAxesUI
 from grafity.ui.forms.graph_fit import GraphFitUI
 from grafity.ui.forms.functions import FunctionsWindowUI
 from grafity.ui.forms.fitoptions import FitOptionsUI
-from grafity.ui.utils import getimage, connectevents, Page, graph_modes
+from grafity.ui.utils import getimage, connectevents, Page, graph_modes, dataset_tools
 from grafity.ui.graph_tools import ZoomTool, RangeTool, ArrowTool, HandTool
 from grafity.ui.graph_tools import DataReaderTool, ScreenReaderTool
 
@@ -751,22 +751,14 @@ class GraphView(QVBox):
         self.datasets = [d for d in self.graph.datasets if hasattr(d, '_item') and d._item.isSelected()]
         self.graph.emit('selection-changed', self.datasets)
 
-    def on_context_menu_rename(self):
-        self.context_item._tree_item.startRename(0)
-
-    def on_context_menu_delete(self):
-        self.project.remove(self.context_item.id)
+    def on_contextm(self, id):
+        dataset_tools[id](self.graph, self)
 
     def on_legend_cmenu(self, item, point):
         self.context_menu = QPopupMenu(self)
-        self.context_menu.insertItem('Hide', self.on_context_menu_delete)
-        self.context_menu.insertItem('Full range', self.on_context_menu_delete)
-        self.context_menu.insertItem('Show only', self.on_context_menu_rename)
-        self.context_menu.insertSeparator ()
-#        self.context_menu.insertItem ('Delete', self.wsheet_context_menu_del)
-#        self.context_menu.insertItem ('Import ASCII...', self.wsheet_context_menu_importascii)
-
-#        self.context_item = item._object
+        for id, tool in enumerate(dataset_tools):
+            self.context_menu.insertItem(tool.name, id)
+        self.connect(self.context_menu, SIGNAL('activated(int)'), self.on_contextm)
         self.context_menu.popup(point)
  
     def on_add_function_term(self, term):

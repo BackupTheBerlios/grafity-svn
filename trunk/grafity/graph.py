@@ -90,6 +90,7 @@ class Dataset(HasSignals):
         x = asarray(self.x)[:length]
         y = asarray(self.y)[:length]
         self.minx, self.maxx = min(x), max(x)
+        self.miny, self.maxy = min(y), max(y)
         ind = isfinite(x) & isfinite(y) & (self.xfrom <= x) & (x <= self.xto)
         xx = x[ind]
         yy = y[ind]
@@ -566,10 +567,10 @@ class Graph(Item, HasSignals):
 
     def autoscale(self):
         if len(self.datasets):
-            xmin = min(d.xx.min() for d in self.datasets)
-            xmax = max(d.xx.max() for d in self.datasets)
-            ymin = min(d.yy.min() for d in self.datasets)
-            ymax = max(d.yy.max() for d in self.datasets)
+            xmin = min(d.minx for d in self.datasets)
+            xmax = max(d.maxx for d in self.datasets)
+            ymin = min(d.miny for d in self.datasets)
+            ymax = max(d.maxy for d in self.datasets)
             self.zoom(xmin, xmax, ymin, ymax)
 
     def set_range(self, fr, to):

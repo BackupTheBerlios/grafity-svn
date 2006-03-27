@@ -20,11 +20,10 @@ column_tools = []
 
 
 @extension_type('dataset-tool')
-def dataset_tool(name, image=None):
-    def dataset_tool_dec(function):
-        dataset_tools.append((name, function, image))
-        return function
-    return dataset_tool_dec
+def dataset_tool_dec(function):
+    print >>sys.stderr, "registering dataset tool", function.name
+    dataset_tools.append(function)
+    return function
 
 dataset_tools = []
 
@@ -32,6 +31,7 @@ dataset_tools = []
 def register_graph_mode(mode):
     print >>sys.stderr, "registering graph mode", mode.name
     graph_modes.append(mode)
+
 
 graph_modes = []
 def getimage(name, cache={}):
