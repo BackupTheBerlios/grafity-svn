@@ -33,8 +33,8 @@ class RangeTool(GraphTool):
         self.graph, self.view, self.plot = graph, view, plot
 
     def activate(self):
-        self.rangemin = self.plot.insertLineMarker(None, QwtPlot.xBottom)
-        self.rangemax = self.plot.insertLineMarker(None, QwtPlot.xBottom)
+        self.rangemin = self.plot.insertLineMarker('', QwtPlot.xBottom)
+        self.rangemax = self.plot.insertLineMarker('', QwtPlot.xBottom)
         self.plot.setMarkerLineStyle(self.rangemin, QwtMarker.VLine)
         self.plot.setMarkerLineStyle(self.rangemax, QwtMarker.VLine)
         self.moving_rangemin = self.moving_rangemax = False
@@ -153,7 +153,7 @@ class DataReaderTool(GraphTool):
         self.graph, self.view, self.plot = graph, view, plot
 
     def activate(self):
-        self.reader = self.plot.insertLineMarker(None, QwtPlot.xBottom)
+        self.reader = self.plot.insertLineMarker('', QwtPlot.xBottom)
         self.plot.setMarkerLineStyle(self.reader, QwtMarker.Cross)
 
     def deactivate(self):
@@ -180,7 +180,7 @@ class ScreenReaderTool(GraphTool):
         self.graph, self.view, self.plot = graph, view, plot
 
     def activate(self):
-        self.reader = self.plot.insertLineMarker(None, QwtPlot.xBottom)
+        self.reader = self.plot.insertLineMarker('', QwtPlot.xBottom)
         self.plot.setMarkerLineStyle(self.reader, QwtMarker.Cross)
 
     def deactivate(self):
