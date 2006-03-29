@@ -55,7 +55,6 @@ class Item(object):
             for key, value in contents.iteritems():
                 if isinstance(value, attribute):
                     value.name = key
-
             return c
 
     @classmethod
