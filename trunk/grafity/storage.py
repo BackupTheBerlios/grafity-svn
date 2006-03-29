@@ -60,6 +60,8 @@ class Item(object):
 
     @classmethod
     def attributes(cls):
+        if not hasattr(cls, '__storename__'):
+            return None
         st = cls.__storename__+'['
         for c in cls.__mro__:
             for key, attr in c.__dict__.iteritems():
@@ -72,7 +74,7 @@ class Item(object):
         self._row = row
 
     oid = attribute('S')
-    __storename__='items'
+#    __storename__='items'
 
 
 class Folder(Item):
