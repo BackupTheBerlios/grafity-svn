@@ -8,7 +8,7 @@ import metakit
 from grafity.actions import action_from_methods, action_list, action_from_methods2, StopAction
 from grafity.signals import HasSignals
 
-# by (Carl Free Jr. http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/213761)
+# http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/213761
 def create_id(*args):
     """Generates a universally unique ID.
     Any arguments only create more randomness.
