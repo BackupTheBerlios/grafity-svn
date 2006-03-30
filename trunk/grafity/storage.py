@@ -4,9 +4,11 @@ import marshal
 
 import metakit
 
+from grafity.signals import HasSignals
+
 itemtypes = {}
 
-class Storage(object):
+class Storage(HasSignals):
     def __init__(self):
         self.db = metakit.storage()
         self.items = {}
@@ -23,9 +25,8 @@ class Storage(object):
         data = md5.md5(data).hexdigest()
         return data
 
-
     def create(self, itemtype):
-        oid = self.operation('add', itemtype.__storename__)
+        oid = self.operation('add', itemtype.__storename__, None)
         obj = self[oid]
         obj.storage = self
         self.items[oid] = obj
@@ -39,15 +40,23 @@ class Storage(object):
 
     def __getitem__(self, oid):
         if oid not in self.items:
-            itemtype = oid.split('/')[0]
-            self.items[oid] = itemtypes[itemtype](self.db.view(itemtype)[self.db.view(itemtype).find(oid=oid)])
+            obj = None
+            for level in oid.split(':'):
+                itemtype = level.split('/')[0]
+                if obj is None:
+                    view = self.db.view(itemtype)
+                else:
+                    view = getattr(obj._row, itemtype)
+                row = view[view.find(oid=oid)]
+                obj = itemtypes[itemtype](row)
+            self.items[oid] = obj
         return self.items[oid]
 
     def undo(self):
         self.operation(undo=True, *self.undolist.pop())
 
     def redo(self):
-        self.operation(undo=False, *self.redolist.pop())
+        self.operation(redo=True, *self.redolist.pop())
 
     def operation(self, *args, **kwds):
         print 'executing operation', args
@@ -55,9 +64,13 @@ class Storage(object):
         opcode, args = args[0], args[1:]
         ret = None
         if opcode == 'add':
-            itemtype, = args
+            itemtype, root = args
             oid = itemtype+'/'+self.create_id()
-            view = self.db.getas(itemtypes[itemtype].attributes())
+            if root is None:
+                view = self.db.getas(itemtypes[itemtype].attributes())
+            else:
+                view = getattr(self[root]._row, itemtype)
+                oid = root+':'+oid
             view.append(oid=oid)
             inv = ('del', oid)
             ret = oid
@@ -76,38 +89,74 @@ class Storage(object):
             oid, name, value = args 
             inv = ('set', oid, name, getattr(self[oid]._row, name))
             setattr(self[oid]._row, name, value)
+
         if 'undo' in kwds and kwds['undo']:
             self.redolist.append(inv)
-        else:
+            print 'adding', inv, 'to redo list'
+        elif 'redo' in kwds and kwds['redo']:
             self.undolist.append(inv)
+            print 'adding', inv, 'to undo list'
+        else:
+            del self.redolist[:]
+            print 'clearing redo list'
+            self.undolist.append(inv)
+            print 'adding', inv, 'to undo list'
         return ret
 
 
-class attribute(object):
+class Attribute(object):
     def __init__(self, code):
-        self.code = code
+        self.key = code
 
     def __get__(self, obj, cls):
+        if self.name not in Item.__dict__ and obj.deleted:
+            raise ValueError, 'object is deleted'
         return getattr(obj._row, self.name)
 
     def __set__(self, obj, value):
         if obj.deleted:
             raise ValueError, 'object is deleted'
         obj.storage.operation('set', obj.oid, self.name, value)
-#        setattr(obj._row, self.name, value)
-#        print >>sys.stderr, "set", obj.oid, obj.storage, self.name, value
 
+    def get_code(self):
+        return self.name +':'+self.key
+    code = property(get_code)
 
-class Item(object):
+class ItemList(Attribute):
+    def __init__(self, cls):
+        self.cls = cls
+
+    def get_code(self):
+        return self.cls.attributes()
+    code = property(get_code)
+
+    def __get__(self, obj, cls):
+        self.obj = obj
+        return self
+
+    def create(self):
+        oid = self.obj.storage.operation('add', self.cls.__storename__, self.obj.oid)
+        print >>sys.stderr, oid
+        obj = self.obj.storage[oid]
+        obj.storage = self.obj.storage
+#        self.items[oid] = obj
+        return obj
+
+    def __getitem__(self, item):
+        return self.obj.storage[getattr(self.obj._row, self.cls.__storename__).select(deleted=0)[item].oid]
+
+class Item(HasSignals):
     class __metaclass__(type):
         def __new__(cls, name, bases, contents):
             c = type.__new__(cls, name, bases, contents)
-            if '__storename__' in contents:
-                itemtypes[contents['__storename__']] = c
 
             for key, value in contents.iteritems():
-                if isinstance(value, attribute):
+                if isinstance(value, Attribute):
                     value.name = key
+            if '__storename__' in contents:
+                itemtypes[contents['__storename__']] = c
+                print 'registered class', c.__name__, 'as', c.attributes()
+
             return c
 
     @classmethod
@@ -115,39 +164,41 @@ class Item(object):
         if not hasattr(cls, '__storename__'):
             return None
         st = cls.__storename__+'['
-        for c in cls.__mro__:
+        for c in reversed(cls.__mro__):
             for key, attr in c.__dict__.iteritems():
-                if isinstance(attr, attribute):
-                    st += key+':'+attr.code+','
+                if isinstance(attr, Attribute):
+                    st += attr.code+','
         st = st[:-1] + ']'
         return st
 
     def __init__(self, row):
         self._row = row
 
-    oid = attribute('S')
-    deleted = attribute('I')
+    oid = Attribute('S')
+    deleted = Attribute('I')
 
-#    __storename__='items'
-
+class Column(Item):
+    __storename__ = 'column'
+    colname = Attribute('S')
 
 class Folder(Item):
-    __storename__ = 'folders'
+    __storename__ = 'folder'
+    name = Attribute('S')
+    number = Attribute('I')
+    column = ItemList(Column)
+
     def __init__(self, row, *args):
         Item.__init__(self, row)
 
-#        print self._rowref
-    name = attribute('S')
-    number = attribute('I')
 
 if __name__=='__main__':
     store = Storage()
     f = store.create(Folder)
-    f.name = '314'
-    print f.number
-    f.number = 200
-    print f.number
+    print f.column.create()
+    col =  f.column[0]
 
-    store.delete(f)
+    print  f.column[0]
+    print store.delete(col)
+    print  f.column[0]
 
     store.save('/home/daniel/project.mk')
