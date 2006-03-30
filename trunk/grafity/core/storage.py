@@ -167,23 +167,6 @@ class Item(HasSignals):
     oid = Attribute('S')
     deleted = Attribute('I')
 
-
-
-
-class Column(Item):
-    __storename__ = 'column'
-    colname = Attribute('S')
-
-class Folder(Item):
-    __storename__ = 'folder'
-    name = Attribute('S')
-    number = Attribute('I')
-    column = ItemList(Column)
-
-    def __init__(self, row, *args):
-        Item.__init__(self, row)
-
-
 if __name__=='__main__':
     from grafity.core.utils import test
     test('storage.txt')

@@ -7,12 +7,22 @@ Using ``factorial``
 This is an example text file in reStructuredText format.  First import
 ``factorial`` from the ``example`` module:
 
-    >>> from grafity.core.storage import Storage, Folder
+    >>> from grafity.core.storage import Storage, Item, Attribute, ItemList
 
 Now use it:
 
+    >>> class Column(Item):
+    ...     __storename__ = 'column'
+    ...     colname = Attribute('S')
+    ... 
+    >>> class Folder(Item):
+    ...     __storename__ = 'folder'
+    ...     name = Attribute('S')
+    ...     number = Attribute('I')
+    ...     column = ItemList(Column)
+    ...
     >>> st = Storage()
-    >>> f = st.create(Folder)
+    >>> f = st.create(Folder2)
     >>> f.name = 'foo'
     >>> f.name
     'foo'
@@ -22,4 +32,3 @@ Now use it:
     >>> st.redo()
     >>> f.name
     'foo'
-
