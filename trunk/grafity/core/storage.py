@@ -59,7 +59,6 @@ class Storage(HasSignals):
         self.operation(redo=True, *self.redolist.pop())
 
     def operation(self, *args, **kwds):
-#        print 'executing operation', args
         oper = args
         opcode, args = args[0], args[1:]
         ret = None
@@ -92,15 +91,11 @@ class Storage(HasSignals):
 
         if 'undo' in kwds and kwds['undo']:
             self.redolist.append(inv)
-#            print 'adding', inv, 'to redo list'
         elif 'redo' in kwds and kwds['redo']:
             self.undolist.append(inv)
-#            print 'adding', inv, 'to undo list'
         else:
             del self.redolist[:]
-#            print 'clearing redo list'
             self.undolist.append(inv)
-#            print 'adding', inv, 'to undo list'
         return ret
 
 
@@ -136,10 +131,8 @@ class ItemList(Attribute):
 
     def create(self):
         oid = self.obj.storage.operation('add', self.cls.__storename__, self.obj.oid)
-#        print >>sys.stderr, oid
         obj = self.obj.storage[oid]
         obj.storage = self.obj.storage
-#        self.items[oid] = obj
         return obj
 
     def __getitem__(self, item):
@@ -149,14 +142,11 @@ class Item(HasSignals):
     class __metaclass__(type):
         def __new__(cls, name, bases, contents):
             c = type.__new__(cls, name, bases, contents)
-
             for key, value in contents.iteritems():
                 if isinstance(value, Attribute):
                     value.name = key
             if '__storename__' in contents:
                 itemtypes[contents['__storename__']] = c
-#                print 'registered class', c.__name__, 'as', c.attributes()
-
             return c
 
     @classmethod
