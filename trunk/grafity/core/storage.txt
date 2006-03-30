@@ -1,0 +1,25 @@
+The ``example`` module
+======================
+
+Using ``factorial``
+-------------------
+
+This is an example text file in reStructuredText format.  First import
+``factorial`` from the ``example`` module:
+
+    >>> from grafity.core.storage import Storage, Folder
+
+Now use it:
+
+    >>> st = Storage()
+    >>> f = st.create(Folder)
+    >>> f.name = 'foo'
+    >>> f.name
+    'foo'
+    >>> st.undo()
+    >>> f.name
+    ''
+    >>> st.redo()
+    >>> f.name
+    'foo'
+

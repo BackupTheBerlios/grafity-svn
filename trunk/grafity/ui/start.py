@@ -69,11 +69,11 @@ class ErrorWindow(exception_form):
         exception_form.__init__(self, mainwin, 'error', True)
         self.label.setText("An error <b>(%s)</b> has occurred.<br><i>%s</i><br>This should not happen, please tell Daniel!" % (type, value))
         self.pixmap.setPixmap(getimage('vogel'))
-        lines = ''.join(traceback.format_exception (type, value, tback))
-        f = file('.grafity-birds', 'a')
-        f.write('# bird at %s\n' % time.strftime("%d %b %Y %H:%M:%S"))
-        f.write(lines)
-        f.write('\n\n')
+#        lines = ''.join(traceback.format_exception (type, value, tback))
+#        f = file('.grafity-birds', 'a')
+#        f.write('# bird at %s\n' % time.strftime("%d %b %Y %H:%M:%S"))
+#        f.write(lines)
+#        f.write('\n\n')
 
        
 def excepthook(type, value, traceback):

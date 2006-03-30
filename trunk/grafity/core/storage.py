@@ -59,7 +59,7 @@ class Storage(HasSignals):
         self.operation(redo=True, *self.redolist.pop())
 
     def operation(self, *args, **kwds):
-        print 'executing operation', args
+#        print 'executing operation', args
         oper = args
         opcode, args = args[0], args[1:]
         ret = None
@@ -92,15 +92,15 @@ class Storage(HasSignals):
 
         if 'undo' in kwds and kwds['undo']:
             self.redolist.append(inv)
-            print 'adding', inv, 'to redo list'
+#            print 'adding', inv, 'to redo list'
         elif 'redo' in kwds and kwds['redo']:
             self.undolist.append(inv)
-            print 'adding', inv, 'to undo list'
+#            print 'adding', inv, 'to undo list'
         else:
             del self.redolist[:]
-            print 'clearing redo list'
+#            print 'clearing redo list'
             self.undolist.append(inv)
-            print 'adding', inv, 'to undo list'
+#            print 'adding', inv, 'to undo list'
         return ret
 
 
@@ -136,7 +136,7 @@ class ItemList(Attribute):
 
     def create(self):
         oid = self.obj.storage.operation('add', self.cls.__storename__, self.obj.oid)
-        print >>sys.stderr, oid
+#        print >>sys.stderr, oid
         obj = self.obj.storage[oid]
         obj.storage = self.obj.storage
 #        self.items[oid] = obj
@@ -155,7 +155,7 @@ class Item(HasSignals):
                     value.name = key
             if '__storename__' in contents:
                 itemtypes[contents['__storename__']] = c
-                print 'registered class', c.__name__, 'as', c.attributes()
+#                print 'registered class', c.__name__, 'as', c.attributes()
 
             return c
 
@@ -195,13 +195,5 @@ class Folder(Item):
 
 
 if __name__=='__main__':
-    store = Storage()
-    f = store.create(Folder)
-    print f.column.create()
-    col =  f.column[0]
-
-    print  f.column[0]
-    print store.delete(col)
-    print  f.column[0]
-
-    store.save('/home/daniel/project.mk')
+    from grafity.core.utils import test
+    test('storage.txt')
