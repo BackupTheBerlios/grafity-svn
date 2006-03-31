@@ -12,8 +12,10 @@ This is an example text file in reStructuredText format.  First import
 Writing attributes:
 
 An attribute class defines:
-    * the metakit columns that it requires for saving
-    * 
+    * the metakit columns that it requires for saving 
+    * def spec(self, name): return '%s_x:I,%s_y:I' % (name,)
+    * def to_cols(self, value):
+    * def from_cols(self, cols):
 
 class Attribute(object):
     def convert(self, value):  
