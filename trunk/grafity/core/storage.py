@@ -66,7 +66,7 @@ class Storage(HasSignals):
             itemtype, root = args
             oid = itemtype+'/'+self.create_id()
             if root is None:
-                view = self.db.getas(itemtypes[itemtype].attributes())
+                view = self.db.getas('%s[%s]'%(itemtype, itemtypes[itemtype].attributes()))
             else:
                 view = getattr(self[root]._row, itemtype)
                 oid = root+':'+oid
@@ -117,26 +117,38 @@ class Attribute(object):
         return self.name +':'+self.key
     code = property(get_code)
 
-class ItemList(Attribute):
-    def __init__(self, cls):
-        self.cls = cls
+class Attr(object):
+    class String(Attribute):
+        def __init__(self):
+            Attribute.__init__(self, 'S')
 
-    def get_code(self):
-        return self.cls.attributes()
-    code = property(get_code)
+    class Integer(Attribute):
+        def __init__(self):
+            Attribute.__init__(self, 'I')
 
-    def __get__(self, obj, cls):
-        self.obj = obj
-        return self
+    class ItemList(Attribute):
+        def __init__(self, cls):
+            self.cls = cls
 
-    def create(self):
-        oid = self.obj.storage.operation('add', self.cls.__storename__, self.obj.oid)
-        obj = self.obj.storage[oid]
-        obj.storage = self.obj.storage
-        return obj
+        def get_code(self):
+            return '%s[%s]' % (self.name, self.cls.attributes())
+        code = property(get_code)
 
-    def __getitem__(self, item):
-        return self.obj.storage[getattr(self.obj._row, self.cls.__storename__).select(deleted=0)[item].oid]
+        def __get__(self, obj, cls):
+            self.obj = obj
+            return self
+
+        def create(self):
+            oid = self.obj.storage.operation('add', self.name, self.obj.oid)
+            obj = self.obj.storage[oid]
+            obj.storage = self.obj.storage
+            return obj
+
+        def __getitem__(self, item):
+            return self.obj.storage[getattr(self.obj._row, self.name).select(deleted=0)[item].oid]
+
+        def __len__(self):
+            return len(getattr(self.obj._row, self.name))
 
 class Item(HasSignals):
     class __metaclass__(type):
@@ -151,14 +163,16 @@ class Item(HasSignals):
 
     @classmethod
     def attributes(cls):
-        if not hasattr(cls, '__storename__'):
-            return None
-        st = cls.__storename__+'['
+#        if not hasattr(cls, '__storename__'):
+#            return None
+#        st = cls.__storename__+'['
+        st = ''
         for c in reversed(cls.__mro__):
             for key, attr in c.__dict__.iteritems():
                 if isinstance(attr, Attribute):
                     st += attr.code+','
-        st = st[:-1] + ']'
+        st = st[:-1]
+#        st = st[:-1] + ']'
         return st
 
     def __init__(self, row):
@@ -166,6 +180,7 @@ class Item(HasSignals):
 
     oid = Attribute('S')
     deleted = Attribute('I')
+
 
 if __name__=='__main__':
     from grafity.core.utils import test

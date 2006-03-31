@@ -7,22 +7,38 @@ Using ``factorial``
 This is an example text file in reStructuredText format.  First import
 ``factorial`` from the ``example`` module:
 
-    >>> from grafity.core.storage import Storage, Item, Attribute, ItemList
+    >>> from grafity.core.storage import Storage, Container, Item, Attr
 
-Now use it:
+Writing attributes:
+
+An attribute class defines:
+    * the metakit columns that it requires for saving
+    * 
+
+class Attribute(object):
+    def convert(self, value):  
+
+You define new classes derived from Item, like this
 
     >>> class Column(Item):
-    ...     __storename__ = 'column'
-    ...     colname = Attribute('S')
+    ...     colname = Attr.String()
     ... 
     >>> class Folder(Item):
-    ...     __storename__ = 'folder'
-    ...     name = Attribute('S')
-    ...     number = Attribute('I')
-    ...     column = ItemList(Column)
+    ...     name = Attr.String()
+    ...     number = Attr.Integer()
+    ...     columns = Container(Column)
+    ...     col2 = Container(Column)
     ...
-    >>> st = Storage()
-    >>> f = st.create(Folder2)
+    >>> class Meta(Item):
+    ...     name = Attr.String()
+    ...     value = Attr.String()
+    ...
+    >>> class Store(Storage):
+    ...     folders = Container(Folder)
+    ...     meta = Container(Meta)
+    ...
+    >>> st = Store()
+    >>> f = st.folders.create()
     >>> f.name = 'foo'
     >>> f.name
     'foo'
@@ -32,3 +48,10 @@ Now use it:
     >>> st.redo()
     >>> f.name
     'foo'
+    >>> f.number = 15
+    >>> f.number
+    15
+    >>> c = f.columns.create()
+    >>> len(f.columns)
+    1
+    >>> st.undo()
