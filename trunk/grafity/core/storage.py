@@ -2,18 +2,25 @@ import sys
 import time, random, md5
 import marshal
 
+from dispatch import dispatcher
 import metakit
 
-from grafity.signals import HasSignals
-
 itemtypes = {}
-
-class Storage(HasSignals):
+class Storage(object):
     def __init__(self):
-        self.db = metakit.storage()
+        self.db = metakit.storage('foudi.db', 1)
+        self.undodb = metakit.storage('undo.db', 1)
         self.items = {}
-        self.undolist = []
-        self.redolist = []
+        self.oplist = []
+
+
+        self.storage = self
+        for name in dir(type(self)):
+            attr = getattr(self, name)
+            if isinstance(attr, Container):
+                attr.name = name
+                attr.storage = self
+                itemtypes[name] = attr.cls
 
     def create_id(self, *args):
         """Generates a unique ID.
@@ -24,13 +31,6 @@ class Storage(HasSignals):
         data = str(t)+' '+str(r)+' '+str(args)
         data = md5.md5(data).hexdigest()
         return data
-
-    def create(self, itemtype):
-        oid = self.operation('add', itemtype.__storename__, None)
-        obj = self[oid]
-        obj.storage = self
-        self.items[oid] = obj
-        return obj
 
     def delete(self, obj):
         self.operation('del', obj.oid)
@@ -48,20 +48,15 @@ class Storage(HasSignals):
                 else:
                     view = getattr(obj._row, itemtype)
                 row = view[view.find(oid=oid)]
-                obj = itemtypes[itemtype](row)
+                if obj is None:
+                    obj = itemtypes[itemtype](row)
+                else:
+                    obj = getattr(obj, itemtype).cls(row)
+                obj.storage  = self
             self.items[oid] = obj
         return self.items[oid]
 
-    def undo(self):
-        self.operation(undo=True, *self.undolist.pop())
-
-    def redo(self):
-        self.operation(redo=True, *self.redolist.pop())
-
-    def operation(self, *args, **kwds):
-        oper = args
-        opcode, args = args[0], args[1:]
-        ret = None
+    def operation(self, opcode, *args):
         if opcode == 'add':
             itemtype, root = args
             oid = itemtype+'/'+self.create_id()
@@ -72,31 +67,60 @@ class Storage(HasSignals):
                 oid = root+':'+oid
             view.append(oid=oid)
             inv = ('del', oid)
-            ret = oid
+            dispatcher.send('add-object', self, oid)
         elif opcode == 'del':
             oid, = args
             obj = self[oid]
             obj._row.deleted = True
             del self.items[oid]
             inv = ('und', obj._row.oid)
+            dispatcher.send('delete-object', self, oid)
         elif opcode == 'und':
             oid, = args
             obj = self[oid]
             obj._row.deleted = False
             inv = ('del', obj._row.oid)
+            dispatcher.send('add-object', self, oid)
         elif opcode == 'set':
             oid, name, value = args 
             inv = ('set', oid, name, getattr(self[oid]._row, name))
             setattr(self[oid]._row, name, value)
+            dispatcher.send('set-attr', self[oid], name)
+        self.oplist.append(inv)
+        self.db.commit()
 
-        if 'undo' in kwds and kwds['undo']:
-            self.redolist.append(inv)
-        elif 'redo' in kwds and kwds['redo']:
-            self.undolist.append(inv)
-        else:
-            del self.redolist[:]
-            self.undolist.append(inv)
-        return ret
+    def begin_action(self, name):
+        self.action_name = name
+        self.oplist = []
+
+    def end_action(self):
+        uview = self.undodb.getas("undolist[name:S,ops:B]")
+        uview.append(name=self.action_name, ops=marshal.dumps(self.oplist))
+        self.undodb.commit()
+        print self.oplist
+
+    def undo(self, _redo=False):
+        uview = self.undodb.getas("undolist[name:S,ops:B]")
+        rview = self.undodb.getas("redolist[name:S,ops:B]")
+
+        if _redo:
+            uview, rview = rview, uview
+
+        name, oplist = uview[-1].name, marshal.loads(uview[-1].ops)
+
+        print 'undoing operation', name
+
+        self.oplist = []
+        for oper in reversed(oplist):
+            self.operation(*oper)
+
+        uview.delete(len(uview)-1)
+
+        rview.append(name=name, ops=marshal.dumps(self.oplist))
+        self.undodb.commit()
+
+    def redo(self):
+        return self.undo(_redo=True)
 
 
 class Attribute(object):
@@ -117,6 +141,7 @@ class Attribute(object):
         return self.name +':'+self.key
     code = property(get_code)
 
+
 class Attr(object):
     class String(Attribute):
         def __init__(self):
@@ -126,53 +151,58 @@ class Attr(object):
         def __init__(self):
             Attribute.__init__(self, 'I')
 
-    class ItemList(Attribute):
-        def __init__(self, cls):
-            self.cls = cls
+class Container(object):
+    def __init__(self, cls):
+        self.cls = cls
 
-        def get_code(self):
-            return '%s[%s]' % (self.name, self.cls.attributes())
-        code = property(get_code)
+    def get_code(self):
+        return '%s[%s]' % (self.name, self.cls.attributes())
+    code = property(get_code)
 
-        def __get__(self, obj, cls):
-            self.obj = obj
-            return self
+    def __get__(self, obj, cls):
+        self.obj = obj
+        return self
 
-        def create(self):
-            oid = self.obj.storage.operation('add', self.name, self.obj.oid)
-            obj = self.obj.storage[oid]
-            obj.storage = self.obj.storage
-            return obj
+    def create(self):
+        if isinstance(self.obj, Storage):
+            parent = None
+        else:
+            parent = self.obj.oid
+        self.obj.storage.operation('add', self.name, parent)
+        obj  = self[-1]
+        obj.storage = self.obj.storage
+        return obj
 
-        def __getitem__(self, item):
+    def __getitem__(self, item):
+        if isinstance(self.obj, Storage):
+            return self.obj[self.obj.db.view(self.name).select(deleted=0)[item].oid]
+        else:
             return self.obj.storage[getattr(self.obj._row, self.name).select(deleted=0)[item].oid]
 
-        def __len__(self):
+    def __len__(self):
+        if isinstance(self.obj, Storage):
+            return len(self.obj.db.view(self.name).select(deleted=0))
+        else:
             return len(getattr(self.obj._row, self.name))
 
-class Item(HasSignals):
+
+class Item(object):
     class __metaclass__(type):
         def __new__(cls, name, bases, contents):
             c = type.__new__(cls, name, bases, contents)
             for key, value in contents.iteritems():
-                if isinstance(value, Attribute):
+                if isinstance(value, (Attribute, Container)):
                     value.name = key
-            if '__storename__' in contents:
-                itemtypes[contents['__storename__']] = c
             return c
 
     @classmethod
     def attributes(cls):
-#        if not hasattr(cls, '__storename__'):
-#            return None
-#        st = cls.__storename__+'['
         st = ''
         for c in reversed(cls.__mro__):
             for key, attr in c.__dict__.iteritems():
-                if isinstance(attr, Attribute):
+                if isinstance(attr, (Attribute, Container)):
                     st += attr.code+','
         st = st[:-1]
-#        st = st[:-1] + ']'
         return st
 
     def __init__(self, row):
@@ -180,7 +210,6 @@ class Item(HasSignals):
 
     oid = Attribute('S')
     deleted = Attribute('I')
-
 
 if __name__=='__main__':
     from grafity.core.utils import test

@@ -9,17 +9,6 @@ This is an example text file in reStructuredText format.  First import
 
     >>> from grafity.core.storage import Storage, Container, Item, Attr
 
-Writing attributes:
-
-An attribute class defines:
-    * the metakit columns that it requires for saving 
-    * def spec(self, name): return '%s_x:I,%s_y:I' % (name,)
-    * def to_cols(self, value):
-    * def from_cols(self, cols):
-
-class Attribute(object):
-    def convert(self, value):  
-
 You define new classes derived from Item, like this
 
     >>> class Column(Item):
@@ -35,19 +24,31 @@ You define new classes derived from Item, like this
     ...     name = Attr.String()
     ...     value = Attr.String()
     ...
+
+You define the database like this
+
     >>> class Store(Storage):
     ...     folders = Container(Folder)
     ...     meta = Container(Meta)
     ...
+
+
+Create a store
+
     >>> st = Store()
+
+Create new objects
+
     >>> f = st.folders.create()
     >>> f.name = 'foo'
     >>> f.name
     'foo'
     >>> st.undo()
+    1
     >>> f.name
     ''
     >>> st.redo()
+    0
     >>> f.name
     'foo'
     >>> f.number = 15
@@ -56,4 +57,49 @@ You define new classes derived from Item, like this
     >>> c = f.columns.create()
     >>> len(f.columns)
     1
+    >>> c.colname = 'foobar'
+    >>> c.colname = 'barfoo'
+    >>> c.colname
+    'barfoo'
     >>> st.undo()
+    5
+    >>> c.colname
+    'foobar'
+    >>> m = st.meta.create()
+    >>> m == st.meta[0]
+    True
+    >>> m.name = 'version'
+    >>> m.value = '1.0'
+    >>> st.undo()
+    7
+    >>> st.undo()
+    6
+    >>> st.undo()
+    5
+    >>> len(st.meta)
+    0
+    >>> st.redo()
+    2
+    >>> st.redo()
+    1
+    >>> st.redo()
+    0
+    >>> len(st.meta)
+    1
+    >>> st.meta[0].value
+    '1.0'
+
+
+    >>> st.begin_action('foobar')
+    ... try:
+    ...     m = st.meta.create()
+    ...     m.name, m.value = 'foo', 'bar'
+    ... finally:
+    ...     st.end_action()
+    ... 
+    >>> st.undo()
+    >>> st.undo()
+    >>> st.undo()
+    >>> len(st.meta)
+    >>> st.redo()
+    >>> len(st.meta)
