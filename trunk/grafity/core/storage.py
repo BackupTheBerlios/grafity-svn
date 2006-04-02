@@ -1,4 +1,5 @@
 import sys
+import os
 import time, random, md5
 import marshal
 
@@ -7,13 +8,15 @@ import metakit
 
 itemtypes = {}
 class Storage(object):
-    def __init__(self):
-        self.db = metakit.storage('foudi.db', 1)
-        self.undodb = metakit.storage('undo.db', 1)
+    def __init__(self, filename):
+        self.db = metakit.storage(filename, 1)
+        if os.path.exists(filename+'.swp'):
+            print 'foo!'
+            os.remove(filename+'.swp')
+        self.filename = filename
+        self.undodb = metakit.storage(filename+'.swp', 1)
         self.items = {}
         self.oplist = []
-
-
         self.storage = self
         for name in dir(type(self)):
             attr = getattr(self, name)
@@ -21,6 +24,9 @@ class Storage(object):
                 attr.name = name
                 attr.storage = self
                 itemtypes[name] = attr.cls
+
+    def close(self):
+        os.remove(self.filename+'.swp')
 
     def create_id(self, *args):
         """Generates a unique ID.
