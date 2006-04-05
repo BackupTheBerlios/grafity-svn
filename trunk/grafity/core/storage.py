@@ -17,6 +17,7 @@ class Storage(object):
         self.undodb = metakit.storage(filename+'.swp', 1)
         self.items = {}
         self.oplist = []
+        self.action_name = None
         self.storage = self
         for name in dir(type(self)):
             attr = getattr(self, name)
@@ -93,16 +94,18 @@ class Storage(object):
             setattr(self[oid]._row, name, value)
             dispatcher.send('set-attr', self[oid], name)
         self.oplist.append(inv)
-        self.db.commit()
+#        self.db.commit()
 
-    def begin_action(self, name):
+    def begin(self, name):
         self.action_name = name
         self.oplist = []
 
-    def end_action(self):
+    def commit(self):
         uview = self.undodb.getas("undolist[name:S,ops:B]")
         uview.append(name=self.action_name, ops=marshal.dumps(self.oplist))
         self.undodb.commit()
+        self.db.commit()
+        self.action_name = None
         print self.oplist
 
     def undo(self, _redo=False):
@@ -136,26 +139,47 @@ class Attribute(object):
     def __get__(self, obj, cls):
         if self.name not in Item.__dict__ and obj.deleted:
             raise ValueError, 'object is deleted'
-        return getattr(obj._row, self.name)
+        self.obj = obj
+        return self.decode(getattr(obj._row, self.name))
 
     def __set__(self, obj, value):
         if obj.deleted:
             raise ValueError, 'object is deleted'
-        obj.storage.operation('set', obj.oid, self.name, value)
+        obj.storage.operation('set', obj.oid, self.name, self.encode(value))
 
     def get_code(self):
         return self.name +':'+self.key
     code = property(get_code)
 
+    def encode(self, value):
+        return value
+
+    def decode(self, value):
+        return value
+
 
 class Attr(object):
-    class String(Attribute):
+    class Text(Attribute):
         def __init__(self):
             Attribute.__init__(self, 'S')
+
+    class Bytes(Attribute):
+        def __init__(self):
+            Attribute.__init__(self, 'B')
 
     class Integer(Attribute):
         def __init__(self):
             Attribute.__init__(self, 'I')
+
+    class ObjectRef(Attribute):
+        def __init__(self):
+            Attribute.__init__(self, 'S')
+
+        def encode(self, value):
+            return value.oid
+
+        def decode(self, value):
+            return self.obj.storage[value]
 
 class Container(object):
     def __init__(self, cls):
