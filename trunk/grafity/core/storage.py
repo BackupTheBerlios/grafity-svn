@@ -11,7 +11,7 @@ class Storage(object):
     def __init__(self, filename):
         self.db = metakit.storage(filename, 1)
         if os.path.exists(filename+'.swp'):
-            print 'foo!'
+#            print 'foo!'
             os.remove(filename+'.swp')
         self.filename = filename
         self.undodb = metakit.storage(filename+'.swp', 1)
@@ -106,7 +106,7 @@ class Storage(object):
         self.undodb.commit()
         self.db.commit()
         self.action_name = None
-        print self.oplist
+#        print self.oplist
 
     def undo(self, _redo=False):
         uview = self.undodb.getas("undolist[name:S,ops:B]")
@@ -116,8 +116,6 @@ class Storage(object):
             uview, rview = rview, uview
 
         name, oplist = uview[-1].name, marshal.loads(uview[-1].ops)
-
-        print 'undoing operation', name
 
         self.oplist = []
         for oper in reversed(oplist):

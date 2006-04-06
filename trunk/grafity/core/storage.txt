@@ -12,17 +12,17 @@ This is an example text file in reStructuredText format.  First import
 You define new classes derived from Item, like this
 
     >>> class Column(Item):
-    ...     colname = Attr.String()
+    ...     colname = Attr.Text()
     ... 
     >>> class Folder(Item):
-    ...     name = Attr.String()
+    ...     name = Attr.Text()
     ...     number = Attr.Integer()
     ...     columns = Container(Column)
     ...     col2 = Container(Column)
     ...
     >>> class Meta(Item):
-    ...     name = Attr.String()
-    ...     value = Attr.String()
+    ...     name = Attr.Text()
+    ...     value = Attr.Text()
     ...
 
 You define the database like this
@@ -35,71 +35,22 @@ You define the database like this
 
 Create a store
 
-    >>> st = Store()
+    >>> st = Store('foo.db')
 
 Create new objects
 
-    >>> f = st.folders.create()
-    >>> f.name = 'foo'
-    >>> f.name
-    'foo'
-    >>> st.undo()
-    1
-    >>> f.name
-    ''
-    >>> st.redo()
-    0
-    >>> f.name
-    'foo'
-    >>> f.number = 15
-    >>> f.number
-    15
-    >>> c = f.columns.create()
-    >>> len(f.columns)
-    1
-    >>> c.colname = 'foobar'
-    >>> c.colname = 'barfoo'
-    >>> c.colname
-    'barfoo'
-    >>> st.undo()
-    5
-    >>> c.colname
-    'foobar'
-    >>> m = st.meta.create()
-    >>> m == st.meta[0]
-    True
-    >>> m.name = 'version'
-    >>> m.value = '1.0'
-    >>> st.undo()
-    7
-    >>> st.undo()
-    6
-    >>> st.undo()
-    5
-    >>> len(st.meta)
-    0
-    >>> st.redo()
-    2
-    >>> st.redo()
-    1
-    >>> st.redo()
-    0
-    >>> len(st.meta)
-    1
-    >>> st.meta[0].value
-    '1.0'
-
-
-    >>> st.begin_action('foobar')
-    ... try:
+    >>> st.begin('foobar')
+    >>> try:
+    ...     f = st.folders.create()
+    ...     f.name = 'foo'
     ...     m = st.meta.create()
     ...     m.name, m.value = 'foo', 'bar'
     ... finally:
-    ...     st.end_action()
+    ...     st.commit()
     ... 
     >>> st.undo()
-    >>> st.undo()
-    >>> st.undo()
     >>> len(st.meta)
+    0
     >>> st.redo()
     >>> len(st.meta)
+    1
