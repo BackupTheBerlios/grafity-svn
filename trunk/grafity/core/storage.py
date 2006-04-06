@@ -1,3 +1,61 @@
+"""
+grafity.core.storage
+====================
+
+Using ``factorial``
+-------------------
+
+This is an example text file in reStructuredText format.  First import
+``factorial`` from the ``example`` module:
+
+    >>> from grafity.core.storage import Storage, Container, Item, Attr
+
+You define new classes derived from Item, like this
+
+    >>> class Column(Item):
+    ...     colname = Attr.Text()
+    ... 
+    >>> class Folder(Item):
+    ...     name = Attr.Text()
+    ...     number = Attr.Integer()
+    ...     columns = Container(Column)
+    ...     col2 = Container(Column)
+    ...
+    >>> class Meta(Item):
+    ...     name = Attr.Text()
+    ...     value = Attr.Text()
+    ...
+
+You define the database like this
+
+    >>> class Store(Storage):
+    ...     folders = Container(Folder)
+    ...     meta = Container(Meta)
+    ...
+
+
+Create a store
+
+    >>> st = Store('foo.db')
+
+Create new objects
+
+    >>> st.begin('foobar')
+    >>> try:
+    ...     f = st.folders.create()
+    ...     f.name = 'foo'
+    ...     m = st.meta.create()
+    ...     m.name, m.value = 'foo', 'bar'
+    ... finally:
+    ...     st.commit()
+    ... 
+    >>> st.undo()
+    >>> len(st.meta)
+    0
+    >>> st.redo()
+    >>> len(st.meta)
+    1
+"""
 import sys
 import os
 import time, random, md5
@@ -11,7 +69,6 @@ class Storage(object):
     def __init__(self, filename):
         self.db = metakit.storage(filename, 1)
         if os.path.exists(filename+'.swp'):
-#            print 'foo!'
             os.remove(filename+'.swp')
         self.filename = filename
         self.undodb = metakit.storage(filename+'.swp', 1)
@@ -26,10 +83,7 @@ class Storage(object):
                 attr.storage = self
                 itemtypes[name] = attr.cls
 
-    def close(self):
-        os.remove(self.filename+'.swp')
-
-    def create_id(self, *args):
+    def _create_id(self, *args):
         """Generates a unique ID.
         Any arguments only create more randomness.
         """
@@ -39,11 +93,11 @@ class Storage(object):
         data = md5.md5(data).hexdigest()
         return data
 
-    def delete(self, obj):
-        self.operation('del', obj.oid)
-
     def save(self, filename):
         self.db.save(open(filename, 'w'))
+
+    def close(self):
+        os.remove(self.filename+'.swp')
 
     def __getitem__(self, oid):
         if oid not in self.items:
@@ -63,12 +117,15 @@ class Storage(object):
             self.items[oid] = obj
         return self.items[oid]
 
-    def operation(self, opcode, *args):
+    def delete(self, obj):
+        self._operation('del', obj.oid)
+
+    def _operation(self, opcode, *args):
         if opcode == 'add':
             itemtype, root = args
-            oid = itemtype+'/'+self.create_id()
+            oid = itemtype+'/'+self._create_id()
             if root is None:
-                view = self.db.getas('%s[%s]'%(itemtype, itemtypes[itemtype].attributes()))
+                view = self.db.getas('%s[%s]'%(itemtype, itemtypes[itemtype]._attributes()))
             else:
                 view = getattr(self[root]._row, itemtype)
                 oid = root+':'+oid
@@ -94,7 +151,6 @@ class Storage(object):
             setattr(self[oid]._row, name, value)
             dispatcher.send('set-attr', self[oid], name)
         self.oplist.append(inv)
-#        self.db.commit()
 
     def begin(self, name):
         self.action_name = name
@@ -106,7 +162,6 @@ class Storage(object):
         self.undodb.commit()
         self.db.commit()
         self.action_name = None
-#        print self.oplist
 
     def undo(self, _redo=False):
         uview = self.undodb.getas("undolist[name:S,ops:B]")
@@ -119,7 +174,7 @@ class Storage(object):
 
         self.oplist = []
         for oper in reversed(oplist):
-            self.operation(*oper)
+            self._operation(*oper)
 
         uview.delete(len(uview)-1)
 
@@ -143,11 +198,11 @@ class Attribute(object):
     def __set__(self, obj, value):
         if obj.deleted:
             raise ValueError, 'object is deleted'
-        obj.storage.operation('set', obj.oid, self.name, self.encode(value))
+        obj.storage._operation('set', obj.oid, self.name, self.encode(value))
 
-    def get_code(self):
+    def _getcode(self):
         return self.name +':'+self.key
-    code = property(get_code)
+    code = property(_getcode)
 
     def encode(self, value):
         return value
@@ -157,6 +212,8 @@ class Attribute(object):
 
 
 class Attr(object):
+    """Default attribute types"""
+
     class Text(Attribute):
         def __init__(self):
             Attribute.__init__(self, 'S')
@@ -183,9 +240,9 @@ class Container(object):
     def __init__(self, cls):
         self.cls = cls
 
-    def get_code(self):
-        return '%s[%s]' % (self.name, self.cls.attributes())
-    code = property(get_code)
+    def _getcode(self):
+        return '%s[%s]' % (self.name, self.cls._attributes())
+    code = property(_getcode)
 
     def __get__(self, obj, cls):
         self.obj = obj
@@ -196,7 +253,7 @@ class Container(object):
             parent = None
         else:
             parent = self.obj.oid
-        self.obj.storage.operation('add', self.name, parent)
+        self.obj.storage._operation('add', self.name, parent)
         obj  = self[-1]
         obj.storage = self.obj.storage
         return obj
@@ -224,7 +281,7 @@ class Item(object):
             return c
 
     @classmethod
-    def attributes(cls):
+    def _attributes(cls):
         st = ''
         for c in reversed(cls.__mro__):
             for key, attr in c.__dict__.iteritems():
@@ -240,5 +297,7 @@ class Item(object):
     deleted = Attribute('I')
 
 if __name__=='__main__':
-    from grafity.core.utils import test
-    test('storage.txt')
+    import doctest
+    doctest.testmod()
+#    from grafity.core.utils import test
+#    test('storage.txt')
