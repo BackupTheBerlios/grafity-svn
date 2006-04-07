@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<grafity-plugins>
+  <plugin name="Dielectric" version="0.1">
+    <download url="http://grafity.berlios.de/plugins/dielectric-0.1.zip"/>
+    <description>Contains tools useful for using grafity for dielectric spectoscopy.
+Fit functions, including Havriliak-Negami, Vogel-Tamman-Fulcher etc.</description>
+  </plugin>
+  <plugin name="DSC" version="0.1">
+    <download url="http://grafity.berlios.de/plugins/dsc-0.1.zip"/>
+    <description>Analysis of DSC curves.</description>
+  </plugin>
+</grafity-plugins>

@@ -1,0 +1,37 @@
+Grafity: User manual
+
++ The grafity main window
+    - Explorer
+    - Creating, deleting, renaming objects and folders
+    - Action list
+    - Console
+
++ Working with worksheets
+    - Adding columns
+    - Inserting rows
+    - Entering data
+    - Importing data
+    - Automatic columns
+
++ Working with graphs
+    - Adding and removing datasets
+    - Controlling style 
+    - Axes
+    - Making figures
+
++ Fitting
+    - Fit Functions
+    - Fit Options
+
++ Scripts
+    - project/folder api    
+    - worksheet api
+    - graph api
+
++ Extending grafity
+    - The resources directory
+    - Writing worksheet and column tools
+    - Writing graph tools
+    - Plugins
+
++ Appendix: The grafity file format

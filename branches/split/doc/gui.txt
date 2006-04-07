@@ -1,0 +1,21 @@
+
+import sys
+sys.path.append('/home/daniel/grafity/grafity')
+import gui
+
+class MainWindow(gui.Window):
+    def __init__(self):
+        gui.Window.__init__(self)
+
+        box = gui.Box(self, 'vertical')
+
+        self.label = gui.Label(box, 'hello, world!', stretch=0)
+        self.button = gui.Button(box, 'hello, world!', expand=True)
+        self.button.connect('clicked', self.on_button_clicked)
+        
+    def on_button_clicked(self):
+        print 'click!'
+
+if __name__ == '__main__':
+    gui.run(MainWindow)
+

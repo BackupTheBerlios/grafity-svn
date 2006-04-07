@@ -1,0 +1,56 @@
+The ``example`` module
+======================
+
+Using ``factorial``
+-------------------
+
+This is an example text file in reStructuredText format.  First import
+``factorial`` from the ``example`` module:
+
+    >>> from grafity.core.storage import Storage, Container, Item, Attr
+
+You define new classes derived from Item, like this
+
+    >>> class Column(Item):
+    ...     colname = Attr.Text()
+    ... 
+    >>> class Folder(Item):
+    ...     name = Attr.Text()
+    ...     number = Attr.Integer()
+    ...     columns = Container(Column)
+    ...     col2 = Container(Column)
+    ...
+    >>> class Meta(Item):
+    ...     name = Attr.Text()
+    ...     value = Attr.Text()
+    ...
+
+You define the database like this
+
+    >>> class Store(Storage):
+    ...     folders = Container(Folder)
+    ...     meta = Container(Meta)
+    ...
+
+
+Create a store
+
+    >>> st = Store('foo.db')
+
+Create new objects
+
+    >>> st.begin('foobar')
+    >>> try:
+    ...     f = st.folders.create()
+    ...     f.name = 'foo'
+    ...     m = st.meta.create()
+    ...     m.name, m.value = 'foo', 'bar'
+    ... finally:
+    ...     st.commit()
+    ... 
+    >>> st.undo()
+    >>> len(st.meta)
+    0
+    >>> st.redo()
+    >>> len(st.meta)
+    1

@@ -1,0 +1,15 @@
+Dielectric/Havriliak-Negami
+------
+
+------
+f0, de, a, b
+------
+y= -(de/((1 + (1j*x/(10**f0))**a)**b)).imag
+------
+hn(f)=\Im\[\frac{\Delta\epsilon}{(1+(if/f_0)^\alpha)^\beta}\]
+------
+# move the peak with the mouse
+def move(x, y, f0, de, a, b):
+    f0 = log10(x*( sin(a*b*pi/(2+2*b)) / sin(a*pi/(2+2*b)) )**(1/a))    
+    de = de * y/(-(de/((1 + (1j*x/(10**f0))**a)**b)).imag)
+    return f0, de, a, b
