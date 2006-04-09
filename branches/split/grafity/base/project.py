@@ -49,7 +49,6 @@ class Project(object):
         new.name = name
         return new
 
-
     def on_action(self, arg1=None, arg2=None, signal=None, sender=None):
         print 'ACTION', sender, signal, arg1, arg2
 
@@ -58,7 +57,17 @@ if __name__ == '__main__':
     f = p.new_folder('foo')
     w = p.new_worksheet('bar', f)
     c = w.columns.create()
+    c.name = 'baroof'
+    print hasattr(w, 'babasdasd')
+    print list(w.columns)
+    print w.baroof
     c[:] = [1,2,3]
     w.columns[0][10] = 3
+    w.baroof = [1,2,3,4,5,6,7,]
+    w.printa = [2,3,4]
+    print w.baroof
     print c, c.data
     print f
+    print w.printa[33]
+    w.printa[1240] = 4
+    print w.printa[1230:1250]

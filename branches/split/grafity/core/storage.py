@@ -208,6 +208,8 @@ class Attribute(object):
         self.key = code
 
     def __get__(self, obj, cls):
+        if obj is None:
+            return self
         if self.name not in Item.__dict__ and obj.deleted:
             raise ValueError, 'object is deleted'
         self.obj = obj
