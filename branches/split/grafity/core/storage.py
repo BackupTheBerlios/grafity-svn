@@ -75,12 +75,12 @@ class Storage(object):
         self.items = {}
         self.oplist = []
         self.action_name = None
-        self.storage = self
+        self._storage = self
         for name in dir(type(self)):
             attr = getattr(self, name)
             if isinstance(attr, Container):
                 attr.name = name
-                attr.storage = self
+                attr._storage = self
                 self.itemtypes[name] = attr.cls
 
     def _create_id(self, *args):
@@ -111,13 +111,13 @@ class Storage(object):
                 else:
                     view = getattr(obj._row, itemtype)
                 row = view[view.find(oid=oid)]
+                parent = obj
                 if obj is None:
                     obj = self.itemtypes[itemtype]()
-                    obj.initialize(row, view)
                 else:
                     obj = getattr(obj, itemtype).cls()
-                    obj.initialize(row, view)
-                obj.storage  = self
+                obj.initialize(row, view, parent)
+                obj._storage  = self
             self.items[oid] = obj
         return self.items[oid]
 
@@ -216,7 +216,7 @@ class Attribute(object):
     def __set__(self, obj, value):
         if obj.deleted:
             raise ValueError, 'object is deleted'
-        obj.storage._operation('set', obj.oid, self.name, self.encode(value))
+        obj._storage._operation('set', obj.oid, self.name, self.encode(value))
 
     def _getcode(self):
         return self.name +':'+self.key
@@ -247,7 +247,7 @@ class Attr(object):
         def get_data(self):
             return getattr(self.obj._row, self.name)
         def set_data(self, value):
-            self.obj.storage._operation('set', self.obj.oid, self.name, value)
+            self.obj._storage._operation('set', self.obj.oid, self.name, value)
         data = property(get_data, set_data)
 
         def get(self, offset, length):
@@ -255,7 +255,10 @@ class Attr(object):
             return self.obj._view.access(getattr(self.obj._view, self.name), ind, offset, length)
 
         def set(self, data, offset):
-            self.obj.storage._operation('mod', self.obj.oid, self.name, data, offset)
+            self.obj._storage._operation('mod', self.obj.oid, self.name, data, offset)
+
+        def __len__(self):
+            return self.obj._view.itemsize(getattr(self.obj._view, self.name), self.obj._view.find(oid=self.obj.oid))
             
     class Integer(Attribute):
         def __init__(self):
@@ -269,7 +272,7 @@ class Attr(object):
             return value.oid
 
         def decode(self, value):
-            return self.obj.storage[value]
+            return self.obj._storage[value]
 
 class Container(object):
     def __init__(self, cls):
@@ -288,16 +291,22 @@ class Container(object):
             parent = None
         else:
             parent = self.obj.oid
-        self.obj.storage._operation('add', self.name, parent)
+        self.obj._storage._operation('add', self.name, parent)
         obj  = self[-1]
-        obj.storage = self.obj.storage
+        obj._storage = self.obj._storage
         return obj
 
     def __getitem__(self, item):
         if isinstance(self.obj, Storage):
-            return self.obj[self.obj.db.view(self.name).select(deleted=0)[item].oid]
+            try:
+                return self.obj[self.obj.db.view(self.name).select(deleted=0)[item].oid]
+            except ValueError:
+                raise IndexError
         else:
-            return self.obj.storage[getattr(self.obj._row, self.name).select(deleted=0)[item].oid]
+            try:
+                return self.obj._storage[getattr(self.obj._row, self.name).select(deleted=0)[item].oid]
+            except ValueError:
+                raise IndexError
 
     def __len__(self):
         if isinstance(self.obj, Storage):
@@ -325,13 +334,14 @@ class Item(object):
         st = st[:-1]
         return st
 
-    def initialize(self, row, view):
+    def initialize(self, row, view, obj):
         self._row = row
         self._view = view
-        self.initialized = True
+        self._initialized = True
+        self._parent = obj
 
     def __init__(self):
-        self.initialized = False
+        self._initialized = False
 
 #    def __init__(self, row):
 #        self._row = row

@@ -1,43 +1,37 @@
 import sys
 import re
 
-from dispatch import dispatcher
+from grafity.signals import HasSignals
+from grafity.actions import action_from_methods, action_from_methods2, StopAction, action_list
+from grafity.project import Item, wrap_attribute, register_class, create_id
+from grafity.arrays import MkArray, transpose, array, asarray
 
-from grafity.core.storage import Item, Attr, Container
-from grafity.core.arrays import MkArray, transpose, array, asarray
-from grafity.base.items import ProjectItem
+import grafity.arrays as arrays
 
-import grafity.core.arrays as arrays
+class Column(MkArray, HasSignals):
+    def __init__(self, worksheet, ind):
+        self.data = worksheet.data.columns[ind]
+        self.worksheet = worksheet
+        MkArray.__init__(self, worksheet.data.columns, worksheet.data.columns.data, ind)
+        self.dependencies = set()
+        self.worksheet.connect('set-parent', self.on_ws_set_parent)
 
-class Column(ProjectItem):
-    name = Attr.Text()
-    expr = Attr.Text()
-    data = MkArray()
-    
-    def __init__(self):
-        ProjectItem.__init__(self)
-#        self.data = worksheet.data.columns[ind]
-#        self.worksheet = worksheet
-#        MkArray.__init__(self, worksheet.data.columns, worksheet.data.columns.data, ind)
-#        self.dependencies = set()
-#        self.worksheet.connect('set-parent', self.on_ws_set_parent)
+    def reload(self, ind):
+        MkArray.__init__(self, self.worksheet.data.columns, self.worksheet.data.columns.data, ind)
+        self.data = self.worksheet.data.columns[ind]
 
-#    def reload(self, ind):
-#        MkArray.__init__(self, self.worksheet.data.columns, self.worksheet.data.columns.data, ind)
-#        self.data = self.worksheet.data.columns[ind]
+    def set_name(self, name):
+        prevname = self.data.name
+        self.data.name = name.encode('utf-8')
+        self.emit('rename', self, prevname, name)
+        self.worksheet.emit('rename-column', self, prevname, name)
+    def get_name(self):
+        return self.data.name.decode('utf-8')
+    name = property(get_name, set_name)
 
-#    def set_name(self, name):
-#        prevname = self.data.name
-#        self.data.name = name.encode('utf-8')
-#        self.emit('rename', self, prevname, name)
-#        self.worksheet.emit('rename-column', self, prevname, name)
-#    def get_name(self):
-#        return self.data.name.decode('utf-8')
-#    name = property(get_name, set_name)
-
-#    def get_fullname(self):
-#        return self.worksheet.fullname+'.'+self.name
-#    fullname = property(get_fullname)
+    def get_fullname(self):
+        return self.worksheet.fullname+'.'+self.name
+    fullname = property(get_fullname)
 
     def do_set_expr(self, state, expr, setstate=True):
         # find dependencies and error-check expression
@@ -88,13 +82,13 @@ class Column(ProjectItem):
     def redo_set_expr(self, state):
         self.do_set_expr(None, state['new'], setstate=False)
 
-#    set_expr = action_from_methods2('worksheet/column-expr', 
-#                                     do_set_expr, undo_set_expr, redo=redo_set_expr)
+    set_expr = action_from_methods2('worksheet/column-expr', 
+                                     do_set_expr, undo_set_expr, redo=redo_set_expr)
 
     def get_expr(self):
         return self.data.expr.decode('utf-8')
 
-#    expr = property(get_expr, set_expr)
+    expr = property(get_expr, set_expr)
 
     def calculate(self):
         self[:] = self.worksheet.evaluate(self.expr)
@@ -134,48 +128,43 @@ class Column(ProjectItem):
     def on_dep_ws_rename(self, name, item=None): self.update_expression()
     def on_ws_set_parent(self, parent): self.update_expression()
                 
-#    def set_id(self, id):
-#        self.data.id = id
-#    def get_id(self):
-#        return self.data.id
-#    id = property(get_id, set_id)
+    def set_id(self, id):
+        self.data.id = id
+    def get_id(self):
+        return self.data.id
+    id = property(get_id, set_id)
 
     def __setitem__(self, key, value):
-#        prev = self[key]
-        self.data[key] = value
-#        self.worksheet.emit('data-changed')
-#        self.emit('data-changed')
-#        return [key, value, prev]
+        prev = self[key]
+        MkArray.__setitem__(self, key, value)
+        self.worksheet.emit('data-changed')
+        self.emit('data-changed')
+        return [key, value, prev]
 
-    def __getitem__(self, key):
-        return self.data[key]
-
-#    def undo_setitem(self, state):
-#        key, value, prev = state
-#        self[key] = prev
+    def undo_setitem(self, state):
+        key, value, prev = state
+        self[key] = prev
 
     def __eq__(self, other):
         return hasattr(self, 'id') and hasattr(other, 'id') and self.id == other.id
 
-#    __setitem__ = action_from_methods('column_change_data', __setitem__, undo_setitem)
+    __setitem__ = action_from_methods('column_change_data', __setitem__, undo_setitem)
 
 
-class Worksheet(ProjectItem):
-    columns = Container(Column)
-    def __init__(self):
-        ProjectItem.__init__(self)
+class Worksheet(Item, HasSignals):
+    def __init__(self, project, name=None, parent=None, location=None):
         self.__attr = False
-#
-#        Item.__init__(self, project, name, parent, location)
-#
-#        self.columns = []
-#
-#        if location is not None:
-#            for i in range(len(self.data.columns)):
-#                if not self.data.columns[i].name.startswith('-'):
-#                    self.columns.append(Column(self, i))
-#
-#        self.__attr = True
+
+        Item.__init__(self, project, name, parent, location)
+
+        self.columns = []
+
+        if location is not None:
+            for i in range(len(self.data.columns)):
+                if not self.data.columns[i].name.startswith('-'):
+                    self.columns.append(Column(self, i))
+
+        self.__attr = True
 
     def __items__(self):
         return dict((c.name, c) for c in self.columns)
@@ -200,7 +189,7 @@ class Worksheet(ProjectItem):
             self.swap_columns(i, i+cmp(dest, src), nocomm=True)
         self.emit('data-changed')
 
-#n    move_column = action_from_methods2('move column', move_column, undo_move_column)
+    move_column = action_from_methods2('move column', move_column, undo_move_column)
 
 
     def swap_columns(self, state, i=None, j=None, nocomm=False):
@@ -232,7 +221,7 @@ class Worksheet(ProjectItem):
 
         return True
 
-#    swap_columns = action_from_methods2('worksheet/swap-columns', swap_columns, swap_columns)
+    swap_columns = action_from_methods2('worksheet/swap-columns', swap_columns, swap_columns)
 
     def evaluate(self, expression):
         if expression == '':
@@ -257,9 +246,9 @@ class Worksheet(ProjectItem):
         return result
 
     def __getattr__(self, name):
-#        if name in self.column_names:
-#            return self[name]
-#        else:
+        if name in self.column_names:
+            return self[name]
+        else:
             return object.__getattribute__(self, name)
 
     def __setattr__(self, name, value):
@@ -299,8 +288,8 @@ class Worksheet(ProjectItem):
         self.columns.append(col)
         self.emit('data-changed')
 
-#    add_column = action_from_methods2('worksheet/add_column', add_column, add_column_undo,
-#                                       redo=add_column_redo)
+    add_column = action_from_methods2('worksheet/add_column', add_column, add_column_undo,
+                                       redo=add_column_redo)
 
     def remove_column(self, state, name):
         ind = self.column_index(name)
@@ -320,8 +309,8 @@ class Worksheet(ProjectItem):
         self.columns.insert(ind, col)
         self.emit('data-changed')
 
-#    remove_column = action_from_methods2('worksheet_remove_column', remove_column, 
-#                                          undo_remove_column)
+    remove_column = action_from_methods2('worksheet_remove_column', remove_column, 
+                                          undo_remove_column)
 
     def get_ncolumns(self):
         return len(self.columns)
@@ -366,8 +355,8 @@ class Worksheet(ProjectItem):
             raise IndexError
         self.emit('data-changed')
 
-#    def __repr__(self):
-#        return '<Worksheet %s%s>' % (self.name, '(deleted)'*self.id.startswith('-'))
+    def __repr__(self):
+        return '<Worksheet %s%s>' % (self.name, '(deleted)'*self.id.startswith('-'))
 
 
     def get_column_names(self):
@@ -402,4 +391,4 @@ class Worksheet(ProjectItem):
 
     default_name_prefix = 'sheet'
 
-#register_class(Worksheet, 'worksheets[name:S,id:S,parent:S,columns[name:S,id:S,data:B,expr:S]]')
+register_class(Worksheet, 'worksheets[name:S,id:S,parent:S,columns[name:S,id:S,data:B,expr:S]]')

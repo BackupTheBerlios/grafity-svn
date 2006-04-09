@@ -1,10 +1,11 @@
 import struct
 import sys
 
-import metakit
+#import metakit
 from numarray import *
 from numarray.ieeespecial import nan, inf, isfinite, isnan
 #from numpy.core import *
+from grafity.core.storage import Attr
 
 Error.setMode(all='ignore')
 
@@ -21,14 +22,14 @@ class VarOperation(object):
     def __call__(self, a, b=None):
         # if the argument is a sequence,
         # wrap the result in a varray, otherwise leave it alone
-        if self.oper.n_inputs == 1:
+        if self.oper.arity == 1:
             try:
                 len(a)
             except (ValueError, TypeError):
                 return self.oper(a)
             else:
                 return asvarray(self.oper(a))
-        elif self.oper.n_inputs == 2:
+        elif self.oper.arity == 2:
             try:
                 length = min(len(a), len(b))
             except (ValueError, TypeError):
@@ -40,7 +41,7 @@ class VarOperation(object):
         return repr(self.oper).replace('UFunc', 'vUFunc')
 
 # wrap all ufuncs with VarOperations
-mod_ufuncs = dict([(k, VarOperation(v)) for k, v in ufunc._UFuncs.iteritems() if v.n_inputs in (1,2)])
+mod_ufuncs = dict([(k, VarOperation(v)) for k, v in ufunc._UFuncs.iteritems() if v.arity in (1,2)])
 globals().update(mod_ufuncs)
 
 def asvarray(*args, **kwds):
@@ -79,7 +80,7 @@ NumArray = type(array([0.]))
 class VArray(with_new_opers, NumArray):
     pass
 
-class MkArray(with_new_opers):
+class MkArray(with_new_opers, Attr.Bytes):
     """
     a = MkArray(view, prop, col)
 
@@ -95,9 +96,10 @@ class MkArray(with_new_opers):
     slices have n < m, no extended slices. Missing values (a[:n]) allowed.
     """    
 
-    def __init__(self, view, prop, row, start=None, end=None):
-        self.view, self.prop, self.row = view, prop, row
-        self.start, self.end = start, end
+    def __init__(self):
+        Attr.Bytes.__init__(self)
+#        self.view, self.prop, self.row = view, prop, row
+#        self.start, self.end = start, end
 
     def __setitem__(self, key, value):
         """Set the column data.
@@ -133,7 +135,8 @@ class MkArray(with_new_opers):
         # adjust size
         if start > len(self):
             buf = array([nan]*(start-len(self)), type=Float64).tostring()
-            self.view.modify(self.prop, self.row, buf, len(self)*8)
+            self.set(buf, len(self)*8)
+#            self.view.modify(self.prop, self.row, buf, len(self)*8)
         
         arr = asvarray(value, type=Float64)
         if arr.shape == ():
@@ -141,12 +144,15 @@ class MkArray(with_new_opers):
         buf = arr.tostring()
 
         if isinstance(key, slice) and key.start is None and key.stop is None:
-            setattr(self.view[self.row], self.prop.name, buf)
+            self.data = buf
+#            setattr(self.view[self.row], self.prop.name, buf)
         else:
-            self.view.modify(self.prop, self.row, buf, start * 8)
+            self.set(buf, start*8)
+#            self.view.modify(self.prop, self.row, buf, start * 8)
 
     def __len__(self):
-        return self.view.itemsize(self.prop, self.row)/8
+#        return self.view.itemsize(self.prop, self.row)/8
+        return Attr.Bytes.__len__(self)/8
 
     def __getitem__(self, key):
         # integer and (non-extended) slice keys supported
@@ -155,7 +161,8 @@ class MkArray(with_new_opers):
                 return nan
             if key <0:
                 key = len(self)-key
-            buf = self.view.access(self.prop, self.row, key*8, 8)
+            buf = self.get(key*8, 8)
+#            buf = self.view.access(self.prop, self.row, key*8, 8)
             value = struct.unpack('d', buf)[0]
         elif isinstance(key, slice):
             if key.start is None:
@@ -168,10 +175,12 @@ class MkArray(with_new_opers):
                 stop = len(self)+key.stop
             else:
                 stop = key.stop
-            buf = self.view.access(self.prop, self.row, start*8, (stop-start)*8)
+#            buf = self.view.access(self.prop, self.row, start*8, (stop-start)*8)
+            buf = self.get(start*8, (stop-start)*8)
             value = fromstring(buf, type=Float64)
         elif hasattr(key, '__getitem__'):
-            buf = self.view.access(self.prop, self.row, 0, len(self)*8)
+#            buf = self.view.access(self.prop, self.row, 0, len(self)*8)
+            buf = self.get(0, len(self)*8)
             value = fromstring(buf, type=Float64)
             if len(key) == 0:
                 return array([], 'd')
