@@ -12,6 +12,7 @@ class Folder(Item):
     columns = Container(Column)
     col2 = Container(Column)
     parent = Attr.ObjectRef()
+    foo = Attr.Bytes()
 
 class Meta(Item):
     name = Attr.Text()
@@ -37,17 +38,11 @@ class Project(object):
         finally:
             self.store.commit()
 
-        st2 = Store('foo.bar')
-        st2.folders.create()
-        st2.folders.create()
-        st2.folders.create()
-        print len(st2.folders)
-        print len(self.store.folders)
-        print m.name, m.value
-        print >>sys.stderr, 'PA', f.parent
-        self.store.undo()
-        self.store.redo()
-        self.store.close()
+        f = self.store.folders.create()
+        f.foo.data = 'foobar'
+        f.foo.set('OOF', 5)
+        print f.foo.data
+        print f.foo.get(3, 3)
 
     def on_action(self, arg, signal=None, sender=None):
         print 'ACTION', signal, sender, arg

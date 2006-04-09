@@ -64,13 +64,13 @@ import marshal
 from dispatch import dispatcher
 import metakit
 
-itemtypes = {}
 class Storage(object):
     def __init__(self, filename):
         self.db = metakit.storage(filename, 1)
         if os.path.exists(filename+'.swp'):
             os.remove(filename+'.swp')
         self.filename = filename
+        self.itemtypes = {}
         self.undodb = metakit.storage(filename+'.swp', 1)
         self.items = {}
         self.oplist = []
@@ -81,7 +81,7 @@ class Storage(object):
             if isinstance(attr, Container):
                 attr.name = name
                 attr.storage = self
-                itemtypes[name] = attr.cls
+                self.itemtypes[name] = attr.cls
 
     def _create_id(self, *args):
         """Generates a unique ID.
@@ -100,7 +100,9 @@ class Storage(object):
         os.remove(self.filename+'.swp')
 
     def __getitem__(self, oid):
-        if oid not in self.items:
+        if oid == '':
+            return None
+        elif oid not in self.items:
             obj = None
             for level in oid.split(':'):
                 itemtype = level.split('/')[0]
@@ -110,9 +112,11 @@ class Storage(object):
                     view = getattr(obj._row, itemtype)
                 row = view[view.find(oid=oid)]
                 if obj is None:
-                    obj = itemtypes[itemtype](row)
+                    obj = self.itemtypes[itemtype]()
+                    obj.initialize(row, view)
                 else:
-                    obj = getattr(obj, itemtype).cls(row)
+                    obj = getattr(obj, itemtype).cls()
+                    obj.initialize(row, view)
                 obj.storage  = self
             self.items[oid] = obj
         return self.items[oid]
@@ -120,12 +124,16 @@ class Storage(object):
     def delete(self, obj):
         self._operation('del', obj.oid)
 
+    def containers(self):
+        for i in self.itemtypes:
+            yield getattr(self, i)
+
     def _operation(self, opcode, *args):
         if opcode == 'add':
             itemtype, root = args
             oid = itemtype+'/'+self._create_id()
             if root is None:
-                view = self.db.getas('%s[%s]'%(itemtype, itemtypes[itemtype]._attributes()))
+                view = self.db.getas('%s[%s]'%(itemtype, self.itemtypes[itemtype]._attributes()))
             else:
                 view = getattr(self[root]._row, itemtype)
                 oid = root+':'+oid
@@ -148,8 +156,18 @@ class Storage(object):
         elif opcode == 'set':
             oid, name, value = args 
             inv = ('set', oid, name, getattr(self[oid]._row, name))
+            old = getattr(self[oid], name)
             setattr(self[oid]._row, name, value)
-            dispatcher.send('set-attr', self[oid], name)
+            dispatcher.send('set-attr', self[oid], name, value=value, old=old)
+        elif opcode == 'mod':
+            oid, name, data, offset = args
+            obj = self[oid]
+            ind = obj._view.find(oid=obj.oid)
+            old = obj._view.access(getattr(obj._view, name), ind, offset, len(data))
+            obj._view.modify(getattr(obj._view, name), ind, data, offset)
+            inv = ('mod', oid, name, old, offset)
+            dispatcher.send('mod-attr', self[oid], name, offset=offset, data=data, old=old)
+
         self.oplist.append(inv)
 
     def begin(self, name):
@@ -160,7 +178,7 @@ class Storage(object):
         uview = self.undodb.getas("undolist[name:S,ops:B]")
         uview.append(name=self.action_name, ops=marshal.dumps(self.oplist))
         self.undodb.commit()
-        self.db.commit()
+#        self.db.commit()
         self.action_name = None
 
     def undo(self, _redo=False):
@@ -222,6 +240,23 @@ class Attr(object):
         def __init__(self):
             Attribute.__init__(self, 'B')
 
+        def __get__(self, obj, cls):
+            self.obj = obj
+            return self
+
+        def get_data(self):
+            return getattr(self.obj._row, self.name)
+        def set_data(self, value):
+            self.obj.storage._operation('set', self.obj.oid, self.name, value)
+        data = property(get_data, set_data)
+
+        def get(self, offset, length):
+            ind = self.obj._view.find(oid=self.obj.oid)
+            return self.obj._view.access(getattr(self.obj._view, self.name), ind, offset, length)
+
+        def set(self, data, offset):
+            self.obj.storage._operation('mod', self.obj.oid, self.name, data, offset)
+            
     class Integer(Attribute):
         def __init__(self):
             Attribute.__init__(self, 'I')
@@ -290,8 +325,16 @@ class Item(object):
         st = st[:-1]
         return st
 
-    def __init__(self, row):
+    def initialize(self, row, view):
         self._row = row
+        self._view = view
+        self.initialized = True
+
+    def __init__(self):
+        self.initialized = False
+
+#    def __init__(self, row):
+#        self._row = row
 
     oid = Attribute('S')
     deleted = Attribute('I')

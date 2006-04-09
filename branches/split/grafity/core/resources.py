@@ -12,8 +12,8 @@ import new
 
 import pkg_resources
 
-from grafity.settings import USERDATADIR
-from grafity.extend import extension_type
+from grafity.core.settings import USERDATADIR
+from grafity.core.extend import extension_type
 import grafity
 
 processors = []
@@ -33,10 +33,6 @@ def process_script(res):
     mod.grafity = grafity
     exec resource_data(res) in mod.__dict__
     sys.modules[res] = mod
-
-#@processes_resource('*.function')
-def process_function(res):
-    functions.append(res)
 
 def resource_data(res):
     protocol, path = res.split(':')
