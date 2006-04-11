@@ -56,6 +56,10 @@ Create new objects
     >>> len(st.meta)
     1
 """
+
+__author__ = "Daniel Fragiadakis <dfragi@gmail.com>"
+__revision__ = "$Id: resources.py 163 2006-04-07 15:29:08Z danielf $"
+
 import sys
 import os
 import time, random, md5
