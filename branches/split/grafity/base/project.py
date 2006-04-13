@@ -29,25 +29,21 @@ class Project(object):
         self.top.folder = self.top
         self.top.name = 'top'
 
-    def new_folder(self, name, parent=None):
+    def _new_object(self, container, name, parent=None, **kwds):
         if parent is None:
             parent = self.top
 
-        new = self.store.folders.create()
+        new = container.create()
         new._project = self
         new.folder = parent
         new.name = name
         return new
+
+    def new_folder(self, name, parent=None):
+        return self._new_object(self.store.folders, name, parent)
 
     def new_worksheet(self, name, parent=None):
-        if parent is None:
-            parent = self.top
-
-        new = self.store.worksheets.create()
-        new._project = self
-        new.folder = parent
-        new.name = name
-        return new
+        return self._new_object(self.store.worksheets, name, parent)
 
     def on_action(self, arg1=None, arg2=None, signal=None, sender=None):
         print 'ACTION', sender, signal, arg1, arg2
