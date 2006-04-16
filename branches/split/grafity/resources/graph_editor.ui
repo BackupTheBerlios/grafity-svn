@@ -1,0 +1,1084 @@
+<ui version="4.0" >
+ <author></author>
+ <comment></comment>
+ <exportmacro></exportmacro>
+ <class>GraphEditor</class>
+ <widget class="QDialog" name="GraphEditor" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>246</width>
+    <height>616</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Graph Properties</string>
+  </property>
+  <property name="sizeGripEnabled" >
+   <bool>false</bool>
+  </property>
+  <layout class="QVBoxLayout" >
+   <property name="margin" >
+    <number>0</number>
+   </property>
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <item>
+    <widget class="QTabWidget" name="tabs" >
+     <property name="font" >
+      <font>
+       <family>Sans Serif</family>
+       <pointsize>9</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+       <underline>false</underline>
+       <strikeout>false</strikeout>
+      </font>
+     </property>
+     <property name="tabPosition" >
+      <enum>QTabWidget::North</enum>
+     </property>
+     <property name="tabShape" >
+      <enum>QTabWidget::Rounded</enum>
+     </property>
+     <property name="currentIndex" >
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tab_2" >
+      <attribute name="title" >
+       <string/>
+      </attribute>
+      <attribute name="icon" >
+       <iconset>images/new/general/worksheet.png</iconset>
+      </attribute>
+      <layout class="QVBoxLayout" >
+       <property name="margin" >
+        <number>9</number>
+       </property>
+       <property name="spacing" >
+        <number>6</number>
+       </property>
+       <item>
+        <layout class="QHBoxLayout" >
+         <property name="margin" >
+          <number>0</number>
+         </property>
+         <property name="spacing" >
+          <number>6</number>
+         </property>
+         <item>
+          <widget class="QToolButton" name="add_button" >
+           <property name="text" >
+            <string>Add</string>
+           </property>
+           <property name="icon" >
+            <iconset>images/16/add.png</iconset>
+           </property>
+           <property name="toolButtonStyle" >
+            <enum>Qt::ToolButtonTextBesideIcon</enum>
+           </property>
+           <property name="autoRaise" >
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="toolButton" >
+           <property name="text" >
+            <string>Replace</string>
+           </property>
+           <property name="icon" >
+            <iconset>images/16/add.png</iconset>
+           </property>
+           <property name="toolButtonStyle" >
+            <enum>Qt::ToolButtonTextBesideIcon</enum>
+           </property>
+           <property name="autoRaise" >
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer>
+           <property name="orientation" >
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType" >
+            <enum>QSizePolicy::Expanding</enum>
+           </property>
+           <property name="sizeHint" >
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QSplitter" name="splitter" >
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="childrenCollapsible" >
+          <bool>false</bool>
+         </property>
+         <widget class="QWidget" name="widget_2" >
+          <layout class="QVBoxLayout" >
+           <property name="margin" >
+            <number>0</number>
+           </property>
+           <property name="spacing" >
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="label" >
+             <property name="text" >
+              <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600;">worksheet&lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
+             </property>
+             <property name="buddy" >
+              <cstring>treeView</cstring>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QTreeView" name="treeView" />
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="widget_2" >
+          <layout class="QVBoxLayout" >
+           <property name="margin" >
+            <number>0</number>
+           </property>
+           <property name="spacing" >
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="label_2" >
+             <property name="text" >
+              <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600;">x axis&lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
+             </property>
+             <property name="buddy" >
+              <cstring>listView</cstring>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QListView" name="listView" />
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="widget_2" >
+          <layout class="QVBoxLayout" >
+           <property name="margin" >
+            <number>0</number>
+           </property>
+           <property name="spacing" >
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="label_3" >
+             <property name="text" >
+              <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600;">y axis&lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
+             </property>
+             <property name="buddy" >
+              <cstring>listView_2</cstring>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QListView" name="listView_2" />
+           </item>
+          </layout>
+         </widget>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="Style" >
+      <attribute name="title" >
+       <string/>
+      </attribute>
+      <attribute name="icon" >
+       <iconset>images/new/general/style.png</iconset>
+      </attribute>
+      <attribute name="toolTip" >
+       <string>Style</string>
+      </attribute>
+      <layout class="QVBoxLayout" >
+       <property name="margin" >
+        <number>9</number>
+       </property>
+       <property name="spacing" >
+        <number>6</number>
+       </property>
+       <item>
+        <layout class="QVBoxLayout" >
+         <property name="margin" >
+          <number>0</number>
+         </property>
+         <property name="spacing" >
+          <number>0</number>
+         </property>
+         <item>
+          <layout class="QVBoxLayout" >
+           <property name="margin" >
+            <number>0</number>
+           </property>
+           <property name="spacing" >
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="textLabel1_3" >
+             <property name="text" >
+              <string>&lt;b>line&lt;/b></string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" >
+             <property name="margin" >
+              <number>0</number>
+             </property>
+             <property name="spacing" >
+              <number>0</number>
+             </property>
+             <item>
+              <spacer>
+               <property name="orientation" >
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeType" >
+                <enum>QSizePolicy::Fixed</enum>
+               </property>
+               <property name="sizeHint" >
+                <size>
+                 <width>8</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <layout class="QGridLayout" >
+               <property name="margin" >
+                <number>0</number>
+               </property>
+               <property name="spacing" >
+                <number>0</number>
+               </property>
+               <item row="2" column="0" >
+                <widget class="QCheckBox" name="lwidth_ch" >
+                 <property name="sizePolicy" >
+                  <sizepolicy>
+                   <hsizetype>0</hsizetype>
+                   <vsizetype>0</vsizetype>
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text" >
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="2" >
+                <widget class="QSpinBox" name="lwidth" >
+                 <property name="sizePolicy" >
+                  <sizepolicy>
+                   <hsizetype>3</hsizetype>
+                   <vsizetype>0</vsizetype>
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="maximum" >
+                  <number>40</number>
+                 </property>
+                 <property name="minimum" >
+                  <number>1</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="2" >
+                <widget class="QComboBox" name="lstyle" >
+                 <property name="sizePolicy" >
+                  <sizepolicy>
+                   <hsizetype>3</hsizetype>
+                   <vsizetype>0</vsizetype>
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1" >
+                <widget class="QLabel" name="textLabel5_2" >
+                 <property name="sizePolicy" >
+                  <sizepolicy>
+                   <hsizetype>0</hsizetype>
+                   <vsizetype>0</vsizetype>
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text" >
+                  <string>style</string>
+                 </property>
+                 <property name="buddy" >
+                  <cstring>lstyle</cstring>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1" >
+                <widget class="QLabel" name="textLabel6_2" >
+                 <property name="sizePolicy" >
+                  <sizepolicy>
+                   <hsizetype>0</hsizetype>
+                   <vsizetype>0</vsizetype>
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text" >
+                  <string>width</string>
+                 </property>
+                 <property name="buddy" >
+                  <cstring>lwidth</cstring>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="0" >
+                <widget class="QCheckBox" name="ltype_ch" >
+                 <property name="sizePolicy" >
+                  <sizepolicy>
+                   <hsizetype>0</hsizetype>
+                   <vsizetype>0</vsizetype>
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text" >
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0" >
+                <widget class="QCheckBox" name="lstyle_ch" >
+                 <property name="sizePolicy" >
+                  <sizepolicy>
+                   <hsizetype>0</hsizetype>
+                   <vsizetype>0</vsizetype>
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text" >
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1" >
+                <widget class="QLabel" name="textLabel4_2" >
+                 <property name="sizePolicy" >
+                  <sizepolicy>
+                   <hsizetype>0</hsizetype>
+                   <vsizetype>0</vsizetype>
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text" >
+                  <string>type</string>
+                 </property>
+                 <property name="buddy" >
+                  <cstring>ltype</cstring>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="2" >
+                <widget class="QComboBox" name="ltype" >
+                 <property name="sizePolicy" >
+                  <sizepolicy>
+                   <hsizetype>3</hsizetype>
+                   <vsizetype>0</vsizetype>
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <item>
+                  <property name="text" >
+                   <string>(no line)</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text" >
+                   <string>straight</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text" >
+                   <string>spline</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QLabel" name="textLabel1_4" >
+           <property name="text" >
+            <string>&lt;b>symbol&lt;/b></string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" >
+           <property name="margin" >
+            <number>0</number>
+           </property>
+           <property name="spacing" >
+            <number>0</number>
+           </property>
+           <item>
+            <spacer>
+             <property name="orientation" >
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType" >
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" >
+              <size>
+               <width>8</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <layout class="QGridLayout" >
+             <property name="margin" >
+              <number>0</number>
+             </property>
+             <property name="spacing" >
+              <number>0</number>
+             </property>
+             <item row="3" column="0" >
+              <widget class="QCheckBox" name="color_ch" >
+               <property name="sizePolicy" >
+                <sizepolicy>
+                 <hsizetype>0</hsizetype>
+                 <vsizetype>0</vsizetype>
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text" >
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="2" >
+              <widget class="QComboBox" name="shape" >
+               <property name="sizePolicy" >
+                <sizepolicy>
+                 <hsizetype>3</hsizetype>
+                 <vsizetype>0</vsizetype>
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1" >
+              <widget class="QLabel" name="textLabel4" >
+               <property name="sizePolicy" >
+                <sizepolicy>
+                 <hsizetype>0</hsizetype>
+                 <vsizetype>0</vsizetype>
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text" >
+                <string>shape</string>
+               </property>
+               <property name="buddy" >
+                <cstring>shape</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="2" >
+              <widget class="QComboBox" name="color" >
+               <property name="sizePolicy" >
+                <sizepolicy>
+                 <hsizetype>3</hsizetype>
+                 <vsizetype>0</vsizetype>
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="2" >
+              <widget class="QComboBox" name="fill" >
+               <property name="sizePolicy" >
+                <sizepolicy>
+                 <hsizetype>3</hsizetype>
+                 <vsizetype>0</vsizetype>
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <item>
+                <property name="text" >
+                 <string>filled</string>
+                </property>
+               </item>
+               <item>
+                <property name="text" >
+                 <string>open</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="1" column="1" >
+              <widget class="QLabel" name="textLabel4_3" >
+               <property name="sizePolicy" >
+                <sizepolicy>
+                 <hsizetype>0</hsizetype>
+                 <vsizetype>0</vsizetype>
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text" >
+                <string>fill</string>
+               </property>
+               <property name="buddy" >
+                <cstring>fill</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1" >
+              <widget class="QLabel" name="textLabel7" >
+               <property name="sizePolicy" >
+                <sizepolicy>
+                 <hsizetype>0</hsizetype>
+                 <vsizetype>0</vsizetype>
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text" >
+                <string>color</string>
+               </property>
+               <property name="buddy" >
+                <cstring>color</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0" >
+              <widget class="QCheckBox" name="size_ch" >
+               <property name="sizePolicy" >
+                <sizepolicy>
+                 <hsizetype>0</hsizetype>
+                 <vsizetype>0</vsizetype>
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text" >
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0" >
+              <widget class="QCheckBox" name="fill_ch" >
+               <property name="sizePolicy" >
+                <sizepolicy>
+                 <hsizetype>0</hsizetype>
+                 <vsizetype>0</vsizetype>
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text" >
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0" >
+              <widget class="QCheckBox" name="shape_ch" >
+               <property name="sizePolicy" >
+                <sizepolicy>
+                 <hsizetype>0</hsizetype>
+                 <vsizetype>0</vsizetype>
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text" >
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1" >
+              <widget class="QLabel" name="textLabel6" >
+               <property name="sizePolicy" >
+                <sizepolicy>
+                 <hsizetype>0</hsizetype>
+                 <vsizetype>0</vsizetype>
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text" >
+                <string>size</string>
+               </property>
+               <property name="buddy" >
+                <cstring>size</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="2" >
+              <widget class="QSpinBox" name="size" >
+               <property name="sizePolicy" >
+                <sizepolicy>
+                 <hsizetype>3</hsizetype>
+                 <vsizetype>0</vsizetype>
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="maximum" >
+                <number>60</number>
+               </property>
+               <property name="minimum" >
+                <number>1</number>
+               </property>
+               <property name="value" >
+                <number>5</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" >
+         <property name="margin" >
+          <number>0</number>
+         </property>
+         <property name="spacing" >
+          <number>6</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="textLabel4_2_2" >
+           <property name="sizePolicy" >
+            <sizepolicy>
+             <hsizetype>0</hsizetype>
+             <vsizetype>5</vsizetype>
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text" >
+            <string>&lt;b>group&lt;/b></string>
+           </property>
+           <property name="buddy" >
+            <cstring>group</cstring>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="group" >
+           <item>
+            <property name="text" >
+             <string>identical</string>
+            </property>
+           </item>
+           <item>
+            <property name="text" >
+             <string>series</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType" >
+          <enum>QSizePolicy::Expanding</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>213</width>
+           <height>191</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_3" >
+      <attribute name="title" >
+       <string/>
+      </attribute>
+      <attribute name="icon" >
+       <iconset>images/16/axes.png</iconset>
+      </attribute>
+      <layout class="QVBoxLayout" >
+       <property name="margin" >
+        <number>9</number>
+       </property>
+       <property name="spacing" >
+        <number>6</number>
+       </property>
+       <item>
+        <layout class="QVBoxLayout" >
+         <property name="margin" >
+          <number>0</number>
+         </property>
+         <property name="spacing" >
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="textLabel1" >
+           <property name="text" >
+            <string>&lt;b>x axis&lt;/b></string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" >
+           <property name="margin" >
+            <number>0</number>
+           </property>
+           <property name="spacing" >
+            <number>0</number>
+           </property>
+           <item>
+            <spacer>
+             <property name="orientation" >
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType" >
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" >
+              <size>
+               <width>8</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <layout class="QGridLayout" >
+             <property name="margin" >
+              <number>0</number>
+             </property>
+             <property name="spacing" >
+              <number>0</number>
+             </property>
+             <item row="3" column="1" >
+              <widget class="QComboBox" name="xscale" >
+               <item>
+                <property name="text" >
+                 <string>linear</string>
+                </property>
+               </item>
+               <item>
+                <property name="text" >
+                 <string>log</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="0" column="1" >
+              <widget class="QLineEdit" name="xtitle" />
+             </item>
+             <item row="1" column="0" >
+              <widget class="QLabel" name="textLabel5" >
+               <property name="sizePolicy" >
+                <sizepolicy>
+                 <hsizetype>0</hsizetype>
+                 <vsizetype>0</vsizetype>
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text" >
+                <string>from</string>
+               </property>
+               <property name="buddy" >
+                <cstring>xfrom</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0" >
+              <widget class="QLabel" name="textLabel4_5" >
+               <property name="sizePolicy" >
+                <sizepolicy>
+                 <hsizetype>0</hsizetype>
+                 <vsizetype>0</vsizetype>
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text" >
+                <string>title</string>
+               </property>
+               <property name="buddy" >
+                <cstring>xtitle</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0" >
+              <widget class="QLabel" name="textLabel7_3" >
+               <property name="sizePolicy" >
+                <sizepolicy>
+                 <hsizetype>0</hsizetype>
+                 <vsizetype>0</vsizetype>
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text" >
+                <string>scale</string>
+               </property>
+               <property name="buddy" >
+                <cstring>xscale</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1" >
+              <widget class="QLineEdit" name="xfrom" />
+             </item>
+             <item row="2" column="1" >
+              <widget class="QLineEdit" name="xto" />
+             </item>
+             <item row="2" column="0" >
+              <widget class="QLabel" name="textLabel6_4" >
+               <property name="sizePolicy" >
+                <sizepolicy>
+                 <hsizetype>0</hsizetype>
+                 <vsizetype>0</vsizetype>
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text" >
+                <string>to</string>
+               </property>
+               <property name="buddy" >
+                <cstring>xto</cstring>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" >
+         <property name="margin" >
+          <number>0</number>
+         </property>
+         <property name="spacing" >
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="textLabel1_2" >
+           <property name="text" >
+            <string>&lt;b>y axis&lt;/b></string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" >
+           <property name="margin" >
+            <number>0</number>
+           </property>
+           <property name="spacing" >
+            <number>0</number>
+           </property>
+           <item>
+            <spacer>
+             <property name="orientation" >
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType" >
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" >
+              <size>
+               <width>8</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <layout class="QGridLayout" >
+             <property name="margin" >
+              <number>0</number>
+             </property>
+             <property name="spacing" >
+              <number>0</number>
+             </property>
+             <item row="3" column="1" >
+              <widget class="QComboBox" name="yscale" >
+               <item>
+                <property name="text" >
+                 <string>linear</string>
+                </property>
+               </item>
+               <item>
+                <property name="text" >
+                 <string>log</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="0" column="1" >
+              <widget class="QLineEdit" name="ytitle" />
+             </item>
+             <item row="1" column="0" >
+              <widget class="QLabel" name="textLabel5_3" >
+               <property name="sizePolicy" >
+                <sizepolicy>
+                 <hsizetype>0</hsizetype>
+                 <vsizetype>0</vsizetype>
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text" >
+                <string>from</string>
+               </property>
+               <property name="buddy" >
+                <cstring>yfrom</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0" >
+              <widget class="QLabel" name="textLabel4_4" >
+               <property name="sizePolicy" >
+                <sizepolicy>
+                 <hsizetype>0</hsizetype>
+                 <vsizetype>0</vsizetype>
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text" >
+                <string>title</string>
+               </property>
+               <property name="buddy" >
+                <cstring>ytitle</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0" >
+              <widget class="QLabel" name="textLabel7_2" >
+               <property name="sizePolicy" >
+                <sizepolicy>
+                 <hsizetype>0</hsizetype>
+                 <vsizetype>0</vsizetype>
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text" >
+                <string>scale</string>
+               </property>
+               <property name="buddy" >
+                <cstring>textLabel7_2</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1" >
+              <widget class="QLineEdit" name="yfrom" />
+             </item>
+             <item row="2" column="1" >
+              <widget class="QLineEdit" name="yto" />
+             </item>
+             <item row="2" column="0" >
+              <widget class="QLabel" name="textLabel6_3" >
+               <property name="sizePolicy" >
+                <sizepolicy>
+                 <hsizetype>0</hsizetype>
+                 <vsizetype>0</vsizetype>
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text" >
+                <string>to</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType" >
+          <enum>QSizePolicy::Expanding</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>163</width>
+           <height>73</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_4" >
+      <attribute name="title" >
+       <string/>
+      </attribute>
+      <attribute name="icon" >
+       <iconset>images/16/function.png</iconset>
+      </attribute>
+      <attribute name="toolTip" >
+       <string>Fit</string>
+      </attribute>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <pixmapfunction></pixmapfunction>
+ <resources/>
+ <connections/>
+</ui>

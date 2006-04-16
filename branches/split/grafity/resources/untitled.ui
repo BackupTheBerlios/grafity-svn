@@ -1,0 +1,115 @@
+<ui version="4.0" >
+ <author></author>
+ <comment></comment>
+ <exportmacro></exportmacro>
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>273</width>
+    <height>616</height>
+   </rect>
+  </property>
+  <property name="contextMenuPolicy" >
+   <enum>Qt::CustomContextMenu</enum>
+  </property>
+  <property name="windowTitle" >
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget" >
+   <layout class="QVBoxLayout" >
+    <property name="margin" >
+     <number>9</number>
+    </property>
+    <property name="spacing" >
+     <number>6</number>
+    </property>
+    <item>
+     <widget class="QTreeView" name="treeView" />
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>273</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_File" >
+    <property name="title" >
+     <string>&amp;File</string>
+    </property>
+    <addaction name="action_New" />
+    <addaction name="action_Open" />
+    <addaction name="separator" />
+    <addaction name="action_Save" />
+    <addaction name="action_Save_As" />
+   </widget>
+   <addaction name="menu_File" />
+  </widget>
+  <widget class="QStatusBar" name="statusbar" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>594</y>
+     <width>273</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QToolBar" name="toolBar" >
+   <property name="orientation" >
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <attribute name="toolBarArea" >
+    <number>4</number>
+   </attribute>
+   <addaction name="act_new" />
+   <addaction name="act_open" />
+  </widget>
+  <action name="act_new" >
+   <property name="icon" >
+    <iconset>images/new/general/new.png</iconset>
+   </property>
+   <property name="text" >
+    <string>New</string>
+   </property>
+  </action>
+  <action name="act_open" >
+   <property name="icon" >
+    <iconset>images/new/general/open.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Open</string>
+   </property>
+  </action>
+  <action name="action_New" >
+   <property name="text" >
+    <string>&amp;New</string>
+   </property>
+  </action>
+  <action name="action_Open" >
+   <property name="text" >
+    <string>&amp;Open...</string>
+   </property>
+  </action>
+  <action name="action_Save" >
+   <property name="text" >
+    <string>&amp;Save</string>
+   </property>
+  </action>
+  <action name="action_Save_As" >
+   <property name="text" >
+    <string>&amp;Save As...</string>
+   </property>
+  </action>
+ </widget>
+ <pixmapfunction></pixmapfunction>
+ <resources/>
+ <connections/>
+</ui>
