@@ -2,9 +2,7 @@ import sys
 
 from qt import *
 
-from grafity.resources import images, resource_data, extension_type
-
-
+from grafity.core.resources import images, resource_data, extension_type
 
 @extension_type('column-tool')
 def column_tool_dec(function):

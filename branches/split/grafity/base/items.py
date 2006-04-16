@@ -13,8 +13,29 @@ class ProjectItem(Item):
     fullname-changed: the item's name or the name of one of its ancestors has changed 
     """
 
-    name = Attr.Text()
-    folder = Attr.ObjectRef()
+    _name = Attr.Text()
+    _folder = Attr.ObjectRef()
+
+    def _get_name(self):
+        return self._name
+    def _set_name(self, name):
+        if name in list(p.name for p in self.folder.contents()):
+            raise NameError
+        self._name = name
+    name = property(_get_name, _set_name)
+
+    def _get_folder(self):
+        return self._folder
+    def _set_folder(self, folder):
+        old = self.folder
+        if self.folder is not None:
+            dispatcher.send('about-to-remove', self.folder, self)
+        dispatcher.send('about-to-add', folder, self)
+        self._folder = folder
+        if self.folder is not None:
+            dispatcher.send('removed', old, self)
+        dispatcher.send('added', folder, self)
+    folder = property(_get_folder, _set_folder)
 
     def __init__(self):
         Item.__init__(self)
@@ -68,4 +89,28 @@ class Folder(ProjectItem):
         if attr == 'name' and self is not self._project.top:
             for child in self.contents():
                 child._on_set_attr('name')
+
+    def __getattr__(self, key):
+        try:
+            return self[key]
+        except KeyError:
+            raise AttributeError
+
+    def __getitem__(self, key):
+        d = dict((i.name, i) for i in self.contents())
+
+#        if isinstance(key, int):
+#            return self.project.items[ci[key]]
+
+        if key in d:
+            return d[key]
+        else:
+            raise KeyError, "item '%s' does not exist" % key
+
+    def __contains__(self, key):
+        try:
+            self[key]
+            return True
+        except KeyError:
+            return False
 

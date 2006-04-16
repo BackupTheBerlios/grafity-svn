@@ -8,15 +8,19 @@ except:
 from qt import *
 
 from grafity.ui.utils import getimage, column_tools, graph_modes
-from grafity.signals import HasSignals, global_connect
-from grafity.actions import undo, redo, action_list
-from grafity.ui.graph_view import GraphView, GraphStyle, GraphData, GraphAxes, GraphFit
-from grafity.ui.worksheet_view import WorksheetView
-from grafity.ui.script_view import ScriptView
-from grafity.import_ascii import import_ascii
+#from grafity.signals import HasSignals, global_connect
+#from grafity.actions import undo, redo, action_list
+#from grafity.ui.graph_view import GraphView, GraphStyle, GraphData, GraphAxes, GraphFit
+#from grafity.ui.worksheet_view import WorksheetView
+#from grafity.ui.script_view import ScriptView
+#from grafity.import_ascii import import_ascii
 from grafity.ui.console import Console
 
+from grafity.ui.panel import Panel
+
 from grafity.ui.forms.main import MainWindowUI
+
+from grafity.core.settings import settings
 
 import grafity
 
@@ -57,7 +61,7 @@ class ActionItem(QListViewItem):
         
        
 
-class ActionList(HasSignals, QListView):
+class ActionList(QListView):
     def __init__(self, parent):
         QListView.__init__(self, parent)
         self.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Expanding)
@@ -71,10 +75,10 @@ class ActionList(HasSignals, QListView):
 #        QObject.connect(self, SIGNAL("contextMenuRequested (QListViewItem *, const QPoint &, int)"),
 #                      self.on_context_menu_requested)
 
-        action_list.connect('added', self.on_added)
-        action_list.connect('removed', self.on_removed)
-        action_list.connect('done', self.on_done)
-        action_list.connect('undone', self.on_undone)
+#        action_list.connect('added', self.on_added)
+#        action_list.connect('removed', self.on_removed)
+#        action_list.connect('done', self.on_done)
+#        action_list.connect('undone', self.on_undone)
 
     def on_added(self, action):
         action._item = ActionItem(self, str(action))
@@ -106,7 +110,7 @@ class ObjDrag(QTextDrag):
         QTextDrag.__init__(self, ' '.join(obj.id for obj in objects), widget)
 
 
-class ProjectExplorer(HasSignals, QListView):
+class ProjectExplorer(QListView):
     def __init__(self, parent):
         QListView.__init__(self, parent)
         self.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Expanding)
@@ -278,7 +282,7 @@ class MainWindow(MainWindowUI):
         self.workspace.setScrollBarsEnabled(True)
         self.connect(self.workspace, SIGNAL("windowActivated(QWidget *)"), self.on_window_activated)
 
-        self.recent = grafity.settings.get('windows', 'recent')
+        self.recent = settings.get('windows', 'recent')
         if self.recent in [None, '']:
             self.recent = []
         else:
@@ -301,8 +305,8 @@ class MainWindow(MainWindowUI):
 
 ### bottom panel ###############################################################################
         locals = {}
-        locals['undo'] = undo
-        locals['redo'] = redo
+#        locals['undo'] = undo
+#        locals['redo'] = redo
         locals['main'] = self
         self.bpanel = Panel(self, QMainWindow.DockBottom)
         self.script = Console(self.bpanel, locals=locals)
@@ -314,7 +318,7 @@ class MainWindow(MainWindowUI):
 ### left panel #################################################################################
         self.lpanel = Panel(self, QMainWindow.DockLeft)
         self.explorer = ProjectExplorer(self.lpanel)
-        self.explorer.connect('activated', self.on_activated)
+#        self.explorer.connect('activated', self.on_activated)
         self.lpanel.add('Explorer', getimage('folder'), self.explorer)
         self.lpanel.btns['Explorer'].setOn(True)
 
@@ -325,18 +329,18 @@ class MainWindow(MainWindowUI):
 ### right panel ################################################################################
         
         self.rpanel = Panel(self, QMainWindow.DockRight)
-        self.graph_data = GraphData(self.bpanel, self)
-        self.graph_style = GraphStyle(self.bpanel, self)
-        self.graph_axes = GraphAxes(self.bpanel, self)
-        self.graph_fit = GraphFit(self.bpanel, self)
-        self.rpanel.add('Data', getimage('worksheet'), self.graph_data)
-        self.rpanel.add('Style', getimage('style'), self.graph_style)
-        self.rpanel.add('Axes', getimage('axes'), self.graph_axes)
-        self.rpanel.add('fit', getimage('function'), self.graph_fit)
+#        self.graph_data = GraphData(self.bpanel, self)
+#        self.graph_style = GraphStyle(self.bpanel, self)
+#        self.graph_axes = GraphAxes(self.bpanel, self)
+#        self.graph_fit = GraphFit(self.bpanel, self)
+#        self.rpanel.add('Data', getimage('worksheet'), self.graph_data)
+#        self.rpanel.add('Style', getimage('style'), self.graph_style)
+#        self.rpanel.add('Axes', getimage('axes'), self.graph_axes)
+#        self.rpanel.add('fit', getimage('function'), self.graph_fit)
 
-        self.open_project(grafity.Project())#'../test/pdms.gt'))
+#        self.open_project(grafity.Project())#'../test/pdms.gt'))
 
-        global_connect('status-message', self.status_message)
+#        global_connect('status-message', self.status_message)
 
         self.worksheet_toolbar.hide()
         self.graph_toolbar.hide()
@@ -608,8 +612,8 @@ class MainWindow(MainWindowUI):
         self.exit()
 
     def exit(self):
-        grafity.settings.set('windows', 'recent', ' '.join(self.recent))
-        grafity.settings.set('script', 'history', '\n'.join(self.script.history[-20:]))
+        settings.set('windows', 'recent', ' '.join(self.recent))
+        settings.set('script', 'history', '\n'.join(self.script.history[-20:]))
         
         try:
             self.ask_save()

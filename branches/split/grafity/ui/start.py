@@ -119,22 +119,22 @@ def main():
 
     app = QApplication(sys.argv)
 
-    from grafity.resources import process_resources
+    from grafity.core.resources import process_resources
 
-    splash = GrafitSplash(getimage('logos/grafity'))
-    splash.show()
-    splash.message('')
+#    splash = GrafitSplash(getimage('logos/grafity'))
+#    splash.show()
+#    splash.message('')
 
     from grafity.ui.main import MainWindow
-    splash.message('loading resources')
+#    splash.message('loading resources')
 
     process_resources()
 
-    splash.message('building user interface')
+#    splash.message('building user interface')
 
     mainwin = MainWindow()
     mainwin.app = app
-    splash.finish(mainwin)
+#    splash.finish(mainwin)
     app.setMainWidget(mainwin)
     mainwin.show()
     app.exec_loop()

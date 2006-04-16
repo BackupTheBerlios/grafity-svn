@@ -30,9 +30,9 @@ def process_image(res):
 @processes_resource('*.py')
 def process_script(res):
     mod = new.module("")
-    mod.grafity = grafity
-    exec resource_data(res) in mod.__dict__
-    sys.modules[res] = mod
+#    mod.grafity = grafity
+#    exec resource_data(res) in mod.__dict__
+#    sys.modules[res] = mod
 
 def resource_data(res):
     protocol, path = res.split(':')

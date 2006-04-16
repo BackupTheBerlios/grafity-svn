@@ -11,7 +11,7 @@ except:
 
 from qt import *
 from qtext import QextScintilla,QextScintillaLexerPython
-from grafity.settings import settings
+from grafity.core.settings import settings
 
 import compiler
 class mydict(dict):
