@@ -11,24 +11,13 @@ class TreeModel(QtCore.QAbstractItemModel):
         self.ids = {}
 
     def headerData(self, section, orientation, role):
-        if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
-            if section == 0:
-                return QtCore.QVariant('section one')
-            elif section == 1:
-                return QtCore.QVariant('section two')
-        return QtCore.QVariant()
-
+        return QtCore.QVariant('section one')
 
     def columnCount(self, parent):
-        """Returns the number of columns for the given parent."""
-        return 2
+        return 1
 
     def rowCount(self, parent):
-        if not parent.isValid():
-            parent_item = self.project.top
-        else:
-            parent_item = self.project.store[self.ids[parent.internalId()]]
-
+        parent_item = self._fromindex(parent)
         return len(list(parent_item.contents()))
 
     def data(self, index, role):
@@ -38,10 +27,7 @@ class TreeModel(QtCore.QAbstractItemModel):
         if role != QtCore.Qt.DisplayRole:
             return QtCore.QVariant()
 
-        if not index.isValid():
-            index_item = self.project.top
-        else:
-            index_item = self.project.store[self.ids[index.internalId()]]
+        index_item = self._fromindex(index)
 
         return QtCore.QVariant(index_item.name)
 
@@ -49,11 +35,7 @@ class TreeModel(QtCore.QAbstractItemModel):
         return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
 
     def index(self, row, column, parent):
-        if not parent.isValid():
-            parent_item = self.project.top
-        else:
-            parent_item = self.project.store[self.ids[parent.internalId()]]
-
+        parent_item = self._fromindex(parent)
         oid = list(parent_item.contents())[row].oid
         return self.createIndex(row, column, self._getpos(oid))
 
@@ -64,7 +46,14 @@ class TreeModel(QtCore.QAbstractItemModel):
             pos = len(self.ids)
             self.ids[pos] = oid
             return pos
-            
+
+    def _fromindex(self, index):
+        if not index.isValid():
+            obj = self.project.top
+        else:
+            obj = self.project.store[self.ids[index.internalId()]]
+
+        return obj
 
     def parent(self, index):
         if not index.isValid():
