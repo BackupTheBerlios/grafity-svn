@@ -3,6 +3,8 @@
 import sys
 from PyQt4 import QtCore, QtGui
 
+from grafity.base.items import Folder
+
 
 class TreeModel(QtCore.QAbstractItemModel):
     def __init__(self, data, parent=None):
@@ -17,19 +19,24 @@ class TreeModel(QtCore.QAbstractItemModel):
         return 1
 
     def rowCount(self, parent):
-        parent_item = self._fromindex(parent)
-        return len(list(parent_item.contents()))
+        item = self._fromindex(parent)
+        if isinstance(item, Folder):
+            return len(list(item.contents()))
+        else:
+            return 0
 
     def data(self, index, role):
-        if not index.isValid():
+        obj = self._fromindex(index)
+        if role == QtCore.Qt.DisplayRole:
+            return QtCore.QVariant(obj.name)
+        elif role == QtCore.Qt.DecorationRole:
+            if isinstance(obj, Folder):
+                icon = QtGui.QIcon('/home/daniel/grafity/grafity/resources/images/new/general/folder.png')
+            else:
+                icon = QtGui.QIcon('/home/daniel/grafity/grafity/resources/images/new/general/worksheet.png')
+            return QtCore.QVariant(icon)
+        else:
             return QtCore.QVariant()
-
-        if role != QtCore.Qt.DisplayRole:
-            return QtCore.QVariant()
-
-        index_item = self._fromindex(index)
-
-        return QtCore.QVariant(index_item.name)
 
     def flags(self, index):
         return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
@@ -49,26 +56,20 @@ class TreeModel(QtCore.QAbstractItemModel):
 
     def _fromindex(self, index):
         if not index.isValid():
-            obj = self.project.top
+            return self.project.top
         else:
-            obj = self.project.store[self.ids[index.internalId()]]
-
-        return obj
+            return self.project.store[self.ids[index.internalId()]]
 
     def parent(self, index):
-        if not index.isValid():
-            return QtCore.QModelIndex()
-
-        parent = self.project.store[self.ids[index.internalId()]].folder
+        parent = self._fromindex(index).folder
         if parent == self.project.top:
             return QtCore.QModelIndex()
-        row = list(parent.folder.contents()).index(parent)
-        return self.createIndex(row, 0, self._getpos(parent.oid))
+        return self.createIndex(list(parent.folder.contents()).index(parent), 0, self._getpos(parent.oid))
 
 
 def foo(*args):
     print >>sys.stderr, args
-    p.new_folder('macaroni', f2)
+    p.new_folder('macaroni', f1)
     view.model().emit(QtCore.SIGNAL("layoutChanged()"))
 
 from grafity.base.project import Project
@@ -77,9 +78,13 @@ if __name__ == "__main__":
 
     p = Project()
     f1 = p.new_folder('foobar')
+    f2 = p.new_worksheet('bs5', f1)
     f2 = p.new_folder('foobaassr', f1)
     f2 = p.new_folder('foobaass2', f1)
     f2 = p.new_folder('foobaass3', f1)
+    f2 = p.new_worksheet('bs1', f1)
+    f3 = p.new_worksheet('bs2', f1)
+    f3 = p.new_worksheet('bs3', f1)
     f3 = p.new_folder('foobar2')
 
     app = QtGui.QApplication(sys.argv)
