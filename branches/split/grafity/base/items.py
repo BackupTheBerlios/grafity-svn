@@ -79,6 +79,7 @@ class Folder(ProjectItem):
     name = Attr.Text()
 
     def contents(self):
+        print >>sys.stderr, "CONTENTS"
         for c in self._storage.containers():
             for item in c:
                 if item.folder is self and item is not self._project.top:

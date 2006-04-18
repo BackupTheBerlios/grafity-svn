@@ -26,6 +26,7 @@ class TreeModel(QtCore.QAbstractItemModel):
             return 0
 
     def data(self, index, role):
+        print >>sys.stderr, 'data', index, role
         obj = self._fromindex(index)
         if role == QtCore.Qt.DisplayRole:
             return QtCore.QVariant(obj.name)
@@ -42,6 +43,7 @@ class TreeModel(QtCore.QAbstractItemModel):
         return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
 
     def index(self, row, column, parent):
+        print >>sys.stderr, 'index', parent
         parent_item = self._fromindex(parent)
         oid = list(parent_item.contents())[row].oid
         return self.createIndex(row, column, self._getpos(oid))
@@ -61,6 +63,7 @@ class TreeModel(QtCore.QAbstractItemModel):
             return self.project.store[self.ids[index.internalId()]]
 
     def parent(self, index):
+        print >>sys.stderr, 'parent', index
         parent = self._fromindex(index).folder
         if parent == self.project.top:
             return QtCore.QModelIndex()

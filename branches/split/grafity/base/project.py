@@ -46,7 +46,8 @@ class Project(object):
         return self._new_object(self.store.worksheets, name, parent)
 
     def on_action(self, arg1=None, arg2=None, signal=None, sender=None):
-        print 'ACTION', sender, signal, arg1, arg2
+    #    print 'ACTION', sender, signal, arg1, arg2
+        pass
 
 if __name__ == '__main__':
     p = Project()
