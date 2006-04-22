@@ -1,4 +1,4 @@
-from grafity.core.storage import Item, Attr, Container
+from grafity.core.storage import Item, Attr
 
 from dispatch import dispatcher
 import sys
@@ -35,11 +35,15 @@ class ProjectItem(Item):
         if self.folder is not None:
             dispatcher.send('removed', old, self)
         dispatcher.send('added', folder, self)
+        if old is not None:
+            old._update_contents()
+        if folder is not None:
+            folder._update_contents()
     folder = property(_get_folder, _set_folder)
 
     def __init__(self):
         Item.__init__(self)
-        dispatcher.connect(self._on_set_attr, signal='set-attr', sender=self)
+#        dispatcher.connect(self._on_set_attr, signal='set-attr', sender=self)
 
     def __repr__(self):
         if self._initialized:
@@ -47,15 +51,20 @@ class ProjectItem(Item):
         else:
             return Item.__repr__(self)
 
-    def _on_set_attr(self, attr, value, old):
-        if attr == 'name':
-            dispatcher.send('fullname-changed', self)
-        elif attr == 'folder' and self is not self._project.top:
-            if old is not None:
-                dispatcher.send('contents-changed', old)
-            dispatcher.send('contents-changed', self.folder)
+#    def _on_set_attr(self, attr, value, old):
+#        print >>sys.stderr, attr, value, old
+#        if attr == 'name':
+#            dispatcher.send('fullname-changed', self)
+#        elif attr == 'folder' and self is not self._project.top:
+#            if old is not None:
+#                old._update_contents()
+#                dispatcher.send('contents-changed', old)
+#            self.folder._update_contents()
+#            dispatcher.send('contents-changed', self.folder)
 
     def _get_fullname(self):
+#        if not hasattr(self, '_project'):
+#            return None
         return '.'.join(reversed([self.name] + [a.name for a in self.ancestors()]))
     fullname = property(_get_fullname)
 
@@ -76,14 +85,22 @@ class Folder(ProjectItem):
     contents-changed: an item has been added or removed from the folder
     """
 
-    name = Attr.Text()
+#    name = Attr.Text()
 
-    def contents(self):
-        print >>sys.stderr, "CONTENTS"
+    def __init__(self, *args):
+        self._contents = []
+        ProjectItem.__init__(self, *args)
+#        self._update_contents()
+
+    def _update_contents(self):
+        self._contents = []
         for c in self._storage.containers():
             for item in c:
                 if item.folder is self and item is not self._project.top:
-                    yield item
+                    self._contents.append(item)
+
+    def contents(self):
+        return self._contents
     
     def _on_set_attr(self, attr, value, old):
         ProjectItem._on_set_attr(self, attr, value, old)
@@ -92,6 +109,9 @@ class Folder(ProjectItem):
                 child._on_set_attr('name')
 
     def __getattr__(self, key):
+#        try:
+#           return object.__getattribute__(self, key)
+#       except AttributeError:
         try:
             return self[key]
         except KeyError:

@@ -1,10 +1,10 @@
 #!/usr/bin/env python
-
 import sys
 from PyQt4 import QtCore, QtGui
+from PyQt4.uic import Compiler
 
 from grafity.base.items import Folder
-
+from grafity.base.project import Project
 
 class TreeModel(QtCore.QAbstractItemModel):
     def __init__(self, data, parent=None):
@@ -66,34 +66,41 @@ class TreeModel(QtCore.QAbstractItemModel):
             return QtCore.QModelIndex()
         return self.createIndex(list(parent.folder.contents()).index(parent), 0, self._getpos(parent.oid))
 
+class MainWindow(QtGui.QMainWindow, Compiler.compileUiToType("main.ui")):
+    def __init__(self, *args):
+        QtGui.QWidget.__init__(self, *args)
+        self.setWindowFlags(self.windowFlags()&QtCore.Qt.Tool)
+        self.setupUi(self)
 
-def foo(*args):
-    print >>sys.stderr, args
-    p.new_folder('macaroni', f1)
-    view.model().emit(QtCore.SIGNAL("layoutChanged()"))
+        self.tree.header().hide()
+        self.connect(self.tree, QtCore.SIGNAL('activated(QModelIndex)'), self.foo)
 
-from grafity.base.project import Project
+
+
+    def foo(self, *args):
+        print >>sys.stderr, args
+        p.new_folder('macaroni', f1)
+        view.model().emit(QtCore.SIGNAL("layoutChanged()"))
+
+
 
 if __name__ == "__main__":
 
     p = Project()
-    f1 = p.new_folder('foobar')
-    f2 = p.new_worksheet('bs5', f1)
-    f2 = p.new_folder('foobaassr', f1)
-    f2 = p.new_folder('foobaass2', f1)
-    f2 = p.new_folder('foobaass3', f1)
-    f2 = p.new_worksheet('bs1', f1)
-    f3 = p.new_worksheet('bs2', f1)
-    f3 = p.new_worksheet('bs3', f1)
-    f3 = p.new_folder('foobar2')
-    print f1.contents()
+#    f1 = p.new_folder('foobar')
+#    f2 = p.new_worksheet('bs5', f1)
+#    f2 = p.new_folder('foobaassr', f1)
+#    f2 = p.new_folder('foobaass2', f1)
+#    f2 = p.new_folder('foobaass3', f1)
+#    f2 = p.new_worksheet('bs1', f1)
+#    f3 = p.new_worksheet('bs2', f1)
+#    f3 = p.new_worksheet('bs3', f1)
+#    f3 = p.new_folder('foobar2')
+#    p.store.commit()
 
     app = QtGui.QApplication(sys.argv)
-    model = TreeModel(p)
-
-    view = QtGui.QTreeView()
-    view.connect(view, QtCore.SIGNAL("activated(const QModelIndex &)"), foo)
-    view.setModel(model)
-    view.setWindowTitle("Simple Tree Model")
-    view.show()
-    sys.exit(app.exec_())
+    form = MainWindow()
+    form.show()
+    m = TreeModel(p)
+    form.tree.setModel(m)
+    app.exec_()

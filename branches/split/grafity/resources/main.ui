@@ -16,7 +16,10 @@
    <enum>Qt::CustomContextMenu</enum>
   </property>
   <property name="windowTitle" >
-   <string>MainWindow</string>
+   <string>Grafity</string>
+  </property>
+  <property name="windowIcon" >
+   <iconset>images/logos/grafity-16.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget" >
    <layout class="QVBoxLayout" >
@@ -27,7 +30,7 @@
      <number>6</number>
     </property>
     <item>
-     <widget class="QTreeView" name="treeView" />
+     <widget class="QTreeView" name="tree" />
     </item>
    </layout>
   </widget>

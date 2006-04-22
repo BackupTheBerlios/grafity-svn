@@ -16,18 +16,31 @@ class Project(object):
     A grafity project.
     """
     def __init__(self):
-        try:
-            os.remove('foo.db')
-        except:
-            pass
+#        try:
+#            os.remove('foo.db')
+#        except:
+#            pass
         filename = 'foo.db'
         self.store = Store(filename)
         dispatcher.connect(self.on_action)
 
-        self.top = self.store.folders.create()
-        self.top._project = self
-        self.top.folder = self.top
-        self.top.name = 'top'
+        # top folder
+        if len(self.store.folders) == 0:
+            self.top = self.store.folders.create()
+            self.top._project = self
+            self.top.folder = self.top
+            self.top.name = 'top'
+        else:
+            self.top = self.store.folders[0]
+            self.top._project = self
+
+        for c in self.store.containers():
+            for item in c:
+                item._project = self
+
+        for f in self.store.folders:
+            f._update_contents()
+
 
     def _new_object(self, container, name, parent=None, **kwds):
         if parent is None:
@@ -46,12 +59,13 @@ class Project(object):
         return self._new_object(self.store.worksheets, name, parent)
 
     def on_action(self, arg1=None, arg2=None, signal=None, sender=None):
-    #    print 'ACTION', sender, signal, arg1, arg2
         pass
 
 if __name__ == '__main__':
     p = Project()
     f = p.new_folder('foo')
+    w = p.new_worksheet('bar', f)
+    w = p.new_worksheet('bar', f)
     w = p.new_worksheet('bar', f)
     c = w.columns.create()
     c.name = 'baroof'

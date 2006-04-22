@@ -15,8 +15,8 @@ class Column(Item):
     expr = Attr.Text()
     data = MkArray()
     
-#    def __init__(self):
-#        Item.__init__(self)
+    def __init__(self, *args):
+        Item.__init__(self, *args)
 
     def __setitem__(self, key, value):
         self.data[key] = value
@@ -27,12 +27,30 @@ class Column(Item):
     def __eq__(self, other):
         return hasattr(self, 'oid') and hasattr(other, 'oid') and self.oid == other.oid
 
+    def __repr__(self):
+        return repr(self.data)
+
+    __str__ = __repr__
+
+    def __add__(self, other): return arrays.add(self.data, arrays.asvarray(other))
+    __radd__ = __add__
+    def __sub__(self, other): return arrays.subtract(self.data, arrays.asvarray(other))
+    def __rsub__(self, other): return arrays.subtract(arrays.asvarray(other), self.data)
+    def __mul__(self, other): return arrays.multiply(self.data, arrays.asvarray(other))
+    __rmul__ = __mul__
+    def __div__(self, other): return arrays.divide(self.data, arrays.asvarray(other))
+    def __rdiv__(self, other): return arrays.divide(arrays.asvarray(other), self.data)
+    def __pow__(self,other): return arrays.power(self.data, arrays.asvarray(other))
+
+    def __len__(self):
+        return len(self.data)
+
 
 class Worksheet(ProjectItem):
     columns = Container(Column)
 
-    def __init__(self):
-        ProjectItem.__init__(self)
+    def __init__(self, *args):
+        ProjectItem.__init__(self, *args)
 
     def __items__(self):
         return dict((c.name, c) for c in self.columns)

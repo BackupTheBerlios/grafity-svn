@@ -107,23 +107,46 @@ class Storage(object):
         if oid == '':
             return None
         elif oid not in self.items:
-            obj = None
-            for level in oid.split(':'):
-                itemtype = level.split('/')[0]
-                if obj is None:
-                    view = self.db.view(itemtype)
-                else:
-                    view = getattr(obj._row, itemtype)
-                row = view[view.find(oid=oid)]
-                parent = obj
-                if obj is None:
-                    obj = self.itemtypes[itemtype]()
-                else:
-                    obj = getattr(obj, itemtype).cls()
-                obj.initialize(row, view, parent)
-                obj._storage  = self
+            parent = None
+            if ':' in oid:
+                objid, theid = oid.split(':')
+                itemtype = theid.split('/')[0]
+                parent = self[objid]
+                view = getattr(parent._row, itemtype)
+            else:
+                itemtype = oid.split('/')[0]
+                view = self.db.view(itemtype)
+
+            row = view[view.find(oid=oid)]
+            if parent is None:
+               obj = self.itemtypes[itemtype]()
+            else:
+                obj = getattr(parent, itemtype).cls()
+            obj.initialize(row, view, parent)
+            obj._storage = self
+
             self.items[oid] = obj
         return self.items[oid]
+
+#        elif oid not in self.items:
+#            obj = None
+#            for level in oid.split(':'):
+#                itemtype = level.split('/')[0]
+#                if obj is None:
+#                    view = self.db.view(itemtype)
+#                else:
+#                    view = getattr(obj._row, itemtype)
+#                print >>sys.stderr, view, len(view)
+#                row = view[view.find(oid=oid)]
+#                parent = obj
+#                if obj is None:
+#                    obj = self.itemtypes[itemtype]()
+#                else:
+#                    obj = getattr(obj, itemtype).cls()
+#                obj.initialize(row, view, parent)
+#                obj._storage  = self
+#            self.items[oid] = obj
+#        return self.items[oid]
 
     def delete(self, obj):
         self._operation('del', obj.oid)
@@ -182,7 +205,7 @@ class Storage(object):
         uview = self.undodb.getas("undolist[name:S,ops:B]")
         uview.append(name=self.action_name, ops=marshal.dumps(self.oplist))
         self.undodb.commit()
-#        self.db.commit()
+        self.db.commit()
         self.action_name = None
 
     def undo(self, _redo=False):
@@ -316,6 +339,8 @@ class Container(object):
 
     def __len__(self):
         if isinstance(self.obj, Storage):
+            if len(self.obj.db.view(self.name)) == 0:
+                return 0
             return len(self.obj.db.view(self.name).select(deleted=0))
         else:
             return len(getattr(self.obj._row, self.name))
