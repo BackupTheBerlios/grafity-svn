@@ -1,62 +1,3 @@
-"""
-grafity.core.storage
-====================
-
-Using ``factorial``
--------------------
-
-This is an example text file in reStructuredText format.  First import
-``factorial`` from the ``example`` module:
-
-    >>> from grafity.core.storage import Storage, Container, Item, Attr
-
-You define new classes derived from Item, like this
-
-    >>> class Column(Item):
-    ...     colname = Attr.Text()
-    ... 
-    >>> class Folder(Item):
-    ...     name = Attr.Text()
-    ...     number = Attr.Integer()
-    ...     columns = Container(Column)
-    ...     col2 = Container(Column)
-    ...
-    >>> class Meta(Item):
-    ...     name = Attr.Text()
-    ...     value = Attr.Text()
-    ...
-
-You define the database like this
-
-    >>> class Store(Storage):
-    ...     folders = Container(Folder)
-    ...     meta = Container(Meta)
-    ...
-
-
-Create a store
-
-    >>> st = Store('foo.db')
-
-Create new objects
-
-    >>> st.begin('foobar')
-    >>> try:
-    ...     f = st.folders.create()
-    ...     f.name = 'foo'
-    ...     m = st.meta.create()
-    ...     m.name, m.value = 'foo', 'bar'
-    ... finally:
-    ...     st.commit()
-    ... 
-    >>> st.undo()
-    >>> len(st.meta)
-    0
-    >>> st.redo()
-    >>> len(st.meta)
-    1
-"""
-
 __author__ = "Daniel Fragiadakis <dfragi@gmail.com>"
 __revision__ = "$Id: resources.py 163 2006-04-07 15:29:08Z danielf $"
 
@@ -127,26 +68,6 @@ class Storage(object):
 
             self.items[oid] = obj
         return self.items[oid]
-
-#        elif oid not in self.items:
-#            obj = None
-#            for level in oid.split(':'):
-#                itemtype = level.split('/')[0]
-#                if obj is None:
-#                    view = self.db.view(itemtype)
-#                else:
-#                    view = getattr(obj._row, itemtype)
-#                print >>sys.stderr, view, len(view)
-#                row = view[view.find(oid=oid)]
-#                parent = obj
-#                if obj is None:
-#                    obj = self.itemtypes[itemtype]()
-#                else:
-#                    obj = getattr(obj, itemtype).cls()
-#                obj.initialize(row, view, parent)
-#                obj._storage  = self
-#            self.items[oid] = obj
-#        return self.items[oid]
 
     def delete(self, obj):
         self._operation('del', obj.oid)
@@ -257,6 +178,7 @@ class Attribute(object):
     def decode(self, value):
         return value
 
+    
 
 class Attr(object):
     """Default attribute types"""
@@ -270,8 +192,10 @@ class Attr(object):
             Attribute.__init__(self, 'B')
 
         def __get__(self, obj, cls):
-            self.obj = obj
-            return self
+            new = type(self)()
+            new.__dict__.update(self.__dict__)
+            new.obj = obj
+            return new
 
         def get_data(self):
             return getattr(self.obj._row, self.name)
@@ -281,14 +205,16 @@ class Attr(object):
 
         def get(self, offset, length):
             ind = self.obj._view.find(oid=self.obj.oid)
-            return self.obj._view.access(getattr(self.obj._view, self.name), ind, offset, length)
+            return self.obj._view.access(getattr(self.obj._view, self.name), 
+                                         ind, offset, length)
 
         def set(self, data, offset):
             self.obj._storage._operation('mod', self.obj.oid, self.name, data, offset)
 
         def __len__(self):
-            return self.obj._view.itemsize(getattr(self.obj._view, self.name), self.obj._view.find(oid=self.obj.oid))
-            
+            return self.obj._view.itemsize(getattr(self.obj._view, self.name), 
+                                           self.obj._view.find(oid=self.obj.oid))
+                
     class Integer(Attribute):
         def __init__(self):
             Attribute.__init__(self, 'I')
