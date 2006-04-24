@@ -22,14 +22,14 @@ class VarOperation(object):
     def __call__(self, a, b=None):
         # if the argument is a sequence,
         # wrap the result in a varray, otherwise leave it alone
-        if self.oper.arity == 1:
+        if self.oper.n_inputs == 1:
             try:
                 len(a)
             except (ValueError, TypeError):
                 return self.oper(a)
             else:
                 return asvarray(self.oper(a))
-        elif self.oper.arity == 2:
+        elif self.oper.n_inputs == 2:
             try:
                 length = min(len(a), len(b))
             except (ValueError, TypeError):
@@ -41,7 +41,7 @@ class VarOperation(object):
         return repr(self.oper).replace('UFunc', 'vUFunc')
 
 # wrap all ufuncs with VarOperations
-mod_ufuncs = dict([(k, VarOperation(v)) for k, v in ufunc._UFuncs.iteritems() if v.arity in (1,2)])
+mod_ufuncs = dict([(k, VarOperation(v)) for k, v in ufunc._UFuncs.iteritems() if v.n_inputs in (1,2)])
 globals().update(mod_ufuncs)
 
 def asvarray(*args, **kwds):

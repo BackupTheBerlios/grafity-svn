@@ -75,18 +75,48 @@ class MainWindow(QtGui.QMainWindow, Compiler.compileUiToType("main.ui")):
         self.tree.header().hide()
         self.connect(self.tree, QtCore.SIGNAL('activated(QModelIndex)'), self.foo)
 
+    @QtCore.pyqtSignature("")
+    def on_action_New_activated(self):
+        project = Project()
+        f1 = project.new_folder('foobar')
+        f2 = project.new_worksheet('bs5', f1)
+        self.open_project(project)
 
+    @QtCore.pyqtSignature("")
+    def on_action_Open_activated(self):
+        filename = QtGui.QFileDialog.getOpenFileName(self, "Choose a file", "", "Projects (*.grafity);;All files (*)")
+        if filename is not None:
+            self.open_project(Project(str(filename)))
 
-    def foo(self, *args):
-        print >>sys.stderr, args
-        p.new_folder('macaroni', f1)
-        view.model().emit(QtCore.SIGNAL("layoutChanged()"))
+    @QtCore.pyqtSignature("")
+    def on_actionE_xit_activated(self):
+        sys.exit(0)
+
+    @QtCore.pyqtSignature("")
+    def on_actionNew_Worksheet_activated(self):
+        sheet = self.project.new_worksheet('sheet1')
+        sheet.a = [1,2,3]
+        sheet.b = [4,5,6]
+        self.model.emit(QtCore.SIGNAL("layoutChanged()"))
+
+    def open_project(self, project):
+        self.project = project
+        self.model = TreeModel(self.project)
+        self.tree.setModel(self.model)
+
+    def foo(self, index):
+        from worksheet import WorksheetView
+        view = WorksheetView(self, self.model._fromindex(index))
+        view.show()
+#        print >>sys.stderr, args
+#        p.new_folder('macaroni', f1)
+#        view.model().emit(QtCore.SIGNAL("layoutChanged()"))
 
 
 
 if __name__ == "__main__":
 
-    p = Project()
+#    p = Project()
 #    f1 = p.new_folder('foobar')
 #    f2 = p.new_worksheet('bs5', f1)
 #    f2 = p.new_folder('foobaassr', f1)
@@ -101,6 +131,6 @@ if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
     form = MainWindow()
     form.show()
-    m = TreeModel(p)
-    form.tree.setModel(m)
+#    m = TreeModel(p)
+#    form.tree.setModel(m)
     app.exec_()

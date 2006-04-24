@@ -10,13 +10,18 @@ from dispatch import dispatcher
 import metakit
 
 class Storage(object):
-    def __init__(self, filename):
-        self.db = metakit.storage(filename, 1)
-        if os.path.exists(filename+'.swp'):
-            os.remove(filename+'.swp')
+    def __init__(self, filename=None):
+        if filename is None:
+            self.db = metakit.storage()
+            self.undodb = metakit.storage()
+        else:
+            self.db = metakit.storage(filename, 1)
+            if os.path.exists(filename+'.swp'):
+                os.remove(filename+'.swp')
+            self.undodb = metakit.storage(filename+'.swp', 1)
+
         self.filename = filename
         self.itemtypes = {}
-        self.undodb = metakit.storage(filename+'.swp', 1)
         self.items = {}
         self.oplist = []
         self.action_name = None
@@ -42,7 +47,8 @@ class Storage(object):
         self.db.save(open(filename, 'w'))
 
     def close(self):
-        os.remove(self.filename+'.swp')
+        if self.filename is not None:
+            os.remove(self.filename+'.swp')
 
     def __getitem__(self, oid):
         if oid == '':
@@ -103,13 +109,27 @@ class Storage(object):
             dispatcher.send('add-object', self, oid)
         elif opcode == 'set':
             oid, name, value = args 
-            inv = ('set', oid, name, getattr(self[oid]._row, name))
-            old = getattr(self[oid], name)
-            setattr(self[oid]._row, name, value)
-            dispatcher.send('set-attr', self[oid], name, value=value, old=old)
+            obj = self[oid]
+
+            try:
+                value = getattr(obj, '_auth__%s' % name)(value)
+                print >>sys.stderr, "A"
+            except AttributeError, foo:
+                pass
+                print >>sys.stderr, "B", foo
+            except ValueError:
+                print >>sys.stderr, "C"
+                return
+
+            print >>sys.stderr, "D"
+            inv = ('set', oid, name, getattr(obj._row, name))
+            old = getattr(obj, name)
+            setattr(obj._row, name, value)
+            dispatcher.send('set-attr', obj, name, value=value, old=old)
         elif opcode == 'mod':
             oid, name, data, offset = args
             obj = self[oid]
+
             ind = obj._view.find(oid=obj.oid)
             old = obj._view.access(getattr(obj._view, name), ind, offset, len(data))
             obj._view.modify(getattr(obj._view, name), ind, data, offset)

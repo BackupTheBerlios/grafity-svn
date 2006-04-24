@@ -6,25 +6,26 @@ from PyQt4.QtCore import Qt
 from PyQt4 import QtCore
 from PyQt4.uic import Compiler
 
-app = qt.QApplication(sys.argv)
 ui = Compiler.compileUiToType("worksheet.ui")
-
-class DemoImpl(qt.QDialog, ui):
-    def __init__(self, *args):
-        qt.QWidget.__init__(self, *args)
-        self.setWindowFlags(self.windowFlags()&Qt.Tool)
+class WorksheetView(qt.QMainWindow, ui):
+    def __init__(self, parent, worksheet):
+        qt.QWidget.__init__(self, parent)
         self.setupUi(self)
-    
+        self.worksheet = worksheet
 
-class ImageModel(QtCore.QAbstractTableModel):
-#    def __init__(self, image, parent=None):
-#        QtCore.QAbstractTableModel.__init__(self, parent)
+        self.m = WorksheetModel(worksheet)
+        self.table.setModel(self.m)
+
+class WorksheetModel(QtCore.QAbstractTableModel):
+    def __init__(self, worksheet):
+        QtCore.QAbstractTableModel.__init__(self)
+        self.worksheet = worksheet
 
     def rowCount(self, parent):
         return 150000
 
     def columnCount(self, parent):
-        return 15
+        return len(self.worksheet.columns)
 
     def data(self, index, role):
         if not index.isValid():
@@ -32,10 +33,4 @@ class ImageModel(QtCore.QAbstractTableModel):
         elif role != QtCore.Qt.DisplayRole:
             return QtCore.QVariant()
 
-        return QtCore.QVariant(str(index.column())+'.'+str(index.row()))
-
-form = DemoImpl()
-form.show()
-m = ImageModel()
-form.table.setModel(m)
-app.exec_()
+        return QtCore.QVariant(str(self.worksheet[index.column()][index.row()]))

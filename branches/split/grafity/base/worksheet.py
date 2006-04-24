@@ -17,9 +17,11 @@ class Column(Item):
     
     def __init__(self, *args):
         Item.__init__(self, *args)
+        self.dependencies = set()
 
     def __setitem__(self, key, value):
         self.data[key] = value
+        dispatcher.send('data-changed', sender=self)
 
     def __getitem__(self, key):
         return self.data[key]
@@ -29,6 +31,24 @@ class Column(Item):
 
     def __repr__(self):
         return repr(self.data)
+
+    def _auth__name(self, name):
+        print >>sys.stderr, name
+        return name
+
+    def _after__name(self, name):
+        pass
+
+    def _auth__expr(self, expr):
+        print >>sys.stderr, self.do_set_expr(expr)
+        return expr
+
+    def _auth__data(self, data):
+        print >>sys.stderr, "data"
+        return data
+
+    def _after__data(self, data):
+        print >>sys.stderr, "data"
 
     __str__ = __repr__
 
@@ -44,6 +64,104 @@ class Column(Item):
 
     def __len__(self):
         return len(self.data)
+
+    def __ioldnit__(self, worksheet, ind):
+        self.data = worksheet.data.columns[ind]
+        self.worksheet = worksheet
+        MkArray.__init__(self, worksheet.data.columns, worksheet.data.columns.data, ind)
+        self.worksheet.connect('set-parent', self.on_ws_set_parent)
+
+    def reload(self, ind):
+        MkArray.__init__(self, self.worksheet.data.columns, self.worksheet.data.columns.data, ind)
+        self.data = self.worksheet.data.columns[ind]
+
+    def do_set_expr(self, expr):
+        # find dependencies and error-check expression
+        try:
+            data = asarray(self.worksheet.evaluate(expr))
+        except Exception, ar:
+            print >>sys.stderr, '*****************', ar
+            raise StopAction, False
+        self.depdict = self.analyze_expression(expr)
+        newdep = set(self.depdict.values())
+
+        # set dependencies
+        for column in newdep - self.dependencies:
+            print >>sys.stderr, "add", column.name
+            dispatcher.connect(self.calculate, signal='data-changed', sender=column)
+            dispatcher.connect(self.on_dep_rename, signal='rename', sender=column)
+        for column in self.dependencies - newdep:
+            print >>sys.stderr, "rem", column.name
+            dispatcher.disconnect(self.calculate, signal='data-changed', sender=column)
+            dispatcher.disconnect(self.on_dep_rename, signal='rename', sender=column)
+        newdepws = set(d.worksheet for d in newdep)
+        depws = set(d.worksheet for d in self.dependencies)
+        for worksheet in newdepws - depws:
+            dispatcher.connect(self.on_dep_ws_rename, signal='fullname-changed', sender=worksheet)
+            dispatcher.connect(self.on_dep_ws_rename, signal='rename', sender=worksheet)
+        for worksheet in depws - newdepws:
+            dispatcher.disconnect(self.on_dep_ws_rename, signal='fullname-changed', sender=worksheet)
+            dispatcher.disconnect(self.on_dep_ws_rename, signal='rename', sender=worksheet)
+        self.dependencies = newdep
+
+        if expr != '':
+            # set data without triggering a action
+            self.data[:] = data
+        dispatcher.send(sender=self, signal='data-changed')
+        dispatcher.send(sender=self.worksheet, signal='data-changed')
+        return True
+
+    def undo_set_expr(self, state):
+        self.do_set_expr(None, state['old'], setstate=False)
+        if 'olddata' in state:
+            MkArray.__setitem__(self, slice(None), state['olddata'])
+
+    def redo_set_expr(self, state):
+        self.do_set_expr(None, state['new'], setstate=False)
+
+
+    def get_expr(self):
+        return self.data.expr.decode('utf-8')
+
+
+    def calculate(self):
+        self[:] = self.worksheet.evaluate(self.expr)
+
+    def analyze_expression(self, expr):
+        idents = re.findall(r'\b([a-zA-Z_][\w\.]*)\b(?!\()', expr)
+        wsnames = ['.'.join(ident.split('.')[:-1]) for ident in idents]
+        worksheets = [self.worksheet.evaluate(name) for name in wsnames]
+        for i, w in enumerate(worksheets):
+            if w == []:
+                worksheets[i] = self.worksheet
+        columns = [ident.split('.')[-1] for ident in idents]
+        deps = [getattr(w, c) for w, c in zip(worksheets, columns)]
+        depdict = dict(zip(idents, deps))
+        return depdict
+
+    def update_expression(self, *args, **kwds):
+        if self.expr == '':
+            return
+
+        expr = self.expr
+        oldexpr = expr
+
+        for depstr, col in self.depdict.iteritems():
+            if col.worksheet == self.worksheet:
+                name = col.name
+            elif col.worksheet.parent == self.worksheet.parent:
+                name = '.'.join([col.worksheet.name, col.name])
+            else:
+                name = '.'.join([col.worksheet.fullname, col.name])
+            expr = re.sub(r'\b%s\b(?!\()'%depstr, name, expr)
+        if oldexpr != expr:
+            print >>sys.stderr, "updating expression from %s to %s" % (oldexpr, expr)
+            self.expr = expr
+ 
+    def on_dep_rename(self, col, oldname, newname): self.update_expression()
+    def on_dep_ws_rename(self, name, item=None): self.update_expression()
+    def on_ws_set_parent(self, parent): self.update_expression()
+                
 
 
 class Worksheet(ProjectItem):
@@ -91,23 +209,9 @@ class Worksheet(ProjectItem):
         if name is None:
             name = suggest_column_name()
         c = self.columns.create()
+        c.worksheet = self
         c.name = name
         return c
-
-    def add_column_undo(self, state):
-        col = state['obj']
-        col.id = '-'+col.id
-        self.columns.remove(col)
-        self.emit('data-changed')
-
-    def add_column_redo(self, state):
-        col = state['obj']
-        col.id = col.id[1:]
-        self.columns.append(col)
-        self.emit('data-changed')
-
-#    add_column = action_from_methods2('worksheet/add_column', add_column, add_column_undo,
-#                                       redo=add_column_redo)
 
     def remove_column(self, state, name):
         ind = self.column_index(name)
@@ -208,3 +312,28 @@ class Worksheet(ProjectItem):
             f.write('\n')
 
     default_name_prefix = 'sheet'
+
+
+    def evaluate(self, expression):
+        if expression == '':
+            return []
+        project = self._project
+        worksheet = self
+
+        namespace = {}
+        namespace.update(arrays.__dict__)
+        namespace['top'] = project.top
+#        namespace['here'] = project.this
+        namespace['this'] = self
+        namespace['up'] = self.folder.folder
+        namespace.update(dict([(c.name, c) for c in self.columns]))
+        namespace.update(dict([(i.name, i) for i in self.folder.contents()]))
+
+        try:
+            result = eval(expression, namespace)
+        except:
+            raise ValueError, expression
+
+        return result
+
+

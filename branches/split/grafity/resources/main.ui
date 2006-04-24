@@ -30,7 +30,14 @@
      <number>6</number>
     </property>
     <item>
-     <widget class="QTreeView" name="tree" />
+     <widget class="QTreeView" name="tree" >
+      <property name="alternatingRowColors" >
+       <bool>true</bool>
+      </property>
+      <property name="indentation" >
+       <number>10</number>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -43,6 +50,21 @@
      <height>29</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menu_Help" >
+    <property name="title" >
+     <string>&amp;Help</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menu_Tools" >
+    <property name="title" >
+     <string>&amp;Tools</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menu_Window" >
+    <property name="title" >
+     <string>&amp;Window</string>
+    </property>
+   </widget>
    <widget class="QMenu" name="menu_File" >
     <property name="title" >
      <string>&amp;File</string>
@@ -52,8 +74,22 @@
     <addaction name="separator" />
     <addaction name="action_Save" />
     <addaction name="action_Save_As" />
+    <addaction name="separator" />
+    <addaction name="actionE_xit" />
+   </widget>
+   <widget class="QMenu" name="menu_Edit" >
+    <property name="title" >
+     <string>&amp;Edit</string>
+    </property>
+    <addaction name="action_Undo" />
+    <addaction name="action_Redo" />
+    <addaction name="separator" />
    </widget>
    <addaction name="menu_File" />
+   <addaction name="menu_Edit" />
+   <addaction name="menu_Tools" />
+   <addaction name="menu_Window" />
+   <addaction name="menu_Help" />
   </widget>
   <widget class="QStatusBar" name="statusbar" >
    <property name="geometry" >
@@ -66,49 +102,115 @@
    </property>
   </widget>
   <widget class="QToolBar" name="toolBar" >
+   <property name="layoutDirection" >
+    <enum>Qt::LeftToRight</enum>
+   </property>
+   <property name="movable" >
+    <bool>false</bool>
+   </property>
    <property name="orientation" >
     <enum>Qt::Horizontal</enum>
    </property>
    <attribute name="toolBarArea" >
     <number>4</number>
    </attribute>
-   <addaction name="act_new" />
-   <addaction name="act_open" />
+   <addaction name="action_New" />
+   <addaction name="action_Open" />
+   <addaction name="action_Save" />
+   <addaction name="action_Save_As" />
   </widget>
-  <action name="act_new" >
+  <widget class="QToolBar" name="toolBar_2" >
+   <property name="movable" >
+    <bool>false</bool>
+   </property>
+   <property name="orientation" >
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <attribute name="toolBarArea" >
+    <number>4</number>
+   </attribute>
+   <addaction name="actionNew_Worksheet" />
+   <addaction name="actionNew_Graph" />
+   <addaction name="actionNew_Folder" />
+  </widget>
+  <action name="action_New" >
    <property name="icon" >
     <iconset>images/new/general/new.png</iconset>
    </property>
-   <property name="text" >
-    <string>New</string>
-   </property>
-  </action>
-  <action name="act_open" >
-   <property name="icon" >
-    <iconset>images/new/general/open.png</iconset>
-   </property>
-   <property name="text" >
-    <string>Open</string>
-   </property>
-  </action>
-  <action name="action_New" >
    <property name="text" >
     <string>&amp;New</string>
    </property>
   </action>
   <action name="action_Open" >
+   <property name="icon" >
+    <iconset>images/new/general/open.png</iconset>
+   </property>
    <property name="text" >
     <string>&amp;Open...</string>
    </property>
   </action>
   <action name="action_Save" >
+   <property name="icon" >
+    <iconset>images/new/general/save.png</iconset>
+   </property>
    <property name="text" >
     <string>&amp;Save</string>
    </property>
   </action>
   <action name="action_Save_As" >
+   <property name="icon" >
+    <iconset>images/new/general/saveas.png</iconset>
+   </property>
    <property name="text" >
     <string>&amp;Save As...</string>
+   </property>
+  </action>
+  <action name="actionNew_Worksheet" >
+   <property name="icon" >
+    <iconset>images/new/general/new-worksheet.png</iconset>
+   </property>
+   <property name="text" >
+    <string>New &amp;Worksheet</string>
+   </property>
+  </action>
+  <action name="actionNew_Graph" >
+   <property name="icon" >
+    <iconset>images/new/general/new-graph.png</iconset>
+   </property>
+   <property name="text" >
+    <string>New &amp;Graph</string>
+   </property>
+  </action>
+  <action name="actionNew_Folder" >
+   <property name="icon" >
+    <iconset>images/new/general/new-folder.png</iconset>
+   </property>
+   <property name="text" >
+    <string>New &amp;Folder</string>
+   </property>
+  </action>
+  <action name="action_Undo" >
+   <property name="icon" >
+    <iconset>images/new/general/undo.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Undo</string>
+   </property>
+  </action>
+  <action name="action_Redo" >
+   <property name="icon" >
+    <iconset>images/new/general/redo.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Redo</string>
+   </property>
+  </action>
+  <action name="actionE_xit" >
+   <property name="icon" >
+    <iconset>images/new/general/exit.png</iconset>
+   </property>
+   <property name="text" >
+    <string>E&amp;xit</string>
    </property>
   </action>
  </widget>

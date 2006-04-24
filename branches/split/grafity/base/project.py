@@ -15,12 +15,11 @@ class Project(object):
     """
     A grafity project.
     """
-    def __init__(self):
+    def __init__(self, filename=None):
 #        try:
 #            os.remove('foo.db')
 #        except:
 #            pass
-        filename = 'foo.db'
         self.store = Store(filename)
         dispatcher.connect(self.on_action)
 
