@@ -9,7 +9,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>600</height>
+    <height>510</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -38,29 +38,50 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>29</height>
+     <height>31</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menu_Dataset" >
-    <property name="title" >
-     <string>&amp;Dataset</string>
-    </property>
-   </widget>
    <widget class="QMenu" name="menu_Worksheet" >
     <property name="title" >
      <string>&amp;Worksheet</string>
     </property>
+    <addaction name="actionNew_Column" />
+    <addaction name="actionDelete_Column" />
+    <addaction name="separator" />
+    <addaction name="actionNew_Row" />
+    <addaction name="actionDelete_Row" />
+    <addaction name="separator" />
+    <addaction name="actionTranspose" />
+   </widget>
+   <widget class="QMenu" name="menu_Dataset" >
+    <property name="title" >
+     <string>&amp;Column</string>
+    </property>
+    <addaction name="actionMove_to_Beginning" />
+    <addaction name="actionMove_Left" />
+    <addaction name="actionMove_Right" />
+    <addaction name="actionMove_to_End" />
+   </widget>
+   <widget class="QMenu" name="menu_Edit" >
+    <property name="title" >
+     <string>&amp;Edit</string>
+    </property>
+    <addaction name="action_Cut" />
+    <addaction name="action_Copy" />
+    <addaction name="action_Paste" />
+    <addaction name="action_Delete" />
    </widget>
    <addaction name="menu_Worksheet" />
    <addaction name="menu_Dataset" />
+   <addaction name="menu_Edit" />
   </widget>
   <widget class="QStatusBar" name="statusbar" >
    <property name="geometry" >
     <rect>
      <x>0</x>
-     <y>578</y>
+     <y>486</y>
      <width>800</width>
-     <height>22</height>
+     <height>24</height>
     </rect>
    </property>
   </widget>
@@ -151,6 +172,26 @@
    </property>
    <property name="text" >
     <string>Transpose</string>
+   </property>
+  </action>
+  <action name="action_Cut" >
+   <property name="text" >
+    <string>&amp;Cut</string>
+   </property>
+  </action>
+  <action name="action_Copy" >
+   <property name="text" >
+    <string>&amp;Copy</string>
+   </property>
+  </action>
+  <action name="action_Paste" >
+   <property name="text" >
+    <string>&amp;Paste</string>
+   </property>
+  </action>
+  <action name="action_Delete" >
+   <property name="text" >
+    <string>&amp;Delete</string>
    </property>
   </action>
  </widget>

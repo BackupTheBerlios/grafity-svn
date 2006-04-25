@@ -113,24 +113,12 @@ class MainWindow(QtGui.QMainWindow, Compiler.compileUiToType("main.ui")):
 #        view.model().emit(QtCore.SIGNAL("layoutChanged()"))
 
 
-
-if __name__ == "__main__":
-
-#    p = Project()
-#    f1 = p.new_folder('foobar')
-#    f2 = p.new_worksheet('bs5', f1)
-#    f2 = p.new_folder('foobaassr', f1)
-#    f2 = p.new_folder('foobaass2', f1)
-#    f2 = p.new_folder('foobaass3', f1)
-#    f2 = p.new_worksheet('bs1', f1)
-#    f3 = p.new_worksheet('bs2', f1)
-#    f3 = p.new_worksheet('bs3', f1)
-#    f3 = p.new_folder('foobar2')
-#    p.store.commit()
-
+def main():
     app = QtGui.QApplication(sys.argv)
     form = MainWindow()
     form.show()
-#    m = TreeModel(p)
-#    form.tree.setModel(m)
     app.exec_()
+
+
+if __name__ == "__main__":
+    main()
