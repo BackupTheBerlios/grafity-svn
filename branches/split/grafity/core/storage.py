@@ -113,15 +113,11 @@ class Storage(object):
 
             try:
                 value = getattr(obj, '_auth__%s' % name)(value)
-                print >>sys.stderr, "A"
             except AttributeError, foo:
                 pass
-                print >>sys.stderr, "B", foo
             except ValueError:
-                print >>sys.stderr, "C"
                 return
 
-            print >>sys.stderr, "D"
             inv = ('set', oid, name, getattr(obj._row, name))
             old = getattr(obj, name)
             setattr(obj._row, name, value)

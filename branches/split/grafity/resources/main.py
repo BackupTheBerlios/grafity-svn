@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import sys
-from PyQt4 import QtCore, QtGui
-from PyQt4.uic import Compiler
+from PyQt4 import QtCore, QtGui, uic
 
 from grafity.base.items import Folder
 from grafity.base.project import Project
@@ -66,7 +65,9 @@ class TreeModel(QtCore.QAbstractItemModel):
             return QtCore.QModelIndex()
         return self.createIndex(list(parent.folder.contents()).index(parent), 0, self._getpos(parent.oid))
 
-class MainWindow(QtGui.QMainWindow, Compiler.compileUiToType("main.ui")):
+#class MainWindow(QtGui.QMainWindow, uic.loadUiType("main.ui")):
+formclass, baseclass = uic.loadUiType("main.ui")
+class MainWindow(formclass, baseclass):
     def __init__(self, *args):
         QtGui.QWidget.__init__(self, *args)
         self.setWindowFlags(self.windowFlags()&QtCore.Qt.Tool)

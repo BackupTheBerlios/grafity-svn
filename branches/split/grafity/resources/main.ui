@@ -34,9 +34,6 @@
       <property name="alternatingRowColors" >
        <bool>true</bool>
       </property>
-      <property name="indentation" >
-       <number>10</number>
-      </property>
      </widget>
     </item>
    </layout>

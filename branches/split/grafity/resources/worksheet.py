@@ -3,11 +3,10 @@ import sys
 
 from PyQt4 import QtGui as qt
 from PyQt4.QtCore import Qt
-from PyQt4 import QtCore
-from PyQt4.uic import Compiler
+from PyQt4 import QtCore, uic
 
-ui = Compiler.compileUiToType("worksheet.ui")
-class WorksheetView(qt.QMainWindow, ui):
+c1, c2 = uic.loadUiType("worksheet.ui")
+class WorksheetView(c1, c2):
     def __init__(self, parent, worksheet):
         qt.QWidget.__init__(self, parent)
         self.setupUi(self)
@@ -15,6 +14,11 @@ class WorksheetView(qt.QMainWindow, ui):
 
         self.m = WorksheetModel(worksheet)
         self.table.setModel(self.m)
+
+    @QtCore.pyqtSignature("")
+    def on_actionNew_Column_activated(self):
+        self.worksheet[self.worksheet.suggest_column_name()] = [1,2,3]
+        self.table.model().emit(QtCore.SIGNAL('layoutChanged()'))
 
 class WorksheetModel(QtCore.QAbstractTableModel):
     def __init__(self, worksheet):
@@ -34,3 +38,12 @@ class WorksheetModel(QtCore.QAbstractTableModel):
             return QtCore.QVariant()
 
         return QtCore.QVariant(str(self.worksheet[index.column()][index.row()]))
+
+    def flags(self, index):
+        return QtCore.QAbstractTableModel.flags(self, index) | QtCore.Qt.ItemIsEditable
+
+    def setData(self, index, value, role):
+        val = self.worksheet.evaluate(unicode(value.toString()))
+        self.worksheet[index.column()][index.row()] = val
+        self.emit(QtCore.SIGNAL('dataChanged()'))
+        return True
