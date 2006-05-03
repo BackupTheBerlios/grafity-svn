@@ -5,6 +5,8 @@ from PyQt4 import QtGui as qt
 from PyQt4.QtCore import Qt
 from PyQt4 import QtCore, uic
 
+from grafity.core.arrays import nan
+
 c1, c2 = uic.loadUiType("worksheet.ui")
 class WorksheetView(c1, c2):
     def __init__(self, parent, worksheet):
@@ -37,7 +39,7 @@ class WorksheetModel(QtCore.QAbstractTableModel):
         elif role != QtCore.Qt.DisplayRole:
             return QtCore.QVariant()
 
-        return QtCore.QVariant(str(self.worksheet[index.column()][index.row()]))
+        return QtCore.QVariant(str(self.worksheet[index.column()][index.row()]).replace(repr(nan), ''))
 
     def flags(self, index):
         return QtCore.QAbstractTableModel.flags(self, index) | QtCore.Qt.ItemIsEditable
