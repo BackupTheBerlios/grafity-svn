@@ -3,11 +3,11 @@ import re
 
 from dispatch import dispatcher
 
-from grafity.core.storage import Item, Attr, Container
-from grafity.core.arrays import MkArray, transpose, array, asarray
+from grafity.base.storage import Item, Attr, Container
+from grafity.base.arrays import MkArray, transpose, array, asarray
 from grafity.base.items import ProjectItem
 
-import grafity.core.arrays as arrays
+import grafity.base.arrays as arrays
 
 class Column(Item):
     name = Attr.Text()

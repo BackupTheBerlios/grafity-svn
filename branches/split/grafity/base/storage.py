@@ -325,5 +325,5 @@ class Item(object):
 if __name__=='__main__':
     import doctest
     doctest.testmod()
-#    from grafity.core.utils import test
+#    from grafity.base.utils import test
 #    test('storage.txt')

@@ -5,7 +5,7 @@ from PyQt4 import QtGui as qt
 from PyQt4.QtCore import Qt
 from PyQt4 import QtCore, uic
 
-from grafity.core.arrays import nan
+from grafity.base.arrays import nan
 
 c1, c2 = uic.loadUiType("worksheet.ui")
 class WorksheetView(c1, c2):
@@ -28,7 +28,7 @@ class WorksheetModel(QtCore.QAbstractTableModel):
         self.worksheet = worksheet
 
     def rowCount(self, parent):
-        return 150000
+        return len(self.worksheet)
 
     def columnCount(self, parent):
         return len(self.worksheet.columns)

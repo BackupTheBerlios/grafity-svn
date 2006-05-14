@@ -3,7 +3,7 @@ import os
 
 from dispatch import dispatcher
 
-from grafity.core.storage import Storage, Container
+from grafity.base.storage import Storage, Container
 from grafity.base.items import Folder
 from grafity.base.worksheet import Worksheet
 

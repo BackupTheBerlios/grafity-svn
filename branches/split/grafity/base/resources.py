@@ -12,8 +12,8 @@ import new
 
 import pkg_resources
 
-from grafity.core.settings import USERDATADIR
-from grafity.core.extend import extension_type
+from grafity.base.settings import USERDATADIR
+from grafity.base.extend import extension_type
 import grafity
 
 processors = []

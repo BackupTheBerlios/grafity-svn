@@ -1,4 +1,4 @@
-from grafity.core.storage import Item, Attr
+from grafity.base.storage import Item, Attr
 
 from dispatch import dispatcher
 import sys
