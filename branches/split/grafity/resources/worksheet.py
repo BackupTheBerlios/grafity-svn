@@ -28,7 +28,7 @@ class WorksheetModel(QtCore.QAbstractTableModel):
         self.worksheet = worksheet
 
     def rowCount(self, parent):
-        return len(self.worksheet)
+        return 10000
 
     def columnCount(self, parent):
         return len(self.worksheet.columns)
