@@ -323,7 +323,7 @@ class Item(object):
     deleted = Attribute('I')
 
 if __name__=='__main__':
-    import doctest
-    doctest.testmod()
-#    from grafity.base.utils import test
-#    test('storage.txt')
+#    import doctest
+#    doctest.testmod()
+    from grafity.base.utils import test
+    test('storage.txt')

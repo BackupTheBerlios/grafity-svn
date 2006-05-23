@@ -7,9 +7,15 @@ Using ``factorial``
 This is an example text file in reStructuredText format.  First import
 ``factorial`` from the ``example`` module:
 
-    >>> from grafity.core.storage import Storage, ContainerOf, Item, Attr
+    >>> from grafity.base.storage import Storage, Container, Item, Attr
 
 You define new classes derived from Item, like this
+
+    >>> class Person(Item):
+    ...     firstname = Attr.Text()
+    ...     lastname = Attr.Text()
+    ...
+    >>> class 
 
     >>> class Column(Item):
     ...     colname = Attr.Text
@@ -17,8 +23,8 @@ You define new classes derived from Item, like this
     >>> class Folder(Item):
     ...     name = Attr.Text
     ...     number = Attr.Integer
-    ...     columns = ContainerOf(Column)
-    ...     col2 = ContainerOf(Column)
+    ...     columns = Container(Column)
+    ...     col2 = Container(Column)
     ...
     >>> class Meta(Item):
     ...     name = Attr.Text
@@ -28,8 +34,8 @@ You define new classes derived from Item, like this
 You define the database like this
 
     >>> class Store(Storage):
-    ...     folders = ContainerOf(Folder)
-    ...     meta = ContainerOf(Meta)
+    ...     folders = Container(Folder)
+    ...     meta = Container(Meta)
     ...
 
 

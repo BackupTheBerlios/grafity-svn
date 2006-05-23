@@ -104,7 +104,7 @@
   </widget>
   <action name="actionNew_Column" >
    <property name="icon" >
-    <iconset>images/new/worksheet/new-column.png</iconset>
+    <iconset>../resources/images/new/worksheet/new-column.png</iconset>
    </property>
    <property name="text" >
     <string>New Column</string>
@@ -112,7 +112,7 @@
   </action>
   <action name="actionDelete_Column" >
    <property name="icon" >
-    <iconset>images/new/worksheet/delete-column.png</iconset>
+    <iconset>../resources/images/new/worksheet/delete-column.png</iconset>
    </property>
    <property name="text" >
     <string>Delete Column</string>
@@ -120,7 +120,7 @@
   </action>
   <action name="actionNew_Row" >
    <property name="icon" >
-    <iconset>images/new/worksheet/new-row.png</iconset>
+    <iconset>../resources/images/new/worksheet/new-row.png</iconset>
    </property>
    <property name="text" >
     <string>New Row</string>
@@ -128,7 +128,7 @@
   </action>
   <action name="actionDelete_Row" >
    <property name="icon" >
-    <iconset>images/new/worksheet/delete-row.png</iconset>
+    <iconset>../resources/images/new/worksheet/delete-row.png</iconset>
    </property>
    <property name="text" >
     <string>Delete Row</string>
@@ -136,7 +136,7 @@
   </action>
   <action name="actionMove_to_Beginning" >
    <property name="icon" >
-    <iconset>images/new/worksheet/first.png</iconset>
+    <iconset>../resources/images/new/worksheet/first.png</iconset>
    </property>
    <property name="text" >
     <string>Move to Beginning</string>
@@ -144,7 +144,7 @@
   </action>
   <action name="actionMove_Left" >
    <property name="icon" >
-    <iconset>images/new/worksheet/left.png</iconset>
+    <iconset>../resources/images/new/worksheet/left.png</iconset>
    </property>
    <property name="text" >
     <string>Move Left</string>
@@ -152,7 +152,7 @@
   </action>
   <action name="actionMove_Right" >
    <property name="icon" >
-    <iconset>images/new/worksheet/right.png</iconset>
+    <iconset>../resources/images/new/worksheet/right.png</iconset>
    </property>
    <property name="text" >
     <string>Move Right</string>
@@ -160,7 +160,7 @@
   </action>
   <action name="actionMove_to_End" >
    <property name="icon" >
-    <iconset>images/new/worksheet/last.png</iconset>
+    <iconset>../resources/images/new/worksheet/last.png</iconset>
    </property>
    <property name="text" >
     <string>Move to End</string>
@@ -168,7 +168,7 @@
   </action>
   <action name="actionTranspose" >
    <property name="icon" >
-    <iconset>images/new/worksheet/transpose.png</iconset>
+    <iconset>../resources/images/new/worksheet/transpose.png</iconset>
    </property>
    <property name="text" >
     <string>Transpose</string>

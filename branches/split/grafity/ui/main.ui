@@ -19,7 +19,7 @@
    <string>Grafity</string>
   </property>
   <property name="windowIcon" >
-   <iconset>images/logos/grafity-16.png</iconset>
+   <iconset>../resources/images/logos/grafity-16.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget" >
    <layout class="QVBoxLayout" >
@@ -132,7 +132,7 @@
   </widget>
   <action name="action_New" >
    <property name="icon" >
-    <iconset>images/new/general/new.png</iconset>
+    <iconset>../resources/images/new/general/new.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;New</string>
@@ -140,7 +140,7 @@
   </action>
   <action name="action_Open" >
    <property name="icon" >
-    <iconset>images/new/general/open.png</iconset>
+    <iconset>../resources/images/new/general/open.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Open...</string>
@@ -148,7 +148,7 @@
   </action>
   <action name="action_Save" >
    <property name="icon" >
-    <iconset>images/new/general/save.png</iconset>
+    <iconset>../resources/images/new/general/save.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Save</string>
@@ -156,7 +156,7 @@
   </action>
   <action name="action_Save_As" >
    <property name="icon" >
-    <iconset>images/new/general/saveas.png</iconset>
+    <iconset>../resources/images/new/general/saveas.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Save As...</string>
@@ -164,7 +164,7 @@
   </action>
   <action name="actionNew_Worksheet" >
    <property name="icon" >
-    <iconset>images/new/general/new-worksheet.png</iconset>
+    <iconset>../resources/images/new/general/new-worksheet.png</iconset>
    </property>
    <property name="text" >
     <string>New &amp;Worksheet</string>
@@ -172,7 +172,7 @@
   </action>
   <action name="actionNew_Graph" >
    <property name="icon" >
-    <iconset>images/new/general/new-graph.png</iconset>
+    <iconset>../resources/images/new/general/new-graph.png</iconset>
    </property>
    <property name="text" >
     <string>New &amp;Graph</string>
@@ -180,7 +180,7 @@
   </action>
   <action name="actionNew_Folder" >
    <property name="icon" >
-    <iconset>images/new/general/new-folder.png</iconset>
+    <iconset>../resources/images/new/general/new-folder.png</iconset>
    </property>
    <property name="text" >
     <string>New &amp;Folder</string>
@@ -188,7 +188,7 @@
   </action>
   <action name="action_Undo" >
    <property name="icon" >
-    <iconset>images/new/general/undo.png</iconset>
+    <iconset>../resources/images/new/general/undo.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Undo</string>
@@ -196,7 +196,7 @@
   </action>
   <action name="action_Redo" >
    <property name="icon" >
-    <iconset>images/new/general/redo.png</iconset>
+    <iconset>../resources/images/new/general/redo.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Redo</string>
@@ -204,7 +204,7 @@
   </action>
   <action name="actionE_xit" >
    <property name="icon" >
-    <iconset>images/new/general/exit.png</iconset>
+    <iconset>../resources/images/new/general/exit.png</iconset>
    </property>
    <property name="text" >
     <string>E&amp;xit</string>
