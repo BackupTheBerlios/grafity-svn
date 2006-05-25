@@ -5,7 +5,7 @@ import sys
 from numarray import *
 from numarray.ieeespecial import nan, inf, isfinite, isnan
 #from numpy.base import *
-from grafity.base.storage import Attr
+from grafity.base.squirrel import Attr
 
 Error.setMode(all='ignore')
 

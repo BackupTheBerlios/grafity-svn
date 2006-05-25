@@ -1,4 +1,4 @@
-from grafity.base.storage import Item, Attr
+from grafity.base.squirrel import Item, Attr
 
 from dispatch import dispatcher
 import sys

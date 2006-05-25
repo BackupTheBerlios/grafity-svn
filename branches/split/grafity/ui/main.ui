@@ -8,8 +8,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>251</width>
-    <height>616</height>
+    <width>237</width>
+    <height>599</height>
    </rect>
   </property>
   <property name="contextMenuPolicy" >
@@ -30,10 +30,32 @@
      <number>6</number>
     </property>
     <item>
-     <widget class="QTreeView" name="tree" >
-      <property name="alternatingRowColors" >
-       <bool>true</bool>
-      </property>
+     <widget class="QTabWidget" name="tabWidget" >
+      <widget class="QWidget" name="tab" >
+       <attribute name="title" >
+        <string>Objects</string>
+       </attribute>
+       <layout class="QHBoxLayout" >
+        <property name="margin" >
+         <number>0</number>
+        </property>
+        <property name="spacing" >
+         <number>6</number>
+        </property>
+        <item>
+         <widget class="QTreeView" name="tree" >
+          <property name="alternatingRowColors" >
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_2" >
+       <attribute name="title" >
+        <string>Changes</string>
+       </attribute>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -43,23 +65,13 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>251</width>
+     <width>237</width>
      <height>31</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_Help" >
     <property name="title" >
      <string>&amp;Help</string>
-    </property>
-   </widget>
-   <widget class="QMenu" name="menu_Tools" >
-    <property name="title" >
-     <string>&amp;Tools</string>
-    </property>
-   </widget>
-   <widget class="QMenu" name="menu_Window" >
-    <property name="title" >
-     <string>&amp;Window</string>
     </property>
    </widget>
    <widget class="QMenu" name="menu_File" >
@@ -73,6 +85,19 @@
     <addaction name="action_Save_As" />
     <addaction name="separator" />
     <addaction name="actionE_xit" />
+   </widget>
+   <widget class="QMenu" name="menu_Window" >
+    <property name="title" >
+     <string>&amp;Window</string>
+    </property>
+    <addaction name="actionConsole" />
+    <addaction name="actionProperties" />
+    <addaction name="separator" />
+   </widget>
+   <widget class="QMenu" name="menu_Tools" >
+    <property name="title" >
+     <string>&amp;Tools</string>
+    </property>
    </widget>
    <widget class="QMenu" name="menu_Edit" >
     <property name="title" >
@@ -92,8 +117,8 @@
    <property name="geometry" >
     <rect>
      <x>0</x>
-     <y>592</y>
-     <width>251</width>
+     <y>575</y>
+     <width>237</width>
      <height>24</height>
     </rect>
    </property>
@@ -115,20 +140,8 @@
    <addaction name="action_Open" />
    <addaction name="action_Save" />
    <addaction name="action_Save_As" />
-  </widget>
-  <widget class="QToolBar" name="toolBar_2" >
-   <property name="movable" >
-    <bool>true</bool>
-   </property>
-   <property name="orientation" >
-    <enum>Qt::Horizontal</enum>
-   </property>
-   <attribute name="toolBarArea" >
-    <number>4</number>
-   </attribute>
-   <addaction name="actionNew_Worksheet" />
-   <addaction name="actionNew_Graph" />
-   <addaction name="actionNew_Folder" />
+   <addaction name="separator" />
+   <addaction name="actionE_xit" />
   </widget>
   <widget class="QToolBar" name="toolBar_3" >
    <property name="layoutDirection" >
@@ -145,6 +158,10 @@
    </attribute>
    <addaction name="actionConsole" />
    <addaction name="actionProperties" />
+   <addaction name="separator" />
+   <addaction name="actionNew_Graph" />
+   <addaction name="actionNew_Worksheet" />
+   <addaction name="actionNew_Folder" />
   </widget>
   <action name="action_New" >
    <property name="icon" >

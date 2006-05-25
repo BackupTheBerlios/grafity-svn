@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import sys
-from PyQt4 import QtCore, QtGui, uic
+from PyQt4.Qt import *
+from PyQt4 import uic
 import code, rlcompleter
 import traceback, operator
 import keyword
@@ -37,14 +38,14 @@ class Interpreter (code.InteractiveInterpreter):
         self.showtraceback ()
 
 
-class Highlighter(QtCore.QObject):
+class Highlighter(QObject):
     def __init__(self, parent=None):
-        QtCore.QObject.__init__(self, parent)
+        QObject.__init__(self, parent)
         
         self.mappings = {}
         
     def addToDocument(self, doc):
-        self.connect(doc, QtCore.SIGNAL("contentsChange(int, int, int)"), self.highlight)
+        self.connect(doc, SIGNAL("contentsChange(int, int, int)"), self.highlight)
     
     def addMapping(self, pattern, format):
         self.mappings[pattern] = format
@@ -56,7 +57,7 @@ class Highlighter(QtCore.QObject):
         if not block.isValid():
             return
     
-        endBlock = QtGui.QTextBlock()
+        endBlock = QTextBlock()
         if added > removed:
             endBlock = doc.findBlock(position + added)
         else:
@@ -73,10 +74,10 @@ class Highlighter(QtCore.QObject):
         overrides = []
     
         for pattern in self.mappings:
-            expression = QtCore.QRegExp(pattern)
+            expression = QRegExp(pattern)
             i = text.indexOf(expression)
             while i >= 0:
-                range = QtGui.QTextLayout.FormatRange()
+                range = QTextLayout.FormatRange()
                 range.start = i
                 range.length = expression.matchedLength()
                 range.format = self.mappings[pattern]
@@ -88,9 +89,9 @@ class Highlighter(QtCore.QObject):
         block.document().markContentsDirty(block.position(), block.length())
         
 
-class ConsoleTextEdit(QtGui.QTextEdit):
+class ConsoleTextEdit(QTextEdit):
     def __init__(self, *args):
-        QtGui.QTextEdit.__init__(self, *args)
+        QTextEdit.__init__(self, *args)
 
         self.locals = {}
         sys.stdout = self
@@ -102,23 +103,23 @@ class ConsoleTextEdit(QtGui.QTextEdit):
         self.completer = rlcompleter.Completer()
         self.highlighter = Highlighter()
 
-        num = QtGui.QTextCharFormat()
-        num.setForeground(QtCore.Qt.darkGreen)
+        num = QTextCharFormat()
+        num.setForeground(Qt.darkGreen)
         self.highlighter.addMapping("#.*$", num)
  
-        variableFormat = QtGui.QTextCharFormat()
-        variableFormat.setFontWeight(QtGui.QFont.Bold)
-        variableFormat.setForeground(QtCore.Qt.blue)
+        variableFormat = QTextCharFormat()
+        variableFormat.setFontWeight(QFont.Bold)
+        variableFormat.setForeground(Qt.blue)
         self.highlighter.addMapping("\\b[A-Z_]+\\b", variableFormat)
 
-        num = QtGui.QTextCharFormat()
-        num.setForeground(QtCore.Qt.blue)
+        num = QTextCharFormat()
+        num.setForeground(Qt.blue)
         self.highlighter.addMapping("\\b[0-9e\.]+\\b", num)
 
 #        for kw in keyword.kwlist:
-#            variableFormat = QtGui.QTextCharFormat()
-#            variableFormat.setFontWeight(QtGui.QFont.Bold)
-#            variableFormat.setForeground(QtCore.Qt.darkRed)
+#            variableFormat = QTextCharFormat()
+#            variableFormat.setFontWeight(QFont.Bold)
+#            variableFormat.setForeground(Qt.darkRed)
 #            self.highlighter.addMapping("\\b%s\\b" % kw, variableFormat)
 
         self.highlighter.addToDocument(self.document())
@@ -143,25 +144,25 @@ class ConsoleTextEdit(QtGui.QTextEdit):
         key = e.key()
         y, x = self.position()
 
-        if key in [QtCore.Qt.Key_Backspace, QtCore.Qt.Key_Left]:
+        if key in [Qt.Key_Backspace, Qt.Key_Left]:
             if x > len(sys.ps1):
-                QtGui.QTextEdit.keyPressEvent(self, e) 
-        elif key in [QtCore.Qt.Key_Return, QtCore.Qt.Key_Enter]:
+                QTextEdit.keyPressEvent(self, e) 
+        elif key in [Qt.Key_Return, Qt.Key_Enter]:
             self.run()
-        elif key == QtCore.Qt.Key_Up:
+        elif key == Qt.Key_Up:
             if len(self.history):
                 if self.pointer == 0:
                     self.pointer = len(self.history)
                 self.pointer -= 1
                 self.__recall()
-        elif key == QtCore.Qt.Key_Down:
+        elif key == Qt.Key_Down:
             if len(self.history):
                 self.pointer += 1
                 if self.pointer == len(self.history):
                     self.pointer = 0
                 self.__recall()
         else:
-            QtGui.QTextEdit.keyPressEvent(self, e) 
+            QTextEdit.keyPressEvent(self, e) 
 
     def position(self):
         cb = self.textCursor().block()
@@ -181,7 +182,7 @@ class ConsoleTextEdit(QtGui.QTextEdit):
         self.ensureCursorVisible()
 
     def cursor_to_end(self):
-        self.textCursor().movePosition(QtGui.QTextCursor.End)
+        self.textCursor().movePosition(QTextCursor.End)
 
     def run(self):
         block = self.textCursor().block()
@@ -200,15 +201,15 @@ class ConsoleTextEdit(QtGui.QTextEdit):
 formclass, baseclass = uic.loadUiType("console.ui")
 class Console(formclass, baseclass):
     def __init__(self, *args):
-        QtGui.QWidget.__init__(self, *args)
-        self.setWindowFlags(self.windowFlags()&QtCore.Qt.Tool)
+        QWidget.__init__(self, *args)
+        self.setWindowFlags(self.windowFlags()&Qt.Tool)
         self.setupUi(self)
 
 
 
 
 def main():
-    app = QtGui.QApplication(sys.argv)
+    app = QApplication(sys.argv)
     form = MainWindow()
     form.show()
     app.exec_()

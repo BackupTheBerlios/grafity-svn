@@ -1,16 +1,15 @@
 #!/usr/bin/env python
 import sys
 
-from PyQt4 import QtGui as qt
-from PyQt4.QtCore import Qt
-from PyQt4 import QtCore, uic
+from PyQt4.Qt import *
+from PyQt4 import uic
 
 from grafity.base.arrays import nan
 
 c1, c2 = uic.loadUiType("worksheet.ui")
 class WorksheetView(c1, c2):
     def __init__(self, parent, worksheet):
-        qt.QWidget.__init__(self, parent)
+        QWidget.__init__(self, parent)
         self.setupUi(self)
         self.worksheet = worksheet
 
@@ -19,14 +18,14 @@ class WorksheetView(c1, c2):
 #        self.table.verticalHeader().resizeSection(0, 10)
 #        self.table.setRowHeight(8, 20)
 
-    @QtCore.pyqtSignature("")
+    @pyqtSignature("")
     def on_actionNew_Column_activated(self):
         self.worksheet[self.worksheet.suggest_column_name()] = [1,2,3]
-        self.table.model().emit(QtCore.SIGNAL('layoutChanged()'))
+        self.table.model().emit(SIGNAL('layoutChanged()'))
 
-class WorksheetModel(QtCore.QAbstractTableModel):
+class WorksheetModel(QAbstractTableModel):
     def __init__(self, worksheet):
-        QtCore.QAbstractTableModel.__init__(self)
+        QAbstractTableModel.__init__(self)
         self.worksheet = worksheet
 
     def rowCount(self, parent):
@@ -37,17 +36,17 @@ class WorksheetModel(QtCore.QAbstractTableModel):
 
     def data(self, index, role):
         if not index.isValid():
-            return QtCore.QVariant()
-        elif role != QtCore.Qt.DisplayRole:
-            return QtCore.QVariant()
+            return QVariant()
+        elif role != Qt.DisplayRole:
+            return QVariant()
 
-        return QtCore.QVariant(str(self.worksheet[index.column()][index.row()]).replace(repr(nan), ''))
+        return QVariant(str(self.worksheet[index.column()][index.row()]).replace(repr(nan), ''))
 
     def flags(self, index):
-        return QtCore.QAbstractTableModel.flags(self, index) | QtCore.Qt.ItemIsEditable
+        return QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable
 
     def setData(self, index, value, role):
         val = self.worksheet.evaluate(unicode(value.toString()))
         self.worksheet[index.column()][index.row()] = val
-        self.emit(QtCore.SIGNAL('dataChanged()'))
+        self.emit(SIGNAL('dataChanged()'))
         return True
