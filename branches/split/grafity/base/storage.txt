@@ -15,7 +15,6 @@ You define new classes derived from Item, like this
     ...     firstname = Attr.Text()
     ...     lastname = Attr.Text()
     ...
-    >>> class 
 
     >>> class Column(Item):
     ...     colname = Attr.Text

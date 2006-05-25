@@ -32,13 +32,13 @@ class ProjectItem(Item):
             dispatcher.send('about-to-remove', self.folder, self)
         dispatcher.send('about-to-add', folder, self)
         self._folder = folder
-        if self.folder is not None:
-            dispatcher.send('removed', old, self)
-        dispatcher.send('added', folder, self)
         if old is not None:
             old._update_contents()
         if folder is not None:
             folder._update_contents()
+        if self.folder is not None:
+            dispatcher.send('removed', old, self)
+        dispatcher.send('added', folder, self)
     folder = property(_get_folder, _set_folder)
 
     def __init__(self):

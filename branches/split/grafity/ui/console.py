@@ -2,6 +2,91 @@
 import sys
 from PyQt4 import QtCore, QtGui, uic
 import code, rlcompleter
+import traceback, operator
+import keyword
+
+
+class Interpreter (code.InteractiveInterpreter):
+    def _showtraceback (self, type=None, exc=None, traceback=None):
+        if type is None:
+            type, value, traceback = sys.exc_info()
+        if type == NameError:
+            modulename = value.args[0].split()[1][1:-1]
+            f_locals = traceback.tb_frame.f_locals
+            f_globals = traceback.tb_frame.f_globals
+
+            try:
+                exec "import " + modulename in f_locals, f_globals
+                exec traceback.tb_frame.f_code in f_locals, f_globals
+            except NameError, exc:
+                self.showtraceback(type, exc, traceback)
+            else:
+                print >>sys.stderr, "autoload: imported %s" % (modulename,)
+        else:
+            self.do_showtraceback()
+           # excepthook(type, value, traceback)
+
+    def showtraceback (self):
+#        print "'Python error"
+#        lines = traceback.format_exception_only (*sys.exc_info()[0:2])
+        lines = traceback.format_exception (*sys.exc_info())
+        for l in reduce (operator.add, lines).splitlines():
+            print '# ' + l
+
+    def showsyntaxerror (self, err):
+        self.showtraceback ()
+
+
+class Highlighter(QtCore.QObject):
+    def __init__(self, parent=None):
+        QtCore.QObject.__init__(self, parent)
+        
+        self.mappings = {}
+        
+    def addToDocument(self, doc):
+        self.connect(doc, QtCore.SIGNAL("contentsChange(int, int, int)"), self.highlight)
+    
+    def addMapping(self, pattern, format):
+        self.mappings[pattern] = format
+    
+    def highlight(self, position, removed, added):
+        doc = self.sender()
+    
+        block = doc.findBlock(position)
+        if not block.isValid():
+            return
+    
+        endBlock = QtGui.QTextBlock()
+        if added > removed:
+            endBlock = doc.findBlock(position + added)
+        else:
+            endBlock = block
+    
+        while block.isValid() and not (endBlock < block):
+            self.highlightBlock(block)
+            block = block.next()
+    
+    def highlightBlock(self, block):
+        layout = block.layout()
+        text = block.text()
+    
+        overrides = []
+    
+        for pattern in self.mappings:
+            expression = QtCore.QRegExp(pattern)
+            i = text.indexOf(expression)
+            while i >= 0:
+                range = QtGui.QTextLayout.FormatRange()
+                range.start = i
+                range.length = expression.matchedLength()
+                range.format = self.mappings[pattern]
+                overrides.append(range)
+    
+                i = text.indexOf(expression, i + expression.matchedLength())
+    
+        layout.setAdditionalFormats(overrides)
+        block.document().markContentsDirty(block.position(), block.length())
+        
 
 class ConsoleTextEdit(QtGui.QTextEdit):
     def __init__(self, *args):
@@ -10,10 +95,33 @@ class ConsoleTextEdit(QtGui.QTextEdit):
         self.locals = {}
         sys.stdout = self
         sys.stdin = self
-        sys.stderr = self
 
-        self.interpreter = code.InteractiveInterpreter(self.locals)
+        self.locals['self'] = self
+
+        self.interpreter = Interpreter(self.locals)
         self.completer = rlcompleter.Completer()
+        self.highlighter = Highlighter()
+
+        num = QtGui.QTextCharFormat()
+        num.setForeground(QtCore.Qt.darkGreen)
+        self.highlighter.addMapping("#.*$", num)
+ 
+        variableFormat = QtGui.QTextCharFormat()
+        variableFormat.setFontWeight(QtGui.QFont.Bold)
+        variableFormat.setForeground(QtCore.Qt.blue)
+        self.highlighter.addMapping("\\b[A-Z_]+\\b", variableFormat)
+
+        num = QtGui.QTextCharFormat()
+        num.setForeground(QtCore.Qt.blue)
+        self.highlighter.addMapping("\\b[0-9e\.]+\\b", num)
+
+#        for kw in keyword.kwlist:
+#            variableFormat = QtGui.QTextCharFormat()
+#            variableFormat.setFontWeight(QtGui.QFont.Bold)
+#            variableFormat.setForeground(QtCore.Qt.darkRed)
+#            self.highlighter.addMapping("\\b%s\\b" % kw, variableFormat)
+
+        self.highlighter.addToDocument(self.document())
 
         sys.ps1 = '>>> '
         sys.ps2 = '... '
@@ -90,7 +198,7 @@ class ConsoleTextEdit(QtGui.QTextEdit):
             self.last_lines = []
 
 formclass, baseclass = uic.loadUiType("console.ui")
-class MainWindow(formclass, baseclass):
+class Console(formclass, baseclass):
     def __init__(self, *args):
         QtGui.QWidget.__init__(self, *args)
         self.setWindowFlags(self.windowFlags()&QtCore.Qt.Tool)

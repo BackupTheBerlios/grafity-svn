@@ -1,15 +1,24 @@
-#!/usr/bin/env python
 import sys
+
 from PyQt4 import QtCore, QtGui, uic
+from dispatch import dispatcher
 
 from grafity.base.items import Folder
 from grafity.base.project import Project
+from grafity.ui.console import Console
+
 
 class TreeModel(QtCore.QAbstractItemModel):
-    def __init__(self, data, parent=None):
+    def __init__(self, project, parent=None):
         QtCore.QAbstractItemModel.__init__(self, parent)
-        self.project = data
+        self.project = project
         self.ids = {}
+        
+        dispatcher.connect(self.update, signal='added')
+
+    def update(self, folder):
+        print >>sys.stderr, 'update'
+        self.emit(QtCore.SIGNAL("layoutChanged()"))
 
     def headerData(self, section, orientation, role):
         return QtCore.QVariant('section one')
@@ -76,6 +85,8 @@ class MainWindow(formclass, baseclass):
         self.tree.header().hide()
         self.connect(self.tree, QtCore.SIGNAL('activated(QModelIndex)'), self.foo)
 
+        self.console = Console(self)
+
     @QtCore.pyqtSignature("")
     def on_action_New_activated(self):
         project = Project()
@@ -94,6 +105,14 @@ class MainWindow(formclass, baseclass):
         sys.exit(0)
 
     @QtCore.pyqtSignature("")
+    def on_actionConsole_activated(self):
+        if self.console.isVisible():
+            self.console.raise_()
+            self.console.show()
+        else:
+            self.console.show()
+
+    @QtCore.pyqtSignature("")
     def on_actionNew_Worksheet_activated(self):
         sheet = self.project.new_worksheet('sheet1')
         sheet.a = [1,2,3]
@@ -102,6 +121,7 @@ class MainWindow(formclass, baseclass):
 
     def open_project(self, project):
         self.project = project
+        self.console.text.locals['project'] = project
         self.model = TreeModel(self.project)
         self.tree.setModel(self.model)
 
@@ -111,7 +131,6 @@ class MainWindow(formclass, baseclass):
         view.show()
 #        print >>sys.stderr, args
 #        p.new_folder('macaroni', f1)
-#        view.model().emit(QtCore.SIGNAL("layoutChanged()"))
 
 
 def main():

@@ -16,6 +16,8 @@ class WorksheetView(c1, c2):
 
         self.m = WorksheetModel(worksheet)
         self.table.setModel(self.m)
+#        self.table.verticalHeader().resizeSection(0, 10)
+#        self.table.setRowHeight(8, 20)
 
     @QtCore.pyqtSignature("")
     def on_actionNew_Column_activated(self):

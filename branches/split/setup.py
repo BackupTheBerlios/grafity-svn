@@ -8,7 +8,7 @@ setup(
 #    install_requires = ["mimetex"],
 
     entry_points = {
-        'gui_scripts': [ 'grafity = grafity.ui.start:main', ]
+        'gui_scripts': [ 'grafity = grafity.ui.main:main', ]
     },
 
     include_package_data = True,

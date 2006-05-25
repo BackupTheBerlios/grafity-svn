@@ -93,20 +93,20 @@ class Storage(object):
                 oid = root+':'+oid
             view.append(oid=oid)
             inv = ('del', oid)
-            dispatcher.send('add-object', self, oid)
+#            dispatcher.send('add-object', self, oid)
         elif opcode == 'del':
             oid, = args
             obj = self[oid]
             obj._row.deleted = True
             del self.items[oid]
             inv = ('und', obj._row.oid)
-            dispatcher.send('delete-object', self, oid)
+#            dispatcher.send('delete-object', self, oid)
         elif opcode == 'und':
             oid, = args
             obj = self[oid]
             obj._row.deleted = False
             inv = ('del', obj._row.oid)
-            dispatcher.send('add-object', self, oid)
+#            dispatcher.send('add-object', self, oid)
         elif opcode == 'set':
             oid, name, value = args 
             obj = self[oid]
@@ -121,7 +121,7 @@ class Storage(object):
             inv = ('set', oid, name, getattr(obj._row, name))
             old = getattr(obj, name)
             setattr(obj._row, name, value)
-            dispatcher.send('set-attr', obj, name, value=value, old=old)
+#            dispatcher.send('set-attr', obj, name, value=value, old=old)
         elif opcode == 'mod':
             oid, name, data, offset = args
             obj = self[oid]
@@ -130,7 +130,7 @@ class Storage(object):
             old = obj._view.access(getattr(obj._view, name), ind, offset, len(data))
             obj._view.modify(getattr(obj._view, name), ind, data, offset)
             inv = ('mod', oid, name, old, offset)
-            dispatcher.send('mod-attr', self[oid], name, offset=offset, data=data, old=old)
+#            dispatcher.send('mod-attr', self[oid], name, offset=offset, data=data, old=old)
 
         self.oplist.append(inv)
 

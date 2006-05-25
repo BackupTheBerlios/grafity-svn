@@ -17,7 +17,12 @@ class Column(Item):
     
     def __init__(self, *args):
         Item.__init__(self, *args)
+
+    def initialize(self, *args):
+        Item.initialize(self, *args)
         self.dependencies = set()
+        self.worksheet = self._parent
+#        self.do_set_expr(self.expr)
 
     def __setitem__(self, key, value):
         self.data[key] = value
@@ -77,11 +82,11 @@ class Column(Item):
 
     def do_set_expr(self, expr):
         # find dependencies and error-check expression
-        try:
-            data = asarray(self.worksheet.evaluate(expr))
-        except Exception, ar:
-            print >>sys.stderr, '*****************', ar
-            raise StopAction, False
+        #try:
+        data = asarray(self.worksheet.evaluate(expr))
+#        except Exception, ar:
+       # x.    print >>sys.stderr, '*****************', ar
+       #     raise UserWarning, False
         self.depdict = self.analyze_expression(expr)
         newdep = set(self.depdict.values())
 
@@ -105,7 +110,7 @@ class Column(Item):
         self.dependencies = newdep
 
         if expr != '':
-            # set data without triggering a action
+            # set data without triggering an action
             self.data[:] = data
         dispatcher.send(sender=self, signal='data-changed')
         dispatcher.send(sender=self.worksheet, signal='data-changed')
