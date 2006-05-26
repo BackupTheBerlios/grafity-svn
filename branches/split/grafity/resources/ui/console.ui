@@ -60,7 +60,7 @@
   <customwidget>
    <class>ConsoleTextEdit</class>
    <extends>QTextEdit</extends>
-   <header>console.h</header>
+   <header>grafity.ui.console</header>
    <container>0</container>
    <pixmap></pixmap>
   </customwidget>
