@@ -162,6 +162,7 @@ class Storage(object):
 
         rview.append(name=name, ops=marshal.dumps(self.oplist))
         self.undodb.commit()
+        self.db.commit()
 
     def redo(self):
         return self.undo(_redo=True)
@@ -326,4 +327,4 @@ if __name__=='__main__':
 #    import doctest
 #    doctest.testmod()
     from grafity.base.utils import test
-    test('storage.txt')
+    test('squirrel.txt')

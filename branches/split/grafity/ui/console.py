@@ -6,6 +6,7 @@ import code, rlcompleter
 import traceback, operator
 import keyword
 
+from pkg_resources import resource_filename
 
 class Interpreter (code.InteractiveInterpreter):
     def _showtraceback (self, type=None, exc=None, traceback=None):
@@ -198,8 +199,8 @@ class ConsoleTextEdit(QTextEdit):
             self.write(sys.ps1)
             self.last_lines = []
 
-formclass, baseclass = uic.loadUiType("console.ui")
-class Console(formclass, baseclass):
+c1, c2 = uic.loadUiType(resource_filename('grafity', 'resources/ui/console.ui'))
+class Console(c1, c2):
     def __init__(self, *args):
         QWidget.__init__(self, *args)
         self.setWindowFlags(self.windowFlags()&Qt.Tool)

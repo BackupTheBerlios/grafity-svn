@@ -5,8 +5,9 @@ from PyQt4.Qt import *
 from PyQt4 import uic
 
 from grafity.base.arrays import nan
+from pkg_resources import resource_filename
 
-c1, c2 = uic.loadUiType("worksheet.ui")
+c1, c2 = uic.loadUiType(resource_filename('grafity', 'resources/ui/worksheet.ui'))
 class WorksheetView(c1, c2):
     def __init__(self, parent, worksheet):
         QWidget.__init__(self, parent)

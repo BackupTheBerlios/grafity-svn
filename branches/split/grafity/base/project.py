@@ -6,10 +6,12 @@ from dispatch import dispatcher
 from grafity.base.squirrel import Storage, Container
 from grafity.base.items import Folder
 from grafity.base.worksheet import Worksheet
+from grafity.base.graph import Graph
 
 class Store(Storage):
     folders = Container(Folder)
     worksheets = Container(Worksheet)
+    graphs = Container(Graph)
 
 class Project(object):
     """
@@ -56,6 +58,10 @@ class Project(object):
 
     def new_worksheet(self, name, parent=None):
         return self._new_object(self.store.worksheets, name, parent)
+
+    def new_graph(self, name, parent=None):
+        return self._new_object(self.store.graphs, name, parent)
+
 
     def on_action(self, arg1=None, arg2=None, signal=None, sender=None):
         pass
