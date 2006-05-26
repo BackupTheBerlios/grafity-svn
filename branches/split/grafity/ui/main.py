@@ -8,7 +8,7 @@ print >>sys.stderr, "ok"
 print >>sys.stderr, "import grafity...",
 from dispatch import dispatcher
 
-from pkg_resources import resource_filename
+from pkg_resources import resource_stream
 
 from grafity.base.items import Folder
 from grafity.base.graph import Graph
@@ -18,6 +18,8 @@ from grafity.ui.console import Console
 from grafity.ui.properties import Properties
 
 print >>sys.stderr, "ok"
+
+import sip
 
 
 class TreeModel(QAbstractItemModel):
@@ -88,7 +90,7 @@ class TreeModel(QAbstractItemModel):
             return QModelIndex()
         return self.createIndex(list(parent.folder.contents()).index(parent), 0, self._getpos(parent.oid))
 
-formclass, baseclass = uic.loadUiType(resource_filename('grafity', 'resources/ui/main.ui'))
+formclass, baseclass = uic.loadUiType(resource_stream('grafity', 'resources/ui/main.ui'))
 class MainWindow(formclass, baseclass):
     def __init__(self, *args):
         QWidget.__init__(self, *args)
@@ -156,7 +158,7 @@ class MainWindow(formclass, baseclass):
 
     def foo(self, index):
         from worksheet import WorksheetView
-        from graph import GraphView
+#        from graph import GraphView
         obj = self.model._fromindex(index) 
         if isinstance(obj, Worksheet):
             view = WorksheetView(self, obj)

@@ -2,11 +2,11 @@
 import sys
 from PyQt4.Qt import *
 from PyQt4 import uic
-import code, rlcompleter
+import code
 import traceback, operator
 import keyword
 
-from pkg_resources import resource_filename
+from pkg_resources import resource_stream
 
 class Interpreter (code.InteractiveInterpreter):
     def _showtraceback (self, type=None, exc=None, traceback=None):
@@ -101,7 +101,7 @@ class ConsoleTextEdit(QTextEdit):
         self.locals['self'] = self
 
         self.interpreter = Interpreter(self.locals)
-        self.completer = rlcompleter.Completer()
+#        self.completer = rlcompleter.Completer()
         self.highlighter = Highlighter()
 
         num = QTextCharFormat()
@@ -199,7 +199,7 @@ class ConsoleTextEdit(QTextEdit):
             self.write(sys.ps1)
             self.last_lines = []
 
-c1, c2 = uic.loadUiType(resource_filename('grafity', 'resources/ui/console.ui'))
+c1, c2 = uic.loadUiType(resource_stream('grafity', 'resources/ui/console.ui'))
 class Console(c1, c2):
     def __init__(self, *args):
         QWidget.__init__(self, *args)

@@ -5,9 +5,9 @@ from PyQt4.Qt import *
 from PyQt4 import uic
 from PyQt4 import Qwt5 as qwt
 
-from pkg_resources import resource_filename
+from pkg_resources import resource_stream
 
-c1, c2 = uic.loadUiType(resource_filename('grafity', 'resources/ui/graph.ui'))
+c1, c2 = uic.loadUiType(resource_stream('grafity', 'resources/ui/graph.ui'))
 class GraphView(c1, c2):
     def __init__(self, parent, graph):
         QWidget.__init__(self, parent)
