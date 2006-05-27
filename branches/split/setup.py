@@ -10,14 +10,13 @@ setup(
         'gui_scripts': [ 'grafity = grafity.ui.main:main', ]
     },
 
-    include_package_data = True,
+#    include_package_data = True,
 
-    package_data = {
-        'grafity': ['data/scripts/*.py', 'data/scripts'], 
-    },
+#    package_data = {
+#        'grafity': ['data/scripts/*.py', 'data/scripts'], 
+#    },
     author = "Daniel Fragiadakis",
     author_email = "danielf@gmail.com",
-#    description = "",
     license = "GPL",
     url = "http://grafity.berlios.de",
 )

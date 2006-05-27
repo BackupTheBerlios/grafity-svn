@@ -30,9 +30,10 @@ class TreeModel(QAbstractItemModel):
         self.ids = {}
         
         dispatcher.connect(self.update, signal='added')
+        dispatcher.connect(self.update, signal='removed')
 
-    def update(self, folder):
-        print >>sys.stderr, 'update'
+    def update(self, folder=None):
+        print >>sys.stderr, 'update', type(folder)
         self.emit(SIGNAL("layoutChanged()"))
 
     def headerData(self, section, orientation, role):
@@ -142,9 +143,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     @pyqtSignature("")
     def on_actionNew_Worksheet_activated(self):
-        sheet = self.project.new_worksheet('sheet1')
-        sheet.a = [1,2,3]
-        sheet.b = [4,5,6]
+        self.project.store.begin('new worksheet')
+        try:
+            sheet = self.project.new_worksheet('sheet1')
+            sheet.a = [1,2,3]
+            sheet.b = [4,5,6]
+        except:
+#            st.rollback()
+            raise
+        else:
+            self.project.store.commit()
         self.model.emit(SIGNAL("layoutChanged()"))
 
     @pyqtSignature("")
@@ -158,6 +166,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.console.text.locals['main'] = self
         self.model = TreeModel(self.project)
         self.tree.setModel(self.model)
+
+    @pyqtSignature("")
+    def on_action_Undo_activated(self):
+        self.project.store.undo()
+
+    @pyqtSignature("")
+    def on_action_Redo_activated(self):
+        self.project.store.redo()
 
     def foo(self, index):
         from worksheet import WorksheetView

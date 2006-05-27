@@ -95,12 +95,24 @@ class Storage(object):
             inv = ('del', oid)
 #            dispatcher.send('add-object', self, oid)
         elif opcode == 'del':
+            # find object
             oid, = args
             obj = self[oid]
+            print >>sys.stderr, "authdel", obj, oid
+
+            # get authorization
+            if hasattr(obj, '_auth_del'):
+                if not getattr(obj, '_auth_del')():
+                    return
+
+            # delete
             obj._row.deleted = True
             del self.items[oid]
             inv = ('und', obj._row.oid)
-#            dispatcher.send('delete-object', self, oid)
+
+            # notify
+            if hasattr(obj, '_notify_del'):
+                getattr(obj, '_notify_del')()
         elif opcode == 'und':
             oid, = args
             obj = self[oid]
@@ -111,8 +123,9 @@ class Storage(object):
             oid, name, value = args 
             obj = self[oid]
 
+            # validation
             try:
-                value = getattr(obj, '_auth__%s' % name)(value)
+                value = getattr(obj, '_validate__%s' % name)(value)
             except AttributeError, foo:
                 pass
             except ValueError:
@@ -121,7 +134,11 @@ class Storage(object):
             inv = ('set', oid, name, getattr(obj._row, name))
             old = getattr(obj, name)
             setattr(obj._row, name, value)
-#            dispatcher.send('set-attr', obj, name, value=value, old=old)
+            new = getattr(obj, name)
+
+            # notification
+            if hasattr(obj, '_notify_set__%s' % name):
+                getattr(obj, '_notify_set__%s' % name)(new, old)
         elif opcode == 'mod':
             oid, name, data, offset = args
             obj = self[oid]
@@ -141,8 +158,9 @@ class Storage(object):
     def commit(self):
         uview = self.undodb.getas("undolist[name:S,ops:B]")
         uview.append(name=self.action_name, ops=marshal.dumps(self.oplist))
-        self.undodb.commit()
-        self.db.commit()
+        if self.filename is not None:
+            self.undodb.commit()
+            self.db.commit()
         self.action_name = None
 
     def undo(self, _redo=False):
@@ -161,8 +179,9 @@ class Storage(object):
         uview.delete(len(uview)-1)
 
         rview.append(name=name, ops=marshal.dumps(self.oplist))
-        self.undodb.commit()
-        self.db.commit()
+        if self.filename is not None:
+            self.undodb.commit()
+            self.db.commit()
 
     def redo(self):
         return self.undo(_redo=True)
@@ -175,8 +194,8 @@ class Attribute(object):
     def __get__(self, obj, cls):
         if obj is None:
             return self
-        if self.name not in Item.__dict__ and obj.deleted:
-            raise ValueError, 'object is deleted'
+#        if self.name not in Item.__dict__ and obj.deleted:
+#            raise ValueError, 'object is deleted'
         self.obj = obj
         return self.decode(getattr(obj._row, self.name))
 
@@ -214,11 +233,11 @@ class Attr(object):
             new.obj = obj
             return new
 
-        def get_data(self):
-            return getattr(self.obj._row, self.name)
-        def set_data(self, value):
-            self.obj._storage._operation('set', self.obj.oid, self.name, value)
-        data = property(get_data, set_data)
+#        def get_data(self):
+#            return getattr(self.obj._row, self.name)
+#        def set_data(self, value):
+#            self.obj._storage._operation('set', self.obj.oid, self.name, value)
+#        data = property(get_data, set_data)
 
         def get(self, offset, length):
             ind = self.obj._view.find(oid=self.obj.oid)

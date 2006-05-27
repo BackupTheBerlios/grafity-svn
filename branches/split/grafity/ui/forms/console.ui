@@ -41,6 +41,9 @@
     <property name="title" >
      <string>Script</string>
     </property>
+    <addaction name="actionClear" />
+    <addaction name="separator" />
+    <addaction name="actionClose" />
    </widget>
    <addaction name="menuScript" />
   </widget>
@@ -54,6 +57,19 @@
     </rect>
    </property>
   </widget>
+  <action name="actionClear" >
+   <property name="icon" >
+    <iconset resource="grafity.qrc" >:/images/general/new.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Clear</string>
+   </property>
+  </action>
+  <action name="actionClose" >
+   <property name="text" >
+    <string>Close</string>
+   </property>
+  </action>
  </widget>
  <pixmapfunction></pixmapfunction>
  <customwidgets>
@@ -65,6 +81,8 @@
    <pixmap></pixmap>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="grafity.qrc" />
+ </resources>
  <connections/>
 </ui>

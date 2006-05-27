@@ -37,18 +37,18 @@ class Column(Item):
     def __repr__(self):
         return repr(self.data)
 
-    def _auth__name(self, name):
+    def _validate__name(self, name):
         print >>sys.stderr, name
         return name
 
     def _after__name(self, name):
         pass
 
-    def _auth__expr(self, expr):
+    def _validate__expr(self, expr):
         print >>sys.stderr, self.do_set_expr(expr)
         return expr
 
-    def _auth__data(self, data):
+    def _validate__data(self, data):
         print >>sys.stderr, "data"
         return data
 

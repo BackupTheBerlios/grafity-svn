@@ -27,19 +27,36 @@ class ProjectItem(Item):
     def _get_folder(self):
         return self._folder
     def _set_folder(self, folder):
-        old = self.folder
-        if self.folder is not None:
-            dispatcher.send('about-to-remove', self.folder, self)
-        dispatcher.send('about-to-add', folder, self)
+#        old = self.folder
+#        if self.folder is not None:
+#            dispatcher.send('about-to-remove', self.folder, self)
+#        dispatcher.send('about-to-add', folder, self)
         self._folder = folder
+    folder = property(_get_folder, _set_folder)
+
+    def _validate___folder(self, folder):
+        return folder
+
+    def _notify_set___folder(self, folder, old):
         if old is not None:
             old._update_contents()
+            dispatcher.send('removed', old, self)
         if folder is not None:
             folder._update_contents()
-        if self.folder is not None:
-            dispatcher.send('removed', old, self)
-        dispatcher.send('added', folder, self)
-    folder = property(_get_folder, _set_folder)
+            dispatcher.send('added', folder, self)
+        
+
+#    def _auth_del(self):
+#        self.___folder = self.folder
+#        print >>sys.stderr, 'roorororoo', self.folder, self._row._folder
+#        print >>sys.stderr, 'roorororoo', self.name, self._row._name
+#        return True
+
+#    def _notify_del(self):
+#        print >>sys.stderr, 'reeeeee', self.___folder
+#        self.___folder._update_contents()
+#        dispatcher.send('removed', self.___folder, self)
+#        del self.___folder
 
     def __init__(self):
         Item.__init__(self)
@@ -96,7 +113,7 @@ class Folder(ProjectItem):
         self._contents = []
         for c in self._storage.containers():
             for item in c:
-                if item.folder is self and item is not self._project.top:
+                if not item.deleted and item.folder is self and item is not self._project.top:
                     self._contents.append(item)
 
     def contents(self):

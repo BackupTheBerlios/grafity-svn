@@ -19,7 +19,7 @@
    <string>Grafity</string>
   </property>
   <property name="windowIcon" >
-   <iconset/>
+   <iconset resource="grafity.qrc" >:/images/grafity-16.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget" >
    <layout class="QVBoxLayout" >

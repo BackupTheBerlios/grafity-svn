@@ -1,13 +1,14 @@
 import struct
 import sys
 
-#import metakit
-from numarray import *
-from numarray.ieeespecial import nan, inf, isfinite, isnan
-#from numpy.base import *
+#from numarray import *
+#from numarray.ieeespecial import nan, inf, isfinite, isnan
+
+from numpy import *
+import numpy.core
 from grafity.base.squirrel import Attr
 
-Error.setMode(all='ignore')
+#Error.setMode(all='ignore')
 
 class VarOperation(object):
     def __init__(self, oper):
@@ -41,8 +42,16 @@ class VarOperation(object):
         return repr(self.oper).replace('UFunc', 'vUFunc')
 
 # wrap all ufuncs with VarOperations
-mod_ufuncs = dict([(k, VarOperation(v)) for k, v in ufunc._UFuncs.iteritems() if v.n_inputs in (1,2)])
-globals().update(mod_ufuncs)
+#mod_ufuncs = dict([(k, VarOperation(v)) 
+#        for k, v in ufunc._UFuncs.iteritems() if v.n_inputs in (1,2)])
+names = dir(numpy.core)
+mod_ufuncs = {}
+for n in names:
+    obj = getattr(numpy.core, n)
+    if isinstance(obj, ufunc):
+        mod_ufuncs[n] = VarOperation(obj)
+
+#globals().update(mod_ufuncs)
 
 def asvarray(*args, **kwds):
     arr = asarray(*args, **kwds)
@@ -53,6 +62,8 @@ def varray(*args, **kwds):
     arr = array(*args, **kwds)
     arr.__class__ = VArray
     return arr
+
+asvarray = asarray
 
 class with_new_opers(object):
     def __add__(self, other): return add(self, asvarray(other)) 
@@ -134,13 +145,13 @@ class MkArray(with_new_opers, Attr.Bytes):
 
         # adjust size
         if start > len(self):
-            buf = array([nan]*(start-len(self)), type=Float64).tostring()
+            buf = array([nan]*(start-len(self)), dtype=Float64).tostring()
             self.set(buf, len(self)*8)
 #            self.view.modify(self.prop, self.row, buf, len(self)*8)
         
-        arr = asvarray(value, type=Float64)
+        arr = asvarray(value, dtype=Float64)
         if arr.shape == ():
-            arr = asvarray([value]*length, type=Float64)
+            arr = asvarray([value]*length, dtype=Float64)
         buf = arr.tostring()
 
         if isinstance(key, slice) and key.start is None and key.stop is None:
@@ -177,11 +188,11 @@ class MkArray(with_new_opers, Attr.Bytes):
                 stop = key.stop
 #            buf = self.view.access(self.prop, self.row, start*8, (stop-start)*8)
             buf = self.get(start*8, (stop-start)*8)
-            value = fromstring(buf, type=Float64)
+            value = fromstring(buf, dtype=Float64)
         elif hasattr(key, '__getitem__'):
 #            buf = self.view.access(self.prop, self.row, 0, len(self)*8)
             buf = self.get(0, len(self)*8)
-            value = fromstring(buf, type=Float64)
+            value = fromstring(buf, dtype=Float64)
             if len(key) == 0:
                 return array([], 'd')
             else:
