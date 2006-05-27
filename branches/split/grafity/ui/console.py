@@ -199,7 +199,7 @@ class ConsoleTextEdit(QTextEdit):
             self.write(sys.ps1)
             self.last_lines = []
 
-c1, c2 = uic.loadUiType(resource_stream('grafity', 'resources/ui/console.ui'))
+c1, c2 = uic.loadUiType('forms/console.ui')
 class Console(c1, c2):
     def __init__(self, *args):
         QWidget.__init__(self, *args)

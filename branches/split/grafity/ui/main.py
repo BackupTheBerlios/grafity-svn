@@ -1,6 +1,5 @@
 import sys
 
-import qtresources
 
 print >>sys.stderr, "import qt...",
 from PyQt4.Qt import *
@@ -18,6 +17,7 @@ from grafity.base.worksheet import Worksheet
 from grafity.base.project import Project
 from grafity.ui.console import Console
 from grafity.ui.properties import Properties
+from grafity.ui.forms import qtresources
 
 print >>sys.stderr, "ok"
 
@@ -92,11 +92,14 @@ class TreeModel(QAbstractItemModel):
             return QModelIndex()
         return self.createIndex(list(parent.folder.contents()).index(parent), 0, self._getpos(parent.oid))
 
-formclass, baseclass = uic.loadUiType(resource_stream('grafity', 'resources/ui/main.ui'))
-class MainWindow(formclass, baseclass):
+#formclass, baseclass = uic.loadUiType(resource_stream('grafity', 'resources/ui/main.ui'))
+from forms.main import Ui_MainWindow
+#class MainWindow(formclass, baseclass):
+class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, *args):
-        QWidget.__init__(self, *args)
-        self.setWindowFlags(self.windowFlags()&Qt.Tool)
+#        QWidget.__init__(self, *args)
+        QMainWindow.__init__(self, *args)
+#        self.setWindowFlags(self.windowFlags()&Qt.Tool)
         self.setupUi(self)
 
         self.tree.header().hide()
