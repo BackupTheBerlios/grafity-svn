@@ -1,5 +1,7 @@
 import sys
 
+import qtresources
+
 print >>sys.stderr, "import qt...",
 from PyQt4.Qt import *
 from PyQt4 import uic

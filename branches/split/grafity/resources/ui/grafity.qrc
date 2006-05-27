@@ -1,0 +1,28 @@
+<RCC>
+    <qresource prefix="/" >
+        <file>images/general/copy.png</file>
+        <file>images/general/cut.png</file>
+        <file>images/general/delete.png</file>
+        <file>images/general/exit.png</file>
+        <file>images/general/folder.png</file>
+        <file>images/general/graph.png</file>
+        <file>images/general/history.png</file>
+        <file>images/general/navigator.png</file>
+        <file>images/general/new-folder.png</file>
+        <file>images/general/new-graph.png</file>
+        <file>images/general/new-script.png</file>
+        <file>images/general/new-worksheet.png</file>
+        <file>images/general/new.png</file>
+        <file>images/general/open.png</file>
+        <file>images/general/paste.png</file>
+        <file>images/general/redo.png</file>
+        <file>images/general/save.png</file>
+        <file>images/general/saveas.png</file>
+        <file>images/general/script.png</file>
+        <file>images/general/style.png</file>
+        <file>images/general/undo.png</file>
+        <file>images/general/worksheet.png</file>
+        <file>images/properties.png</file>
+        <file>images/grafity-16.png</file>
+    </qresource>
+</RCC>

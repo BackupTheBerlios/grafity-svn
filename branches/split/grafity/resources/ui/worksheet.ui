@@ -175,27 +175,41 @@
    </property>
   </action>
   <action name="action_Cut" >
+   <property name="icon" >
+    <iconset resource="grafity.qrc" >:/images/general/cut.png</iconset>
+   </property>
    <property name="text" >
     <string>&amp;Cut</string>
    </property>
   </action>
   <action name="action_Copy" >
+   <property name="icon" >
+    <iconset resource="grafity.qrc" >:/images/general/copy.png</iconset>
+   </property>
    <property name="text" >
     <string>&amp;Copy</string>
    </property>
   </action>
   <action name="action_Paste" >
+   <property name="icon" >
+    <iconset resource="grafity.qrc" >:/images/general/paste.png</iconset>
+   </property>
    <property name="text" >
     <string>&amp;Paste</string>
    </property>
   </action>
   <action name="action_Delete" >
+   <property name="icon" >
+    <iconset resource="grafity.qrc" >:/images/general/delete.png</iconset>
+   </property>
    <property name="text" >
     <string>&amp;Delete</string>
    </property>
   </action>
  </widget>
  <pixmapfunction></pixmapfunction>
- <resources/>
+ <resources>
+  <include location="grafity.qrc" />
+ </resources>
  <connections/>
 </ui>
