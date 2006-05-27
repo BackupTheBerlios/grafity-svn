@@ -1,5 +1,5 @@
 __author__ = "Daniel Fragiadakis <dfragi@gmail.com>"
-__revision__ = "$Id: resources.py 163 2006-04-07 15:29:08Z danielf $"
+__revision__ = "$Id$"
 
 import sys
 import os
@@ -171,6 +171,7 @@ class Storage(object):
             uview, rview = rview, uview
 
         name, oplist = uview[-1].name, marshal.loads(uview[-1].ops)
+        print >>sys.stderr, ['undo', 'redo'][_redo], name
 
         self.oplist = []
         for oper in reversed(oplist):
