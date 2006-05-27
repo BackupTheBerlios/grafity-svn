@@ -5,12 +5,12 @@ from PyQt4.Qt import *
 from PyQt4 import uic
 
 from grafity.base.arrays import nan
+from grafity.ui.forms.worksheet import Ui_MainWindow
 from pkg_resources import resource_stream
 
-c1, c2 = uic.loadUiType(resource_stream('grafity', 'resources/ui/worksheet.ui'))
-class WorksheetView(c1, c2):
+class WorksheetView(QMainWindow, Ui_MainWindow):
     def __init__(self, parent, worksheet):
-        QWidget.__init__(self, parent)
+        QMainWindow.__init__(self, parent)
         self.setupUi(self)
         self.worksheet = worksheet
 

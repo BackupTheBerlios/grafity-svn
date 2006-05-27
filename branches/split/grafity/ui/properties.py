@@ -6,9 +6,10 @@ from pkg_resources import resource_stream
 from PyQt4.Qt import *
 from PyQt4 import uic
 
-c1, c2 = uic.loadUiType('forms/properties.ui')
-class Properties(c1, c2):
+from grafity.ui.forms.properties import Ui_GraphEditor
+
+class Properties(QDialog, Ui_GraphEditor):
     def __init__(self, parent):
-        QWidget.__init__(self, parent)
+        QDialog.__init__(self, parent)
         self.setupUi(self)
 

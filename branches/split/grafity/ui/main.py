@@ -3,7 +3,6 @@ import sys
 
 print >>sys.stderr, "import qt...",
 from PyQt4.Qt import *
-from PyQt4 import uic
 print >>sys.stderr, "ok"
 
 print >>sys.stderr, "import grafity...",
@@ -92,7 +91,6 @@ class TreeModel(QAbstractItemModel):
             return QModelIndex()
         return self.createIndex(list(parent.folder.contents()).index(parent), 0, self._getpos(parent.oid))
 
-#formclass, baseclass = uic.loadUiType(resource_stream('grafity', 'resources/ui/main.ui'))
 from forms.main import Ui_MainWindow
 #class MainWindow(formclass, baseclass):
 class MainWindow(QMainWindow, Ui_MainWindow):

@@ -2,15 +2,15 @@
 import sys
 
 from PyQt4.Qt import *
-from PyQt4 import uic
 from PyQt4 import Qwt5 as qwt
+
+from grafity.ui.worksheet import Ui_MainWindow
 
 from pkg_resources import resource_stream
 
-c1, c2 = uic.loadUiType(resource_stream('grafity', 'resources/ui/graph.ui'))
-class GraphView(c1, c2):
+class GraphView(QMainWindow, Ui_MainWindow):
     def __init__(self, parent, graph):
-        QWidget.__init__(self, parent)
+        QMainWindow.__init__(self, parent)
         self.setupUi(self)
         self.graph = graph
         self.plot = qwt.QwtPlot(self)

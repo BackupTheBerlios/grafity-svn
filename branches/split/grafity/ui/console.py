@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import sys
 from PyQt4.Qt import *
-from PyQt4 import uic
 import code
 import traceback, operator
 import keyword
@@ -199,10 +198,10 @@ class ConsoleTextEdit(QTextEdit):
             self.write(sys.ps1)
             self.last_lines = []
 
-c1, c2 = uic.loadUiType('forms/console.ui')
-class Console(c1, c2):
+from grafity.ui.forms.console import Ui_MainWindow
+class Console(QMainWindow, Ui_MainWindow):
     def __init__(self, *args):
-        QWidget.__init__(self, *args)
+        QMainWindow.__init__(self, *args)
         self.setWindowFlags(self.windowFlags()&Qt.Tool)
         self.setupUi(self)
 
