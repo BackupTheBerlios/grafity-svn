@@ -1,10 +1,11 @@
 import sys
 
 from PyQt4.Qt import *
+from grafity.ui.forms import qtresources
 
 def main():
     app = QApplication(sys.argv)
-    pm = QPixmap("splash02.png")
+    pm = QPixmap(":/images/splash02.jpg")
     splash = QSplashScreen(pm)
     splash.show()
 
@@ -17,14 +18,16 @@ def main():
     dispatcher.connect(messg, signal='splash-message')
 
     from grafity.ui.mainwin import MainWindow
+
+    dispatcher.send('splash-message', msg='Creating windows...')
     form = MainWindow()
     form.show()
     splash.finish(form)
     splash.close()
     app.exec_()
 
-# splash01.png http://flickr.com/photos/sunrise/17563090/
-# splash02.png http://flickr.com/photos/di1980/43594468/
+# splash01.jpg http://flickr.com/photos/sunrise/17563090/
+# splash02.jpg http://flickr.com/photos/di1980/43594468/
 
 if __name__ == "__main__":
     main()

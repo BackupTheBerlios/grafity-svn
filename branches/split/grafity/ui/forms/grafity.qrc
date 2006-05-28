@@ -22,7 +22,11 @@
         <file>images/general/style.png</file>
         <file>images/general/undo.png</file>
         <file>images/general/worksheet.png</file>
-        <file>images/properties.png</file>
         <file>images/grafity-16.png</file>
+        <file>images/properties.png</file>
+        <file>images/python-logo.gif</file>
+        <file>images/qt.png</file>
+        <file>images/splash01.jpg</file>
+        <file>images/splash02.jpg</file>
     </qresource>
 </RCC>

@@ -4,10 +4,8 @@ import sys
 from PyQt4.Qt import *
 from dispatch import dispatcher
 
-dispatcher.send('splash-message', msg='importing pkg_resources')
+dispatcher.send('splash-message', msg='Loading modules..,')
 from pkg_resources import resource_stream
-
-dispatcher.send('splash-message', msg='importing grafity')
 from grafity.base.items import Folder
 from grafity.base.graph import Graph
 from grafity.base.worksheet import Worksheet
@@ -15,8 +13,6 @@ from grafity.base.project import Project
 from grafity.ui.console import Console
 from grafity.ui.properties import Properties
 from grafity.ui.forms import qtresources
-
-dispatcher.send('splash-message', msg='creating mainwin')
 
 
 class TreeModel(QAbstractItemModel):
