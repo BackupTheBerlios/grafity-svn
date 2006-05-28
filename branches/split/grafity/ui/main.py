@@ -4,7 +4,7 @@ from PyQt4.Qt import *
 
 def main():
     app = QApplication(sys.argv)
-    pm = QPixmap("splash.png")
+    pm = QPixmap("splash02.png")
     splash = QSplashScreen(pm)
     splash.show()
 
@@ -23,6 +23,8 @@ def main():
     splash.close()
     app.exec_()
 
+# splash01.png http://flickr.com/photos/sunrise/17563090/
+# splash02.png http://flickr.com/photos/di1980/43594468/
 
 if __name__ == "__main__":
     main()
