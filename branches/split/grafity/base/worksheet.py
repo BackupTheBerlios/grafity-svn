@@ -48,9 +48,9 @@ class Column(Item):
         print >>sys.stderr, self.do_set_expr(expr)
         return expr
 
-    def _validate__data(self, data):
-        print >>sys.stderr, "data"
-        return data
+#    def _validate__data(self, data):
+#        print >>sys.stderr, "data"
+#        return data
 
     def _after__data(self, data):
         print >>sys.stderr, "data"

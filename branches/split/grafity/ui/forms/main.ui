@@ -35,6 +35,9 @@
        <attribute name="title" >
         <string>Objects</string>
        </attribute>
+       <attribute name="icon" >
+        <iconset resource="grafity.qrc" >:/images/general/navigator.png</iconset>
+       </attribute>
        <layout class="QHBoxLayout" >
         <property name="margin" >
          <number>0</number>
@@ -54,6 +57,9 @@
       <widget class="QWidget" name="tab_2" >
        <attribute name="title" >
         <string>Changes</string>
+       </attribute>
+       <attribute name="icon" >
+        <iconset resource="grafity.qrc" >:/images/general/undo.png</iconset>
        </attribute>
       </widget>
      </widget>
@@ -123,7 +129,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QToolBar" name="toolBar" >
+  <widget class="QToolBar" name="toolbar1" >
    <property name="layoutDirection" >
     <enum>Qt::LeftToRight</enum>
    </property>
@@ -143,7 +149,7 @@
    <addaction name="separator" />
    <addaction name="actionE_xit" />
   </widget>
-  <widget class="QToolBar" name="toolBar_3" >
+  <widget class="QToolBar" name="toolbar2" >
    <property name="layoutDirection" >
     <enum>Qt::LeftToRight</enum>
    </property>

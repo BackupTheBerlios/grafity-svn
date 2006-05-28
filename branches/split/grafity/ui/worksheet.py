@@ -48,6 +48,8 @@ class WorksheetModel(QAbstractTableModel):
 
     def setData(self, index, value, role):
         val = self.worksheet.evaluate(unicode(value.toString()))
+        self.worksheet._project.store.begin('change-data')
         self.worksheet[index.column()][index.row()] = val
+        self.worksheet._project.store.commit()
         self.emit(SIGNAL('dataChanged()'))
         return True

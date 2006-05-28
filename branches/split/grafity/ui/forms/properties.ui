@@ -8,7 +8,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>246</width>
+    <width>235</width>
     <height>616</height>
    </rect>
   </property>
@@ -52,11 +52,11 @@
        <string/>
       </attribute>
       <attribute name="icon" >
-       <iconset>images/new/general/worksheet.png</iconset>
+       <iconset resource="grafity.qrc" >:/images/general/worksheet.png</iconset>
       </attribute>
       <layout class="QVBoxLayout" >
        <property name="margin" >
-        <number>9</number>
+        <number>0</number>
        </property>
        <property name="spacing" >
         <number>6</number>
@@ -205,14 +205,14 @@
        <string/>
       </attribute>
       <attribute name="icon" >
-       <iconset>images/new/general/style.png</iconset>
+       <iconset resource="grafity.qrc" >:/images/general/style.png</iconset>
       </attribute>
       <attribute name="toolTip" >
        <string>Style</string>
       </attribute>
       <layout class="QVBoxLayout" >
        <property name="margin" >
-        <number>9</number>
+        <number>0</number>
        </property>
        <property name="spacing" >
         <number>6</number>
@@ -747,7 +747,7 @@
       </attribute>
       <layout class="QVBoxLayout" >
        <property name="margin" >
-        <number>9</number>
+        <number>0</number>
        </property>
        <property name="spacing" >
         <number>6</number>
@@ -1079,6 +1079,8 @@
   </layout>
  </widget>
  <pixmapfunction></pixmapfunction>
- <resources/>
+ <resources>
+  <include location="grafity.qrc" />
+ </resources>
  <connections/>
 </ui>

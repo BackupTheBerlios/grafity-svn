@@ -98,7 +98,6 @@ class Storage(object):
             # find object
             oid, = args
             obj = self[oid]
-            print >>sys.stderr, "authdel", obj, oid
 
             # get authorization
             if hasattr(obj, '_auth_del'):
@@ -118,7 +117,6 @@ class Storage(object):
             obj = self[oid]
             obj._row.deleted = False
             inv = ('del', obj._row.oid)
-#            dispatcher.send('add-object', self, oid)
         elif opcode == 'set':
             oid, name, value = args 
             obj = self[oid]
@@ -143,11 +141,23 @@ class Storage(object):
             oid, name, data, offset = args
             obj = self[oid]
 
+            # validation
+            try:
+                value = getattr(obj, '_validate__%s' % name)(data, offset)
+            except AttributeError, foo:
+                pass
+            except ValueError:
+                return
+
             ind = obj._view.find(oid=obj.oid)
             old = obj._view.access(getattr(obj._view, name), ind, offset, len(data))
-            obj._view.modify(getattr(obj._view, name), ind, data, offset)
+            print >>sys.stderr, "old", repr(old), repr(data)
+            obj._view.modify(getattr(obj._view, name), ind, data, offset, len(data)-len(old))
             inv = ('mod', oid, name, old, offset)
-#            dispatcher.send('mod-attr', self[oid], name, offset=offset, data=data, old=old)
+
+            # notification
+            if hasattr(obj, '_notify_mod__%s' % name):
+                getattr(obj, '_notify_mod__%s' % name)(value, old, offset)
 
         self.oplist.append(inv)
 
@@ -234,11 +244,11 @@ class Attr(object):
             new.obj = obj
             return new
 
-#        def get_data(self):
-#            return getattr(self.obj._row, self.name)
-#        def set_data(self, value):
-#            self.obj._storage._operation('set', self.obj.oid, self.name, value)
-#        data = property(get_data, set_data)
+        def get_data(self):
+            return getattr(self.obj._row, self.name)
+        def set_data(self, value):
+            self.obj._storage._operation('set', self.obj.oid, self.name, value)
+        data = property(get_data, set_data)
 
         def get(self, offset, length):
             ind = self.obj._view.find(oid=self.obj.oid)
@@ -337,14 +347,9 @@ class Item(object):
     def __init__(self):
         self._initialized = False
 
-#    def __init__(self, row):
-#        self._row = row
-
     oid = Attribute('S')
     deleted = Attribute('I')
 
 if __name__=='__main__':
-#    import doctest
-#    doctest.testmod()
     from grafity.base.utils import test
     test('squirrel.txt')
