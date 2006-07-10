@@ -148,6 +148,7 @@ class ConsoleTextEdit(QTextEdit):
             if x > len(sys.ps1):
                 QTextEdit.keyPressEvent(self, e) 
         elif key in [Qt.Key_Return, Qt.Key_Enter]:
+            self.cursor_to_end()
             self.run()
         elif key == Qt.Key_Up:
             if len(self.history):
