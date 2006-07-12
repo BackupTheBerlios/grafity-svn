@@ -35,10 +35,10 @@ class GraphView(QMainWindow, Ui_MainWindow):
         self.plot.canvas().setFrameStyle(QFrame.Box|QFrame.Plain)
 #        self.plot.setAxisScaleDraw(qwt.QwtPlot.xBottom, ScaleDraw())
 #        self.plot.setAxisScaleDraw(qwt.QwtPlot.yLeft, ScaleDraw())
-        self.plot.axis(self.plot.xBottom).setBaselineDist(0)
-        self.plot.axis(self.plot.yLeft).setBaselineDist(0)
-        self.plot.axis(self.plot.yLeft).scaleDraw().setOptions(qwt.QwtScaleDraw.None)
-        self.plot.axis(self.plot.xBottom).scaleDraw().setOptions(qwt.QwtScaleDraw.None)
+#        self.plot.axisWidget(self.plot.xBottom).setBaselineDist(0)
+#        self.plot.axisWidget(self.plot.yLeft).setBaselineDist(0)
+#        self.plot.axisWidget(self.plot.yLeft).scaleDraw().setOptions(qwt.QwtScaleDraw.None)
+#        self.plot.axisWidget(self.plot.xBottom).scaleDraw().setOptions(qwt.QwtScaleDraw.None)
 
-        self.plot.canvas().setFocusPolicy(QWidget.StrongFocus)
+#        self.plot.canvas().setFocusPolicy(QWidget.StrongFocus)
 

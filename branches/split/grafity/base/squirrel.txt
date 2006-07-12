@@ -14,6 +14,8 @@ You define new classes derived from Item, like this
     >>> class Person(Item):
     ...     firstname = Attr.Text()
     ...     lastname = Attr.Text()
+    ...     def _validate__firstname(self, name):
+    ...         return name.lower()
     ...
     >>> class Album(Item):
     ...     artist = Attr.ObjectRef()
@@ -38,7 +40,7 @@ Create new objects
     >>> st.begin('foobar')
     >>> try:
     ...     p = st.people.create()
-    ...     p.first, p.last = 'John', 'Coltrane'
+    ...     p.firstname = 'John'
     ... finally:
     ...     st.commit()
     >>> st.undo()
@@ -47,6 +49,8 @@ Create new objects
     >>> st.redo()
     >>> len(st.people)
     1
+    >>> st.people[0].firstname
+    'john'
     >>> st.undo()
     >>> len(st.people)
     0

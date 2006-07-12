@@ -1,0 +1,213 @@
+<ui version="4.0" >
+ <author></author>
+ <comment></comment>
+ <exportmacro></exportmacro>
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>749</width>
+    <height>565</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget" />
+  <widget class="QMenuBar" name="menubar" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>749</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_Project" >
+    <property name="title" >
+     <string>&amp;Project</string>
+    </property>
+    <addaction name="actionNew_Project" />
+    <addaction name="action_Open_Project" />
+    <addaction name="action_Save_Project" />
+    <addaction name="action_Save_Project_As" />
+   </widget>
+   <addaction name="menu_Project" />
+  </widget>
+  <widget class="QStatusBar" name="statusbar" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>541</y>
+     <width>749</width>
+     <height>24</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QDockWidget" name="dockWidget_3" >
+   <property name="features" >
+    <set>QDockWidget::AllDockWidgetFeatures</set>
+   </property>
+   <attribute name="dockWidgetArea" >
+    <number>8</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_3" >
+    <layout class="QVBoxLayout" >
+     <property name="margin" >
+      <number>0</number>
+     </property>
+     <property name="spacing" >
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QTabWidget" name="tabWidget_3" >
+       <property name="tabPosition" >
+        <enum>QTabWidget::South</enum>
+       </property>
+       <widget class="QWidget" name="tab_5" >
+        <attribute name="title" >
+         <string>Tab 1</string>
+        </attribute>
+       </widget>
+       <widget class="QWidget" name="tab_6" >
+        <attribute name="title" >
+         <string>Tab 2</string>
+        </attribute>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockWidget" >
+   <property name="minimumSize" >
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <property name="features" >
+    <set>QDockWidget::AllDockWidgetFeatures</set>
+   </property>
+   <property name="allowedAreas" >
+    <set>Qt::AllDockWidgetAreas</set>
+   </property>
+   <attribute name="dockWidgetArea" >
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents" >
+    <layout class="QHBoxLayout" >
+     <property name="margin" >
+      <number>0</number>
+     </property>
+     <property name="spacing" >
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QTabWidget" name="tabWidget" >
+       <property name="tabPosition" >
+        <enum>QTabWidget::West</enum>
+       </property>
+       <widget class="QWidget" name="tab" >
+        <attribute name="title" >
+         <string>Tab 1</string>
+        </attribute>
+       </widget>
+       <widget class="QWidget" name="tab_2" >
+        <attribute name="title" >
+         <string>Tab 2</string>
+        </attribute>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockWidget_2" >
+   <property name="features" >
+    <set>QDockWidget::AllDockWidgetFeatures</set>
+   </property>
+   <attribute name="dockWidgetArea" >
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_2" >
+    <layout class="QHBoxLayout" >
+     <property name="margin" >
+      <number>0</number>
+     </property>
+     <property name="spacing" >
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QTabWidget" name="tabWidget_2" >
+       <property name="tabPosition" >
+        <enum>QTabWidget::East</enum>
+       </property>
+       <widget class="QWidget" name="tab_3" >
+        <attribute name="title" >
+         <string>Tab 1</string>
+        </attribute>
+       </widget>
+       <widget class="QWidget" name="tab_4" >
+        <attribute name="title" >
+         <string>Tab 2</string>
+        </attribute>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QToolBar" name="toolBar" >
+   <property name="orientation" >
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <attribute name="toolBarArea" >
+    <number>4</number>
+   </attribute>
+   <addaction name="actionNew_Project" />
+   <addaction name="action_Open_Project" />
+   <addaction name="action_Save_Project" />
+   <addaction name="action_Save_Project_As" />
+  </widget>
+  <action name="actionNew_Project" >
+   <property name="icon" >
+    <iconset resource="grafity.qrc" >:/images/general/new.png</iconset>
+   </property>
+   <property name="text" >
+    <string>New &amp;Project</string>
+   </property>
+  </action>
+  <action name="action_Open_Project" >
+   <property name="icon" >
+    <iconset resource="grafity.qrc" >:/images/general/open.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Open Project</string>
+   </property>
+  </action>
+  <action name="action_Save_Project" >
+   <property name="icon" >
+    <iconset resource="grafity.qrc" >:/images/general/save.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Save Project</string>
+   </property>
+  </action>
+  <action name="action_Save_Project_As" >
+   <property name="icon" >
+    <iconset resource="grafity.qrc" >:/images/general/saveas.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Save Project &amp;As...</string>
+   </property>
+  </action>
+ </widget>
+ <pixmapfunction></pixmapfunction>
+ <resources>
+  <include location="grafity.qrc" />
+ </resources>
+ <connections/>
+</ui>
