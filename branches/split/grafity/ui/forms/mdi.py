@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'unknown'
 #
-# Created: Wed Jul 12 23:49:15 2006
+# Created: Thu Jul 13 00:30:05 2006
 #      by: PyQt4 UI code generator 4.0
 #
 # WARNING! All changes made in this file will be lost!
@@ -91,9 +91,9 @@ class Ui_MainWindow(object):
         self.hboxlayout2.setSpacing(0)
         self.hboxlayout2.setObjectName("hboxlayout2")
 
-        self.treeView = QtGui.QTreeView(self.tab)
-        self.treeView.setObjectName("treeView")
-        self.hboxlayout2.addWidget(self.treeView)
+        self.tree = QtGui.QTreeView(self.tab)
+        self.tree.setObjectName("tree")
+        self.hboxlayout2.addWidget(self.tree)
         self.tabWidget.addTab(self.tab, "")
 
         self.tab_2 = QtGui.QWidget()
@@ -144,30 +144,30 @@ class Ui_MainWindow(object):
         self.toolBar.setObjectName("toolBar")
         MainWindow.addToolBar(self.toolBar)
 
-        self.actionNew_Project = QtGui.QAction(MainWindow)
-        self.actionNew_Project.setIcon(QtGui.QIcon(":/images/general/new.png"))
-        self.actionNew_Project.setObjectName("actionNew_Project")
+        self.action_new = QtGui.QAction(MainWindow)
+        self.action_new.setIcon(QtGui.QIcon(":/images/general/new.png"))
+        self.action_new.setObjectName("action_new")
 
-        self.action_Open_Project = QtGui.QAction(MainWindow)
-        self.action_Open_Project.setIcon(QtGui.QIcon(":/images/general/open.png"))
-        self.action_Open_Project.setObjectName("action_Open_Project")
+        self.action_open = QtGui.QAction(MainWindow)
+        self.action_open.setIcon(QtGui.QIcon(":/images/general/open.png"))
+        self.action_open.setObjectName("action_open")
 
-        self.action_Save_Project = QtGui.QAction(MainWindow)
-        self.action_Save_Project.setIcon(QtGui.QIcon(":/images/general/save.png"))
-        self.action_Save_Project.setObjectName("action_Save_Project")
+        self.action_save = QtGui.QAction(MainWindow)
+        self.action_save.setIcon(QtGui.QIcon(":/images/general/save.png"))
+        self.action_save.setObjectName("action_save")
 
-        self.action_Save_Project_As = QtGui.QAction(MainWindow)
-        self.action_Save_Project_As.setIcon(QtGui.QIcon(":/images/general/saveas.png"))
-        self.action_Save_Project_As.setObjectName("action_Save_Project_As")
-        self.menu_Project.addAction(self.actionNew_Project)
-        self.menu_Project.addAction(self.action_Open_Project)
-        self.menu_Project.addAction(self.action_Save_Project)
-        self.menu_Project.addAction(self.action_Save_Project_As)
+        self.action_saveas = QtGui.QAction(MainWindow)
+        self.action_saveas.setIcon(QtGui.QIcon(":/images/general/saveas.png"))
+        self.action_saveas.setObjectName("action_saveas")
+        self.menu_Project.addAction(self.action_new)
+        self.menu_Project.addAction(self.action_open)
+        self.menu_Project.addAction(self.action_save)
+        self.menu_Project.addAction(self.action_saveas)
         self.menubar.addAction(self.menu_Project.menuAction())
-        self.toolBar.addAction(self.actionNew_Project)
-        self.toolBar.addAction(self.action_Open_Project)
-        self.toolBar.addAction(self.action_Save_Project)
-        self.toolBar.addAction(self.action_Save_Project_As)
+        self.toolBar.addAction(self.action_new)
+        self.toolBar.addAction(self.action_open)
+        self.toolBar.addAction(self.action_save)
+        self.toolBar.addAction(self.action_saveas)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -183,7 +183,7 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), self.tr("Changes"))
         self.tabWidget_2.setTabText(self.tabWidget_2.indexOf(self.tab_3), self.tr("Tab 1"))
         self.tabWidget_2.setTabText(self.tabWidget_2.indexOf(self.tab_4), self.tr("Tab 2"))
-        self.actionNew_Project.setText(self.tr("New &Project"))
-        self.action_Open_Project.setText(self.tr("&Open Project"))
-        self.action_Save_Project.setText(self.tr("&Save Project"))
-        self.action_Save_Project_As.setText(self.tr("&Save Project &As..."))
+        self.action_new.setText(self.tr("New &Project"))
+        self.action_open.setText(self.tr("&Open Project"))
+        self.action_save.setText(self.tr("&Save Project"))
+        self.action_saveas.setText(self.tr("&Save Project &As..."))

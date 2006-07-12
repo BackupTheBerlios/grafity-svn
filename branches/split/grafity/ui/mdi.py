@@ -91,6 +91,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.workspace = QWorkspace(self)
         self.setCentralWidget(self.workspace)
+
+        self.toolBar.addSeparator()
+
         act = self.left.toggleViewAction()
         act.setIcon(QIcon(":/images/general/navigator.png"))
         self.toolBar.addAction(act)
@@ -102,22 +105,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         act = self.bottom.toggleViewAction()
         act.setIcon(QIcon(":/images/general/script.png"))
         self.toolBar.addAction(act)
-#        self.tree.header().hide()
-#        self.connect(self.tree, SIGNAL('activated(QModelIndex)'), self.foo)
+
+        self.tree.header().hide()
+        self.connect(self.tree, SIGNAL('activated(QModelIndex)'), self.foo)
 #        self.insertToolBarBreak(self.toolbar2)
 
 #        self.console = Console(self)
 #        self.properties = Properties(self)
 
     @pyqtSignature("")
-    def on_action_New_activated(self):
+    def on_action_new_activated(self):
         project = Project()
         f1 = project.new_folder('foobar')
         f2 = project.new_worksheet('bs5', f1)
         self.open_project(project)
 
     @pyqtSignature("")
-    def on_action_Open_activated(self):
+    def on_action_open_activated(self):
         filename = QFileDialog.getOpenFileName(self, "Choose a file", "", "Projects (*.grafity);;All files (*)")
         if filename is not None:
             self.open_project(Project(str(filename)))
@@ -170,8 +174,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def open_project(self, project):
         self.project = project
-        self.console.text.locals['project'] = project
-        self.console.text.locals['main'] = self
+#        self.console.text.locals['project'] = project
+#        self.console.text.locals['main'] = self
         self.model = TreeModel(self.project)
         self.tree.setModel(self.model)
 
@@ -188,9 +192,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         from graph import GraphView
         obj = self.model._fromindex(index) 
         if isinstance(obj, Worksheet):
-            view = WorksheetView(self, obj)
+            view = WorksheetView(self.workspace, obj)
+            self.workspace.addWindow(view)
         elif isinstance(obj, Graph):
-            view = GraphView(self, obj)
+            view = GraphView(self.workspace, obj)
+            self.workspace.addWindow(view)
 #        view = GraphView(self, None)
         view.show()
 #        print >>sys.stderr, args

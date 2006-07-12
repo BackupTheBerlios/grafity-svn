@@ -29,10 +29,10 @@
     <property name="title" >
      <string>&amp;Project</string>
     </property>
-    <addaction name="actionNew_Project" />
-    <addaction name="action_Open_Project" />
-    <addaction name="action_Save_Project" />
-    <addaction name="action_Save_Project_As" />
+    <addaction name="action_new" />
+    <addaction name="action_open" />
+    <addaction name="action_save" />
+    <addaction name="action_saveas" />
    </widget>
    <addaction name="menu_Project" />
   </widget>
@@ -137,7 +137,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QTreeView" name="treeView" />
+          <widget class="QTreeView" name="tree" />
          </item>
         </layout>
        </widget>
@@ -207,12 +207,12 @@
    <attribute name="toolBarArea" >
     <number>4</number>
    </attribute>
-   <addaction name="actionNew_Project" />
-   <addaction name="action_Open_Project" />
-   <addaction name="action_Save_Project" />
-   <addaction name="action_Save_Project_As" />
+   <addaction name="action_new" />
+   <addaction name="action_open" />
+   <addaction name="action_save" />
+   <addaction name="action_saveas" />
   </widget>
-  <action name="actionNew_Project" >
+  <action name="action_new" >
    <property name="icon" >
     <iconset resource="grafity.qrc" >:/images/general/new.png</iconset>
    </property>
@@ -220,7 +220,7 @@
     <string>New &amp;Project</string>
    </property>
   </action>
-  <action name="action_Open_Project" >
+  <action name="action_open" >
    <property name="icon" >
     <iconset resource="grafity.qrc" >:/images/general/open.png</iconset>
    </property>
@@ -228,7 +228,7 @@
     <string>&amp;Open Project</string>
    </property>
   </action>
-  <action name="action_Save_Project" >
+  <action name="action_save" >
    <property name="icon" >
     <iconset resource="grafity.qrc" >:/images/general/save.png</iconset>
    </property>
@@ -236,7 +236,7 @@
     <string>&amp;Save Project</string>
    </property>
   </action>
-  <action name="action_Save_Project_As" >
+  <action name="action_saveas" >
    <property name="icon" >
     <iconset resource="grafity.qrc" >:/images/general/saveas.png</iconset>
    </property>
