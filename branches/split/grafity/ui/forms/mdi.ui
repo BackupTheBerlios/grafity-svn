@@ -8,8 +8,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>749</width>
-    <height>565</height>
+    <width>952</width>
+    <height>703</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -21,7 +21,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>749</width>
+     <width>952</width>
      <height>31</height>
     </rect>
    </property>
@@ -40,15 +40,18 @@
    <property name="geometry" >
     <rect>
      <x>0</x>
-     <y>541</y>
-     <width>749</width>
+     <y>679</y>
+     <width>952</width>
      <height>24</height>
     </rect>
    </property>
   </widget>
-  <widget class="QDockWidget" name="dockWidget_3" >
+  <widget class="QDockWidget" name="bottom" >
    <property name="features" >
     <set>QDockWidget::AllDockWidgetFeatures</set>
+   </property>
+   <property name="allowedAreas" >
+    <set>Qt::BottomDockWidgetArea</set>
    </property>
    <attribute name="dockWidgetArea" >
     <number>8</number>
@@ -68,20 +71,29 @@
        </property>
        <widget class="QWidget" name="tab_5" >
         <attribute name="title" >
-         <string>Tab 1</string>
+         <string>Script</string>
         </attribute>
-       </widget>
-       <widget class="QWidget" name="tab_6" >
-        <attribute name="title" >
-         <string>Tab 2</string>
+        <attribute name="icon" >
+         <iconset resource="grafity.qrc" >:/images/general/script.png</iconset>
         </attribute>
+        <layout class="QHBoxLayout" >
+         <property name="margin" >
+          <number>0</number>
+         </property>
+         <property name="spacing" >
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QTextEdit" name="textEdit" />
+         </item>
+        </layout>
        </widget>
       </widget>
      </item>
     </layout>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="dockWidget" >
+  <widget class="QDockWidget" name="left" >
    <property name="minimumSize" >
     <size>
      <width>16</width>
@@ -112,20 +124,48 @@
        </property>
        <widget class="QWidget" name="tab" >
         <attribute name="title" >
-         <string>Tab 1</string>
+         <string>Project</string>
         </attribute>
+        <attribute name="icon" >
+         <iconset resource="grafity.qrc" >:/images/general/navigator.png</iconset>
+        </attribute>
+        <layout class="QHBoxLayout" >
+         <property name="margin" >
+          <number>0</number>
+         </property>
+         <property name="spacing" >
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QTreeView" name="treeView" />
+         </item>
+        </layout>
        </widget>
        <widget class="QWidget" name="tab_2" >
         <attribute name="title" >
-         <string>Tab 2</string>
+         <string>Changes</string>
         </attribute>
+        <attribute name="icon" >
+         <iconset resource="grafity.qrc" >:/images/general/history.png</iconset>
+        </attribute>
+        <layout class="QHBoxLayout" >
+         <property name="margin" >
+          <number>0</number>
+         </property>
+         <property name="spacing" >
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QListWidget" name="listWidget" />
+         </item>
+        </layout>
        </widget>
       </widget>
      </item>
     </layout>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="dockWidget_2" >
+  <widget class="QDockWidget" name="right" >
    <property name="features" >
     <set>QDockWidget::AllDockWidgetFeatures</set>
    </property>

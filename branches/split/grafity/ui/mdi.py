@@ -91,7 +91,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.workspace = QWorkspace(self)
         self.setCentralWidget(self.workspace)
+        act = self.left.toggleViewAction()
+        act.setIcon(QIcon(":/images/general/navigator.png"))
+        self.toolBar.addAction(act)
 
+        act = self.right.toggleViewAction()
+        act.setIcon(QIcon(":/images/properties.png"))
+        self.toolBar.addAction(act)
+
+        act = self.bottom.toggleViewAction()
+        act.setIcon(QIcon(":/images/general/script.png"))
+        self.toolBar.addAction(act)
 #        self.tree.header().hide()
 #        self.connect(self.tree, SIGNAL('activated(QModelIndex)'), self.foo)
 #        self.insertToolBarBreak(self.toolbar2)
