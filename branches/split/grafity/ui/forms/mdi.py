@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'unknown'
 #
-# Created: Thu Jul 13 00:30:05 2006
+# Created: Thu Jul 13 00:40:20 2006
 #      by: PyQt4 UI code generator 4.0
 #
 # WARNING! All changes made in this file will be lost!
@@ -61,6 +61,10 @@ class Ui_MainWindow(object):
         self.textEdit.setObjectName("textEdit")
         self.hboxlayout.addWidget(self.textEdit)
         self.tabWidget_3.addTab(self.tab_5, "")
+
+        self.tab_6 = QtGui.QWidget()
+        self.tab_6.setObjectName("tab_6")
+        self.tabWidget_3.addTab(self.tab_6, "")
         self.vboxlayout.addWidget(self.tabWidget_3)
         self.bottom.setWidget(self.dockWidgetContents_3)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(8),self.bottom)
@@ -179,6 +183,7 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(self.tr("MainWindow"))
         self.menu_Project.setTitle(self.tr("&Project"))
         self.tabWidget_3.setTabText(self.tabWidget_3.indexOf(self.tab_5), self.tr("Script"))
+        self.tabWidget_3.setTabText(self.tabWidget_3.indexOf(self.tab_6), self.tr("Log"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), self.tr("Project"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), self.tr("Changes"))
         self.tabWidget_2.setTabText(self.tabWidget_2.indexOf(self.tab_3), self.tr("Tab 1"))
