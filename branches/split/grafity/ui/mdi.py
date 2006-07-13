@@ -105,7 +105,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.bottomact = self.bottom.toggleViewAction()
         self.bottomact.setIcon(QIcon(":/images/general/script.png"))
         self.toolBar.addAction(self.bottomact)
-        self.bottomact.toggle()
+        self.bottom.hide()
 
         self.tree.header().hide()
         self.connect(self.tree, SIGNAL('activated(QModelIndex)'), self.foo)

@@ -14,7 +14,6 @@ class GraphView(QWidget, Ui_Form):
         self.setupUi(self)
         self.graph = graph
         self.plot = qwt.QwtPlot(self)
-        self.setCentralWidget(self.plot)
 
         self.bg_color = QColor('white')
 
