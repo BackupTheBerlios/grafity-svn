@@ -2,214 +2,36 @@
  <author></author>
  <comment></comment>
  <exportmacro></exportmacro>
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow" >
+ <class>Form</class>
+ <widget class="QWidget" name="MainWindow" >
   <property name="geometry" >
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>377</width>
-    <height>535</height>
+    <width>400</width>
+    <height>300</height>
    </rect>
   </property>
   <property name="windowTitle" >
-   <string>MainWindow</string>
+   <string>Form</string>
   </property>
-  <widget class="QWidget" name="centralwidget" >
-   <layout class="QHBoxLayout" >
-    <property name="margin" >
-     <number>0</number>
-    </property>
-    <property name="spacing" >
-     <number>6</number>
-    </property>
-    <item>
-     <widget class="QTableView" name="table" >
-      <property name="gridStyle" >
-       <enum>Qt::DotLine</enum>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QMenuBar" name="menubar" >
-   <property name="geometry" >
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>377</width>
-     <height>31</height>
-    </rect>
+  <layout class="QHBoxLayout" >
+   <property name="margin" >
+    <number>0</number>
    </property>
-   <widget class="QMenu" name="menu_Worksheet" >
-    <property name="title" >
-     <string>&amp;Worksheet</string>
-    </property>
-    <addaction name="actionNew_Column" />
-    <addaction name="actionDelete_Column" />
-    <addaction name="separator" />
-    <addaction name="actionNew_Row" />
-    <addaction name="actionDelete_Row" />
-    <addaction name="separator" />
-    <addaction name="actionTranspose" />
-   </widget>
-   <widget class="QMenu" name="menu_Dataset" >
-    <property name="title" >
-     <string>&amp;Column</string>
-    </property>
-    <addaction name="actionMove_to_Beginning" />
-    <addaction name="actionMove_Left" />
-    <addaction name="actionMove_Right" />
-    <addaction name="actionMove_to_End" />
-   </widget>
-   <widget class="QMenu" name="menu_Edit" >
-    <property name="title" >
-     <string>&amp;Edit</string>
-    </property>
-    <addaction name="action_Cut" />
-    <addaction name="action_Copy" />
-    <addaction name="action_Paste" />
-    <addaction name="action_Delete" />
-   </widget>
-   <addaction name="menu_Worksheet" />
-   <addaction name="menu_Dataset" />
-   <addaction name="menu_Edit" />
-  </widget>
-  <widget class="QStatusBar" name="statusbar" >
-   <property name="geometry" >
-    <rect>
-     <x>0</x>
-     <y>511</y>
-     <width>377</width>
-     <height>24</height>
-    </rect>
+   <property name="spacing" >
+    <number>0</number>
    </property>
-  </widget>
-  <widget class="QToolBar" name="toolBar" >
-   <property name="orientation" >
-    <enum>Qt::Horizontal</enum>
-   </property>
-   <attribute name="toolBarArea" >
-    <number>4</number>
-   </attribute>
-   <addaction name="actionNew_Column" />
-   <addaction name="actionDelete_Column" />
-   <addaction name="actionNew_Row" />
-   <addaction name="actionDelete_Row" />
-   <addaction name="separator" />
-   <addaction name="actionMove_to_Beginning" />
-   <addaction name="actionMove_Left" />
-   <addaction name="actionMove_Right" />
-   <addaction name="actionMove_to_End" />
-  </widget>
-  <action name="actionNew_Column" >
-   <property name="icon" >
-    <iconset>../resources/images/new/worksheet/new-column.png</iconset>
-   </property>
-   <property name="text" >
-    <string>New Column</string>
-   </property>
-  </action>
-  <action name="actionDelete_Column" >
-   <property name="icon" >
-    <iconset>../resources/images/new/worksheet/delete-column.png</iconset>
-   </property>
-   <property name="text" >
-    <string>Delete Column</string>
-   </property>
-  </action>
-  <action name="actionNew_Row" >
-   <property name="icon" >
-    <iconset>../resources/images/new/worksheet/new-row.png</iconset>
-   </property>
-   <property name="text" >
-    <string>New Row</string>
-   </property>
-  </action>
-  <action name="actionDelete_Row" >
-   <property name="icon" >
-    <iconset>../resources/images/new/worksheet/delete-row.png</iconset>
-   </property>
-   <property name="text" >
-    <string>Delete Row</string>
-   </property>
-  </action>
-  <action name="actionMove_to_Beginning" >
-   <property name="icon" >
-    <iconset>../resources/images/new/worksheet/first.png</iconset>
-   </property>
-   <property name="text" >
-    <string>Move to Beginning</string>
-   </property>
-  </action>
-  <action name="actionMove_Left" >
-   <property name="icon" >
-    <iconset>../resources/images/new/worksheet/left.png</iconset>
-   </property>
-   <property name="text" >
-    <string>Move Left</string>
-   </property>
-  </action>
-  <action name="actionMove_Right" >
-   <property name="icon" >
-    <iconset>../resources/images/new/worksheet/right.png</iconset>
-   </property>
-   <property name="text" >
-    <string>Move Right</string>
-   </property>
-  </action>
-  <action name="actionMove_to_End" >
-   <property name="icon" >
-    <iconset>../resources/images/new/worksheet/last.png</iconset>
-   </property>
-   <property name="text" >
-    <string>Move to End</string>
-   </property>
-  </action>
-  <action name="actionTranspose" >
-   <property name="icon" >
-    <iconset>../resources/images/new/worksheet/transpose.png</iconset>
-   </property>
-   <property name="text" >
-    <string>Transpose</string>
-   </property>
-  </action>
-  <action name="action_Cut" >
-   <property name="icon" >
-    <iconset resource="grafity.qrc" >:/images/general/cut.png</iconset>
-   </property>
-   <property name="text" >
-    <string>&amp;Cut</string>
-   </property>
-  </action>
-  <action name="action_Copy" >
-   <property name="icon" >
-    <iconset resource="grafity.qrc" >:/images/general/copy.png</iconset>
-   </property>
-   <property name="text" >
-    <string>&amp;Copy</string>
-   </property>
-  </action>
-  <action name="action_Paste" >
-   <property name="icon" >
-    <iconset resource="grafity.qrc" >:/images/general/paste.png</iconset>
-   </property>
-   <property name="text" >
-    <string>&amp;Paste</string>
-   </property>
-  </action>
-  <action name="action_Delete" >
-   <property name="icon" >
-    <iconset resource="grafity.qrc" >:/images/general/delete.png</iconset>
-   </property>
-   <property name="text" >
-    <string>&amp;Delete</string>
-   </property>
-  </action>
+   <item>
+    <widget class="QTableView" name="table" >
+     <property name="gridStyle" >
+      <enum>Qt::DotLine</enum>
+     </property>
+    </widget>
+   </item>
+  </layout>
  </widget>
  <pixmapfunction></pixmapfunction>
- <resources>
-  <include location="grafity.qrc" />
- </resources>
+ <resources/>
  <connections/>
 </ui>

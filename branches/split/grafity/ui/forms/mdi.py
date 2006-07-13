@@ -2,18 +2,19 @@
 
 # Form implementation generated from reading ui file 'unknown'
 #
-# Created: Thu Jul 13 00:40:20 2006
-#      by: PyQt4 UI code generator 4.0
+# Created: Thu Jul 13 17:16:29 2006
+#      by: PyQt4 UI code generator snapshot-20060424
 #
 # WARNING! All changes made in this file will be lost!
 
 import sys
+from grafity.ui.console import ConsoleTextEdit
 from PyQt4 import QtCore, QtGui
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(QtCore.QSize(QtCore.QRect(0,0,952,703).size()).expandedTo(MainWindow.minimumSizeHint()))
+        MainWindow.resize(QtCore.QSize(QtCore.QRect(0,0,952,693).size()).expandedTo(MainWindow.minimumSizeHint()))
 
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -28,7 +29,7 @@ class Ui_MainWindow(object):
         MainWindow.setMenuBar(self.menubar)
 
         self.statusbar = QtGui.QStatusBar(MainWindow)
-        self.statusbar.setGeometry(QtCore.QRect(0,679,952,24))
+        self.statusbar.setGeometry(QtCore.QRect(0,669,952,24))
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
 
@@ -57,9 +58,9 @@ class Ui_MainWindow(object):
         self.hboxlayout.setSpacing(0)
         self.hboxlayout.setObjectName("hboxlayout")
 
-        self.textEdit = QtGui.QTextEdit(self.tab_5)
-        self.textEdit.setObjectName("textEdit")
-        self.hboxlayout.addWidget(self.textEdit)
+        self.console = ConsoleTextEdit(self.tab_5)
+        self.console.setObjectName("console")
+        self.hboxlayout.addWidget(self.console)
         self.tabWidget_3.addTab(self.tab_5, "")
 
         self.tab_6 = QtGui.QWidget()

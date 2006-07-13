@@ -102,9 +102,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         act.setIcon(QIcon(":/images/properties.png"))
         self.toolBar.addAction(act)
 
-        act = self.bottom.toggleViewAction()
-        act.setIcon(QIcon(":/images/general/script.png"))
-        self.toolBar.addAction(act)
+        self.bottomact = self.bottom.toggleViewAction()
+        self.bottomact.setIcon(QIcon(":/images/general/script.png"))
+        self.toolBar.addAction(self.bottomact)
+        self.bottomact.toggle()
 
         self.tree.header().hide()
         self.connect(self.tree, SIGNAL('activated(QModelIndex)'), self.foo)
@@ -174,8 +175,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def open_project(self, project):
         self.project = project
-#        self.console.text.locals['project'] = project
-#        self.console.text.locals['main'] = self
+        self.console.locals['project'] = project
+        self.console.locals['main'] = self
         self.model = TreeModel(self.project)
         self.tree.setModel(self.model)
 
