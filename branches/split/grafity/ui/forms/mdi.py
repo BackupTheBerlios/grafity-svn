@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'unknown'
 #
-# Created: Thu Jul 13 22:38:30 2006
-#      by: PyQt4 UI code generator 4.0
+# Created: Fri Jul 14 18:32:28 2006
+#      by: PyQt4 UI code generator snapshot-20060424
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -14,10 +14,15 @@ from PyQt4 import QtCore, QtGui
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(QtCore.QSize(QtCore.QRect(0,0,952,693).size()).expandedTo(MainWindow.minimumSizeHint()))
+        MainWindow.resize(QtCore.QSize(QtCore.QRect(0,0,952,688).size()).expandedTo(MainWindow.minimumSizeHint()))
 
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
+
+        self.hboxlayout = QtGui.QHBoxLayout(self.centralwidget)
+        self.hboxlayout.setMargin(0)
+        self.hboxlayout.setSpacing(0)
+        self.hboxlayout.setObjectName("hboxlayout")
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.menubar = QtGui.QMenuBar(MainWindow)
@@ -26,16 +31,19 @@ class Ui_MainWindow(object):
 
         self.menu_Project = QtGui.QMenu(self.menubar)
         self.menu_Project.setObjectName("menu_Project")
+
+        self.menu_Edit = QtGui.QMenu(self.menubar)
+        self.menu_Edit.setObjectName("menu_Edit")
         MainWindow.setMenuBar(self.menubar)
 
         self.statusbar = QtGui.QStatusBar(MainWindow)
-        self.statusbar.setGeometry(QtCore.QRect(0,669,952,24))
+        self.statusbar.setGeometry(QtCore.QRect(0,664,952,24))
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
 
         self.bottom = QtGui.QDockWidget(MainWindow)
         self.bottom.setFeatures(QtGui.QDockWidget.AllDockWidgetFeatures)
-        self.bottom.setAllowedAreas(QtCore.Qt.BottomDockWidgetArea)
+        self.bottom.setAllowedAreas(QtCore.Qt.LeftDockWidgetArea)
         self.bottom.setObjectName("bottom")
 
         self.dockWidgetContents_3 = QtGui.QWidget(self.bottom)
@@ -53,14 +61,14 @@ class Ui_MainWindow(object):
         self.tab_5 = QtGui.QWidget()
         self.tab_5.setObjectName("tab_5")
 
-        self.hboxlayout = QtGui.QHBoxLayout(self.tab_5)
-        self.hboxlayout.setMargin(0)
-        self.hboxlayout.setSpacing(0)
-        self.hboxlayout.setObjectName("hboxlayout")
+        self.hboxlayout1 = QtGui.QHBoxLayout(self.tab_5)
+        self.hboxlayout1.setMargin(0)
+        self.hboxlayout1.setSpacing(0)
+        self.hboxlayout1.setObjectName("hboxlayout1")
 
         self.console = ConsoleTextEdit(self.tab_5)
         self.console.setObjectName("console")
-        self.hboxlayout.addWidget(self.console)
+        self.hboxlayout1.addWidget(self.console)
         self.tabWidget_3.addTab(self.tab_5, "")
 
         self.tab_6 = QtGui.QWidget()
@@ -71,7 +79,14 @@ class Ui_MainWindow(object):
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(8),self.bottom)
 
         self.left = QtGui.QDockWidget(MainWindow)
+
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Policy(1),QtGui.QSizePolicy.Policy(5))
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.left.sizePolicy().hasHeightForWidth())
+        self.left.setSizePolicy(sizePolicy)
         self.left.setMinimumSize(QtCore.QSize(16,16))
+        self.left.setMaximumSize(QtCore.QSize(170,16777215))
         self.left.setFeatures(QtGui.QDockWidget.AllDockWidgetFeatures)
         self.left.setAllowedAreas(QtCore.Qt.AllDockWidgetAreas)
         self.left.setObjectName("left")
@@ -79,57 +94,82 @@ class Ui_MainWindow(object):
         self.dockWidgetContents = QtGui.QWidget(self.left)
         self.dockWidgetContents.setObjectName("dockWidgetContents")
 
-        self.hboxlayout1 = QtGui.QHBoxLayout(self.dockWidgetContents)
-        self.hboxlayout1.setMargin(0)
-        self.hboxlayout1.setSpacing(0)
-        self.hboxlayout1.setObjectName("hboxlayout1")
+        self.hboxlayout2 = QtGui.QHBoxLayout(self.dockWidgetContents)
+        self.hboxlayout2.setMargin(0)
+        self.hboxlayout2.setSpacing(0)
+        self.hboxlayout2.setObjectName("hboxlayout2")
 
         self.tabWidget = QtGui.QTabWidget(self.dockWidgetContents)
+
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Policy(1),QtGui.QSizePolicy.Policy(7))
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.tabWidget.sizePolicy().hasHeightForWidth())
+        self.tabWidget.setSizePolicy(sizePolicy)
         self.tabWidget.setTabPosition(QtGui.QTabWidget.West)
         self.tabWidget.setObjectName("tabWidget")
 
         self.tab = QtGui.QWidget()
         self.tab.setObjectName("tab")
 
-        self.hboxlayout2 = QtGui.QHBoxLayout(self.tab)
-        self.hboxlayout2.setMargin(0)
-        self.hboxlayout2.setSpacing(0)
-        self.hboxlayout2.setObjectName("hboxlayout2")
+        self.hboxlayout3 = QtGui.QHBoxLayout(self.tab)
+        self.hboxlayout3.setMargin(0)
+        self.hboxlayout3.setSpacing(0)
+        self.hboxlayout3.setObjectName("hboxlayout3")
 
         self.tree = QtGui.QTreeView(self.tab)
+
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Policy(1),QtGui.QSizePolicy.Policy(7))
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.tree.sizePolicy().hasHeightForWidth())
+        self.tree.setSizePolicy(sizePolicy)
         self.tree.setObjectName("tree")
-        self.hboxlayout2.addWidget(self.tree)
+        self.hboxlayout3.addWidget(self.tree)
         self.tabWidget.addTab(self.tab, "")
 
         self.tab_2 = QtGui.QWidget()
         self.tab_2.setObjectName("tab_2")
 
-        self.hboxlayout3 = QtGui.QHBoxLayout(self.tab_2)
-        self.hboxlayout3.setMargin(0)
-        self.hboxlayout3.setSpacing(0)
-        self.hboxlayout3.setObjectName("hboxlayout3")
+        self.hboxlayout4 = QtGui.QHBoxLayout(self.tab_2)
+        self.hboxlayout4.setMargin(0)
+        self.hboxlayout4.setSpacing(0)
+        self.hboxlayout4.setObjectName("hboxlayout4")
 
         self.listWidget = QtGui.QListWidget(self.tab_2)
+
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Policy(1),QtGui.QSizePolicy.Policy(7))
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.listWidget.sizePolicy().hasHeightForWidth())
+        self.listWidget.setSizePolicy(sizePolicy)
         self.listWidget.setObjectName("listWidget")
-        self.hboxlayout3.addWidget(self.listWidget)
+        self.hboxlayout4.addWidget(self.listWidget)
         self.tabWidget.addTab(self.tab_2, "")
-        self.hboxlayout1.addWidget(self.tabWidget)
+        self.hboxlayout2.addWidget(self.tabWidget)
         self.left.setWidget(self.dockWidgetContents)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(1),self.left)
 
         self.right = QtGui.QDockWidget(MainWindow)
+        self.right.setMaximumSize(QtCore.QSize(170,16777215))
         self.right.setFeatures(QtGui.QDockWidget.AllDockWidgetFeatures)
         self.right.setObjectName("right")
 
         self.dockWidgetContents_2 = QtGui.QWidget(self.right)
         self.dockWidgetContents_2.setObjectName("dockWidgetContents_2")
 
-        self.hboxlayout4 = QtGui.QHBoxLayout(self.dockWidgetContents_2)
-        self.hboxlayout4.setMargin(0)
-        self.hboxlayout4.setSpacing(0)
-        self.hboxlayout4.setObjectName("hboxlayout4")
+        self.hboxlayout5 = QtGui.QHBoxLayout(self.dockWidgetContents_2)
+        self.hboxlayout5.setMargin(0)
+        self.hboxlayout5.setSpacing(0)
+        self.hboxlayout5.setObjectName("hboxlayout5")
 
         self.tabs = QtGui.QTabWidget(self.dockWidgetContents_2)
+
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Policy(1),QtGui.QSizePolicy.Policy(7))
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.tabs.sizePolicy().hasHeightForWidth())
+        self.tabs.setSizePolicy(sizePolicy)
 
         font = QtGui.QFont(self.tabs.font())
         font.setFamily("Sans Serif")
@@ -152,28 +192,28 @@ class Ui_MainWindow(object):
         self.vboxlayout1.setSpacing(6)
         self.vboxlayout1.setObjectName("vboxlayout1")
 
-        self.hboxlayout5 = QtGui.QHBoxLayout()
-        self.hboxlayout5.setMargin(0)
-        self.hboxlayout5.setSpacing(6)
-        self.hboxlayout5.setObjectName("hboxlayout5")
+        self.hboxlayout6 = QtGui.QHBoxLayout()
+        self.hboxlayout6.setMargin(0)
+        self.hboxlayout6.setSpacing(6)
+        self.hboxlayout6.setObjectName("hboxlayout6")
 
         self.add_button = QtGui.QToolButton(self.tab_3)
         self.add_button.setIcon(QtGui.QIcon("images/16/add.png"))
         self.add_button.setToolButtonStyle(QtCore.Qt.ToolButtonTextBesideIcon)
         self.add_button.setAutoRaise(True)
         self.add_button.setObjectName("add_button")
-        self.hboxlayout5.addWidget(self.add_button)
+        self.hboxlayout6.addWidget(self.add_button)
 
         self.toolButton = QtGui.QToolButton(self.tab_3)
         self.toolButton.setIcon(QtGui.QIcon("images/16/add.png"))
         self.toolButton.setToolButtonStyle(QtCore.Qt.ToolButtonTextBesideIcon)
         self.toolButton.setAutoRaise(True)
         self.toolButton.setObjectName("toolButton")
-        self.hboxlayout5.addWidget(self.toolButton)
+        self.hboxlayout6.addWidget(self.toolButton)
 
         spacerItem = QtGui.QSpacerItem(40,20,QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Minimum)
-        self.hboxlayout5.addItem(spacerItem)
-        self.vboxlayout1.addLayout(self.hboxlayout5)
+        self.hboxlayout6.addItem(spacerItem)
+        self.vboxlayout1.addLayout(self.hboxlayout6)
 
         self.splitter = QtGui.QSplitter(self.tab_3)
         self.splitter.setOrientation(QtCore.Qt.Vertical)
@@ -193,6 +233,12 @@ class Ui_MainWindow(object):
         self.vboxlayout2.addWidget(self.label)
 
         self.treeView = QtGui.QTreeView(self.widget_2)
+
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Policy(1),QtGui.QSizePolicy.Policy(7))
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.treeView.sizePolicy().hasHeightForWidth())
+        self.treeView.setSizePolicy(sizePolicy)
         self.treeView.setObjectName("treeView")
         self.vboxlayout2.addWidget(self.treeView)
 
@@ -209,6 +255,12 @@ class Ui_MainWindow(object):
         self.vboxlayout3.addWidget(self.label_2)
 
         self.listView = QtGui.QListView(self.widget_21)
+
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Policy(7),QtGui.QSizePolicy.Policy(7))
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.listView.sizePolicy().hasHeightForWidth())
+        self.listView.setSizePolicy(sizePolicy)
         self.listView.setObjectName("listView")
         self.vboxlayout3.addWidget(self.listView)
 
@@ -252,13 +304,13 @@ class Ui_MainWindow(object):
         self.textLabel1_3.setObjectName("textLabel1_3")
         self.vboxlayout7.addWidget(self.textLabel1_3)
 
-        self.hboxlayout6 = QtGui.QHBoxLayout()
-        self.hboxlayout6.setMargin(0)
-        self.hboxlayout6.setSpacing(0)
-        self.hboxlayout6.setObjectName("hboxlayout6")
+        self.hboxlayout7 = QtGui.QHBoxLayout()
+        self.hboxlayout7.setMargin(0)
+        self.hboxlayout7.setSpacing(0)
+        self.hboxlayout7.setObjectName("hboxlayout7")
 
         spacerItem1 = QtGui.QSpacerItem(8,20,QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Minimum)
-        self.hboxlayout6.addItem(spacerItem1)
+        self.hboxlayout7.addItem(spacerItem1)
 
         self.gridlayout = QtGui.QGridLayout()
         self.gridlayout.setMargin(0)
@@ -356,21 +408,21 @@ class Ui_MainWindow(object):
         self.ltype.setSizePolicy(sizePolicy)
         self.ltype.setObjectName("ltype")
         self.gridlayout.addWidget(self.ltype,0,2,1,1)
-        self.hboxlayout6.addLayout(self.gridlayout)
-        self.vboxlayout7.addLayout(self.hboxlayout6)
+        self.hboxlayout7.addLayout(self.gridlayout)
+        self.vboxlayout7.addLayout(self.hboxlayout7)
         self.vboxlayout6.addLayout(self.vboxlayout7)
 
         self.textLabel1_4 = QtGui.QLabel(self.Style)
         self.textLabel1_4.setObjectName("textLabel1_4")
         self.vboxlayout6.addWidget(self.textLabel1_4)
 
-        self.hboxlayout7 = QtGui.QHBoxLayout()
-        self.hboxlayout7.setMargin(0)
-        self.hboxlayout7.setSpacing(0)
-        self.hboxlayout7.setObjectName("hboxlayout7")
+        self.hboxlayout8 = QtGui.QHBoxLayout()
+        self.hboxlayout8.setMargin(0)
+        self.hboxlayout8.setSpacing(0)
+        self.hboxlayout8.setObjectName("hboxlayout8")
 
         spacerItem2 = QtGui.QSpacerItem(8,20,QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Minimum)
-        self.hboxlayout7.addItem(spacerItem2)
+        self.hboxlayout8.addItem(spacerItem2)
 
         self.gridlayout1 = QtGui.QGridLayout()
         self.gridlayout1.setMargin(0)
@@ -499,14 +551,14 @@ class Ui_MainWindow(object):
         self.size.setProperty("value",QtCore.QVariant(5))
         self.size.setObjectName("size")
         self.gridlayout1.addWidget(self.size,2,2,1,1)
-        self.hboxlayout7.addLayout(self.gridlayout1)
-        self.vboxlayout6.addLayout(self.hboxlayout7)
+        self.hboxlayout8.addLayout(self.gridlayout1)
+        self.vboxlayout6.addLayout(self.hboxlayout8)
         self.vboxlayout5.addLayout(self.vboxlayout6)
 
-        self.hboxlayout8 = QtGui.QHBoxLayout()
-        self.hboxlayout8.setMargin(0)
-        self.hboxlayout8.setSpacing(6)
-        self.hboxlayout8.setObjectName("hboxlayout8")
+        self.hboxlayout9 = QtGui.QHBoxLayout()
+        self.hboxlayout9.setMargin(0)
+        self.hboxlayout9.setSpacing(6)
+        self.hboxlayout9.setObjectName("hboxlayout9")
 
         self.textLabel4_2_2 = QtGui.QLabel(self.Style)
 
@@ -516,12 +568,12 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.textLabel4_2_2.sizePolicy().hasHeightForWidth())
         self.textLabel4_2_2.setSizePolicy(sizePolicy)
         self.textLabel4_2_2.setObjectName("textLabel4_2_2")
-        self.hboxlayout8.addWidget(self.textLabel4_2_2)
+        self.hboxlayout9.addWidget(self.textLabel4_2_2)
 
         self.group = QtGui.QComboBox(self.Style)
         self.group.setObjectName("group")
-        self.hboxlayout8.addWidget(self.group)
-        self.vboxlayout5.addLayout(self.hboxlayout8)
+        self.hboxlayout9.addWidget(self.group)
+        self.vboxlayout5.addLayout(self.hboxlayout9)
 
         spacerItem3 = QtGui.QSpacerItem(213,191,QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Expanding)
         self.vboxlayout5.addItem(spacerItem3)
@@ -544,13 +596,13 @@ class Ui_MainWindow(object):
         self.textLabel1.setObjectName("textLabel1")
         self.vboxlayout9.addWidget(self.textLabel1)
 
-        self.hboxlayout9 = QtGui.QHBoxLayout()
-        self.hboxlayout9.setMargin(0)
-        self.hboxlayout9.setSpacing(0)
-        self.hboxlayout9.setObjectName("hboxlayout9")
+        self.hboxlayout10 = QtGui.QHBoxLayout()
+        self.hboxlayout10.setMargin(0)
+        self.hboxlayout10.setSpacing(0)
+        self.hboxlayout10.setObjectName("hboxlayout10")
 
         spacerItem4 = QtGui.QSpacerItem(8,20,QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Minimum)
-        self.hboxlayout9.addItem(spacerItem4)
+        self.hboxlayout10.addItem(spacerItem4)
 
         self.gridlayout2 = QtGui.QGridLayout()
         self.gridlayout2.setMargin(0)
@@ -612,8 +664,8 @@ class Ui_MainWindow(object):
         self.textLabel6_4.setSizePolicy(sizePolicy)
         self.textLabel6_4.setObjectName("textLabel6_4")
         self.gridlayout2.addWidget(self.textLabel6_4,2,0,1,1)
-        self.hboxlayout9.addLayout(self.gridlayout2)
-        self.vboxlayout9.addLayout(self.hboxlayout9)
+        self.hboxlayout10.addLayout(self.gridlayout2)
+        self.vboxlayout9.addLayout(self.hboxlayout10)
         self.vboxlayout8.addLayout(self.vboxlayout9)
 
         self.vboxlayout10 = QtGui.QVBoxLayout()
@@ -625,13 +677,13 @@ class Ui_MainWindow(object):
         self.textLabel1_2.setObjectName("textLabel1_2")
         self.vboxlayout10.addWidget(self.textLabel1_2)
 
-        self.hboxlayout10 = QtGui.QHBoxLayout()
-        self.hboxlayout10.setMargin(0)
-        self.hboxlayout10.setSpacing(0)
-        self.hboxlayout10.setObjectName("hboxlayout10")
+        self.hboxlayout11 = QtGui.QHBoxLayout()
+        self.hboxlayout11.setMargin(0)
+        self.hboxlayout11.setSpacing(0)
+        self.hboxlayout11.setObjectName("hboxlayout11")
 
         spacerItem5 = QtGui.QSpacerItem(8,20,QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Minimum)
-        self.hboxlayout10.addItem(spacerItem5)
+        self.hboxlayout11.addItem(spacerItem5)
 
         self.gridlayout3 = QtGui.QGridLayout()
         self.gridlayout3.setMargin(0)
@@ -693,8 +745,8 @@ class Ui_MainWindow(object):
         self.textLabel6_3.setSizePolicy(sizePolicy)
         self.textLabel6_3.setObjectName("textLabel6_3")
         self.gridlayout3.addWidget(self.textLabel6_3,2,0,1,1)
-        self.hboxlayout10.addLayout(self.gridlayout3)
-        self.vboxlayout10.addLayout(self.hboxlayout10)
+        self.hboxlayout11.addLayout(self.gridlayout3)
+        self.vboxlayout10.addLayout(self.hboxlayout11)
         self.vboxlayout8.addLayout(self.vboxlayout10)
 
         spacerItem6 = QtGui.QSpacerItem(163,73,QtGui.QSizePolicy.Minimum,QtGui.QSizePolicy.Expanding)
@@ -704,7 +756,7 @@ class Ui_MainWindow(object):
         self.tab_7 = QtGui.QWidget()
         self.tab_7.setObjectName("tab_7")
         self.tabs.addTab(self.tab_7, "")
-        self.hboxlayout4.addWidget(self.tabs)
+        self.hboxlayout5.addWidget(self.tabs)
         self.right.setWidget(self.dockWidgetContents_2)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(2),self.right)
 
@@ -713,12 +765,6 @@ class Ui_MainWindow(object):
         self.toolBar.setOrientation(QtCore.Qt.Horizontal)
         self.toolBar.setObjectName("toolBar")
         MainWindow.addToolBar(self.toolBar)
-
-        self.toolBar_2 = QtGui.QToolBar(MainWindow)
-        self.toolBar_2.setMovable(True)
-        self.toolBar_2.setOrientation(QtCore.Qt.Horizontal)
-        self.toolBar_2.setObjectName("toolBar_2")
-        MainWindow.addToolBar(self.toolBar_2)
 
         self.action_new = QtGui.QAction(MainWindow)
         self.action_new.setIcon(QtGui.QIcon(":/images/general/new.png"))
@@ -735,15 +781,32 @@ class Ui_MainWindow(object):
         self.action_saveas = QtGui.QAction(MainWindow)
         self.action_saveas.setIcon(QtGui.QIcon(":/images/general/saveas.png"))
         self.action_saveas.setObjectName("action_saveas")
+
+        self.actionNew_Worksheet = QtGui.QAction(MainWindow)
+        self.actionNew_Worksheet.setIcon(QtGui.QIcon(":/images/general/new-worksheet.png"))
+        self.actionNew_Worksheet.setObjectName("actionNew_Worksheet")
+
+        self.actionNew_Graph = QtGui.QAction(MainWindow)
+        self.actionNew_Graph.setIcon(QtGui.QIcon(":/images/general/new-graph.png"))
+        self.actionNew_Graph.setObjectName("actionNew_Graph")
+
+        self.actionNew_Folder = QtGui.QAction(MainWindow)
+        self.actionNew_Folder.setIcon(QtGui.QIcon(":/images/general/new-folder.png"))
+        self.actionNew_Folder.setObjectName("actionNew_Folder")
         self.menu_Project.addAction(self.action_new)
         self.menu_Project.addAction(self.action_open)
         self.menu_Project.addAction(self.action_save)
         self.menu_Project.addAction(self.action_saveas)
         self.menubar.addAction(self.menu_Project.menuAction())
+        self.menubar.addAction(self.menu_Edit.menuAction())
         self.toolBar.addAction(self.action_new)
         self.toolBar.addAction(self.action_open)
         self.toolBar.addAction(self.action_save)
         self.toolBar.addAction(self.action_saveas)
+        self.toolBar.addSeparator()
+        self.toolBar.addAction(self.actionNew_Worksheet)
+        self.toolBar.addAction(self.actionNew_Graph)
+        self.toolBar.addAction(self.actionNew_Folder)
         self.label.setBuddy(self.treeView)
         self.label_2.setBuddy(self.listView)
         self.label_3.setBuddy(self.listView_2)
@@ -764,7 +827,7 @@ class Ui_MainWindow(object):
         self.textLabel7_2.setBuddy(self.textLabel7_2)
 
         self.retranslateUi(MainWindow)
-        self.tabs.setCurrentIndex(1)
+        self.tabs.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def tr(self, string):
@@ -773,6 +836,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(self.tr("MainWindow"))
         self.menu_Project.setTitle(self.tr("&Project"))
+        self.menu_Edit.setTitle(self.tr("&Edit"))
         self.tabWidget_3.setTabText(self.tabWidget_3.indexOf(self.tab_5), self.tr("Script"))
         self.tabWidget_3.setTabText(self.tabWidget_3.indexOf(self.tab_6), self.tr("Log"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), self.tr("Project"))
@@ -821,3 +885,6 @@ class Ui_MainWindow(object):
         self.action_open.setText(self.tr("&Open Project"))
         self.action_save.setText(self.tr("&Save Project"))
         self.action_saveas.setText(self.tr("&Save Project &As..."))
+        self.actionNew_Worksheet.setText(self.tr("New &Worksheet"))
+        self.actionNew_Graph.setText(self.tr("New &Graph"))
+        self.actionNew_Folder.setText(self.tr("New &Folder"))

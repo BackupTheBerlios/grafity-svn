@@ -17,7 +17,7 @@ def main():
 
     dispatcher.connect(messg, signal='splash-message')
 
-    from grafity.ui.mainwin import MainWindow
+    from grafity.ui.mdi import MainWindow
 
     dispatcher.send('splash-message', msg='Creating windows...')
     form = MainWindow()

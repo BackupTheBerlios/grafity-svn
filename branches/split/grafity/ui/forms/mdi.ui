@@ -9,13 +9,22 @@
     <x>0</x>
     <y>0</y>
     <width>952</width>
-    <height>693</height>
+    <height>688</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>MainWindow</string>
   </property>
-  <widget class="QWidget" name="centralwidget" />
+  <widget class="QWidget" name="centralwidget" >
+   <layout class="QHBoxLayout" >
+    <property name="margin" >
+     <number>0</number>
+    </property>
+    <property name="spacing" >
+     <number>0</number>
+    </property>
+   </layout>
+  </widget>
   <widget class="QMenuBar" name="menubar" >
    <property name="geometry" >
     <rect>
@@ -34,13 +43,19 @@
     <addaction name="action_save" />
     <addaction name="action_saveas" />
    </widget>
+   <widget class="QMenu" name="menu_Edit" >
+    <property name="title" >
+     <string>&amp;Edit</string>
+    </property>
+   </widget>
    <addaction name="menu_Project" />
+   <addaction name="menu_Edit" />
   </widget>
   <widget class="QStatusBar" name="statusbar" >
    <property name="geometry" >
     <rect>
      <x>0</x>
-     <y>669</y>
+     <y>664</y>
      <width>952</width>
      <height>24</height>
     </rect>
@@ -51,7 +66,7 @@
     <set>QDockWidget::AllDockWidgetFeatures</set>
    </property>
    <property name="allowedAreas" >
-    <set>Qt::BottomDockWidgetArea</set>
+    <set>Qt::LeftDockWidgetArea</set>
    </property>
    <attribute name="dockWidgetArea" >
     <number>8</number>
@@ -99,10 +114,24 @@
    </widget>
   </widget>
   <widget class="QDockWidget" name="left" >
+   <property name="sizePolicy" >
+    <sizepolicy>
+     <hsizetype>1</hsizetype>
+     <vsizetype>5</vsizetype>
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <property name="minimumSize" >
     <size>
      <width>16</width>
      <height>16</height>
+    </size>
+   </property>
+   <property name="maximumSize" >
+    <size>
+     <width>170</width>
+     <height>16777215</height>
     </size>
    </property>
    <property name="features" >
@@ -124,6 +153,14 @@
      </property>
      <item>
       <widget class="QTabWidget" name="tabWidget" >
+       <property name="sizePolicy" >
+        <sizepolicy>
+         <hsizetype>1</hsizetype>
+         <vsizetype>7</vsizetype>
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="tabPosition" >
         <enum>QTabWidget::West</enum>
        </property>
@@ -142,7 +179,16 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QTreeView" name="tree" />
+          <widget class="QTreeView" name="tree" >
+           <property name="sizePolicy" >
+            <sizepolicy>
+             <hsizetype>1</hsizetype>
+             <vsizetype>7</vsizetype>
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -161,7 +207,16 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QListWidget" name="listWidget" />
+          <widget class="QListWidget" name="listWidget" >
+           <property name="sizePolicy" >
+            <sizepolicy>
+             <hsizetype>1</hsizetype>
+             <vsizetype>7</vsizetype>
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -171,6 +226,12 @@
    </widget>
   </widget>
   <widget class="QDockWidget" name="right" >
+   <property name="maximumSize" >
+    <size>
+     <width>170</width>
+     <height>16777215</height>
+    </size>
+   </property>
    <property name="features" >
     <set>QDockWidget::AllDockWidgetFeatures</set>
    </property>
@@ -187,6 +248,14 @@
      </property>
      <item>
       <widget class="QTabWidget" name="tabs" >
+       <property name="sizePolicy" >
+        <sizepolicy>
+         <hsizetype>1</hsizetype>
+         <vsizetype>7</vsizetype>
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="font" >
         <font>
          <family>Sans Serif</family>
@@ -205,7 +274,7 @@
         <enum>QTabWidget::Rounded</enum>
        </property>
        <property name="currentIndex" >
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="tab_3" >
         <attribute name="title" >
@@ -306,7 +375,16 @@
               </widget>
              </item>
              <item>
-              <widget class="QTreeView" name="treeView" />
+              <widget class="QTreeView" name="treeView" >
+               <property name="sizePolicy" >
+                <sizepolicy>
+                 <hsizetype>1</hsizetype>
+                 <vsizetype>7</vsizetype>
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+              </widget>
              </item>
             </layout>
            </widget>
@@ -329,7 +407,16 @@
               </widget>
              </item>
              <item>
-              <widget class="QListView" name="listView" />
+              <widget class="QListView" name="listView" >
+               <property name="sizePolicy" >
+                <sizepolicy>
+                 <hsizetype>7</hsizetype>
+                 <vsizetype>7</vsizetype>
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+              </widget>
              </item>
             </layout>
            </widget>
@@ -1253,17 +1340,10 @@
    <addaction name="action_open" />
    <addaction name="action_save" />
    <addaction name="action_saveas" />
-  </widget>
-  <widget class="QToolBar" name="toolBar_2" >
-   <property name="movable" >
-    <bool>true</bool>
-   </property>
-   <property name="orientation" >
-    <enum>Qt::Horizontal</enum>
-   </property>
-   <attribute name="toolBarArea" >
-    <number>4</number>
-   </attribute>
+   <addaction name="separator" />
+   <addaction name="actionNew_Worksheet" />
+   <addaction name="actionNew_Graph" />
+   <addaction name="actionNew_Folder" />
   </widget>
   <action name="action_new" >
    <property name="icon" >
@@ -1295,6 +1375,30 @@
    </property>
    <property name="text" >
     <string>&amp;Save Project &amp;As...</string>
+   </property>
+  </action>
+  <action name="actionNew_Worksheet" >
+   <property name="icon" >
+    <iconset resource="grafity.qrc" >:/images/general/new-worksheet.png</iconset>
+   </property>
+   <property name="text" >
+    <string>New &amp;Worksheet</string>
+   </property>
+  </action>
+  <action name="actionNew_Graph" >
+   <property name="icon" >
+    <iconset resource="grafity.qrc" >:/images/general/new-graph.png</iconset>
+   </property>
+   <property name="text" >
+    <string>New &amp;Graph</string>
+   </property>
+  </action>
+  <action name="actionNew_Folder" >
+   <property name="icon" >
+    <iconset resource="grafity.qrc" >:/images/general/new-folder.png</iconset>
+   </property>
+   <property name="text" >
+    <string>New &amp;Folder</string>
    </property>
   </action>
  </widget>

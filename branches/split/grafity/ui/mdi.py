@@ -47,11 +47,11 @@ class TreeModel(QAbstractItemModel):
             return QVariant(obj.name)
         elif role == Qt.DecorationRole:
             if isinstance(obj, Folder):
-                icon = QIcon('/home/daniel/grafity/grafity/resources/images/new/general/folder.png')
+                icon = QIcon(':/images/general/folder.png')
             elif isinstance(obj, Graph):
-                icon = QIcon('/home/daniel/grafity/grafity/resources/images/new/general/graph.png')
+                icon = QIcon(':/images/general/graph.png')
             else:
-                icon = QIcon('/home/daniel/grafity/grafity/resources/images/new/general/worksheet.png')
+                icon = QIcon(':/images/general/worksheet.png')
             return QVariant(icon)
         else:
             return QVariant()
@@ -89,8 +89,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, *args):
         QMainWindow.__init__(self, *args)
         self.setupUi(self)
+
+        self.otoolbar = QToolBar(self)
+        self.hboxlayout.addWidget(self.otoolbar)
         self.workspace = QWorkspace(self)
-        self.setCentralWidget(self.workspace)
+        self.hboxlayout.addWidget(self.workspace)
 
         self.toolBar.addSeparator()
 
@@ -105,7 +108,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.bottomact = self.bottom.toggleViewAction()
         self.bottomact.setIcon(QIcon(":/images/general/script.png"))
         self.toolBar.addAction(self.bottomact)
+
         self.bottom.hide()
+        self.right.hide()
 
         self.tree.header().hide()
         self.connect(self.tree, SIGNAL('activated(QModelIndex)'), self.foo)
