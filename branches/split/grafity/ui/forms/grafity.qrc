@@ -29,4 +29,16 @@
         <file>images/splash01.jpg</file>
         <file>images/splash02.jpg</file>
     </qresource>
+    <qresource prefix="/worksheet" >
+        <file>images/worksheet/delete-column.png</file>
+        <file>images/worksheet/delete-row.png</file>
+        <file>images/worksheet/first.png</file>
+        <file>images/worksheet/last.png</file>
+        <file>images/worksheet/left.png</file>
+        <file>images/worksheet/link.png</file>
+        <file>images/worksheet/new-column.png</file>
+        <file>images/worksheet/new-row.png</file>
+        <file>images/worksheet/right.png</file>
+        <file>images/worksheet/transpose.png</file>
+    </qresource>
 </RCC>

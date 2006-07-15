@@ -1,6 +1,14 @@
 __author__ = "Daniel Fragiadakis <dfragi@gmail.com>"
 __revision__ = "$Id$"
 
+# defining a database
+# data types
+# reading/writing stuff
+# saving/loading
+# undo/redo
+# notification and validation
+# defining new data types
+
 import sys
 import os
 import time, random, md5
@@ -33,15 +41,11 @@ class Storage(object):
                 attr._storage = self
                 self.itemtypes[name] = attr.cls
 
-    def _create_id(self, *args):
-        """Generates a unique ID.
-        Any arguments only create more randomness.
-        """
+    def _create_id(self):
+        """Generates a unique ID."""
         t = long(time.time() * 1000)
         r = long(random.random()*100000000000000000L)
-        data = str(t)+' '+str(r)+' '+str(args)
-        data = md5.md5(data).hexdigest()
-        return data
+        return md5.md5(str(t)+' '+str(r)).hexdigest()
 
     def save(self, filename):
         self.db.save(open(filename, 'w'))
@@ -157,7 +161,7 @@ class Storage(object):
 
             # notification
             if hasattr(obj, '_notify_mod__%s' % name):
-                getattr(obj, '_notify_mod__%s' % name)(value, old, offset)
+                getattr(obj, '_notify_mod__%s' % name)(data, old, offset)
 
         self.oplist.append(inv)
 

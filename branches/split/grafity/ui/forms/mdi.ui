@@ -13,7 +13,10 @@
    </rect>
   </property>
   <property name="windowTitle" >
-   <string>MainWindow</string>
+   <string>Grafity</string>
+  </property>
+  <property name="windowIcon" >
+   <iconset resource="grafity.qrc" >:/images/grafity-16.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget" >
    <layout class="QHBoxLayout" >

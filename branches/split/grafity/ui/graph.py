@@ -4,11 +4,11 @@ import sys
 from PyQt4.Qt import *
 from PyQt4 import Qwt5 as qwt
 
-from grafity.ui.worksheet import Ui_Form
+from grafity.ui.worksheet import Ui_form
 
 from pkg_resources import resource_stream
 
-class GraphView(QWidget, Ui_Form):
+class GraphView(QWidget, Ui_form):
     def __init__(self, parent, graph):
         QMainWindow.__init__(self, parent)
         self.setupUi(self)

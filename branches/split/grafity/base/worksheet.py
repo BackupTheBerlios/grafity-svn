@@ -14,6 +14,11 @@ class Column(Item):
     number = Attr.Integer()
     expr = Attr.Text()
     data = MkArray()
+
+    def _notify_mod__data(self, value, old, offset):
+        print >>sys.stderr, value, old, offset
+    def _notify_set__data(self, value, old):
+        print >>sys.stderr, value, old
     
     def __init__(self, *args):
         Item.__init__(self, *args)

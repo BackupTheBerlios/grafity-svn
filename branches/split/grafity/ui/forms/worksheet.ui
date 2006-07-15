@@ -2,8 +2,8 @@
  <author></author>
  <comment></comment>
  <exportmacro></exportmacro>
- <class>Form</class>
- <widget class="QWidget" name="MainWindow" >
+ <class>form</class>
+ <widget class="QWidget" name="form" >
   <property name="geometry" >
    <rect>
     <x>0</x>
@@ -30,8 +30,34 @@
     </widget>
    </item>
   </layout>
+  <action name="act_new_column" >
+   <property name="icon" >
+    <iconset resource="grafity.qrc" >:/worksheet/images/worksheet/new-column.png</iconset>
+   </property>
+   <property name="text" >
+    <string>New Column</string>
+   </property>
+  </action>
+  <action name="act_del_column" >
+   <property name="icon" >
+    <iconset resource="grafity.qrc" >:/worksheet/images/worksheet/delete-column.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Delete Column</string>
+   </property>
+  </action>
+  <action name="act_move_left" >
+   <property name="icon" >
+    <iconset resource="grafity.qrc" >:/worksheet/images/worksheet/left.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Move Column Left</string>
+   </property>
+  </action>
  </widget>
  <pixmapfunction></pixmapfunction>
- <resources/>
+ <resources>
+  <include location="grafity.qrc" />
+ </resources>
  <connections/>
 </ui>

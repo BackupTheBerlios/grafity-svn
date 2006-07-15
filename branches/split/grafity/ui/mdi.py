@@ -90,9 +90,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         QMainWindow.__init__(self, *args)
         self.setupUi(self)
 
-        self.otoolbar = QToolBar(self)
+        self.otoolbar = QToolBar(self.centralwidget)
+        self.otoolbar.setOrientation(Qt.Vertical)
         self.hboxlayout.addWidget(self.otoolbar)
-        self.workspace = QWorkspace(self)
+        self.workspace = QWorkspace(self.centralwidget)
         self.hboxlayout.addWidget(self.workspace)
 
         self.toolBar.addSeparator()
@@ -114,10 +115,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.tree.header().hide()
         self.connect(self.tree, SIGNAL('activated(QModelIndex)'), self.foo)
+        self.connect(self.workspace, SIGNAL('windowActivated(QWidget*)'), 
+                     self.on_workspace_windowActivated)
 #        self.insertToolBarBreak(self.toolbar2)
 
 #        self.console = Console(self)
 #        self.properties = Properties(self)
+
 
     @pyqtSignature("")
     def on_action_new_activated(self):
@@ -184,6 +188,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.console.locals['main'] = self
         self.model = TreeModel(self.project)
         self.tree.setModel(self.model)
+
+    def on_workspace_windowActivated(self, window):
+        print >>sys.stderr, window
+        self.otoolbar.clear()
+        if hasattr(window, 'actions'):
+            for act in window.actions:
+                self.otoolbar.addAction(act)
 
     @pyqtSignature("")
     def on_action_Undo_activated(self):

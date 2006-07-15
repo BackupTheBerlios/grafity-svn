@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'unknown'
 #
-# Created: Fri Jul 14 18:32:28 2006
-#      by: PyQt4 UI code generator snapshot-20060424
+# Created: Fri Jul 14 21:15:54 2006
+#      by: PyQt4 UI code generator 4.0
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -15,6 +15,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(QtCore.QSize(QtCore.QRect(0,0,952,688).size()).expandedTo(MainWindow.minimumSizeHint()))
+        MainWindow.setWindowIcon(QtGui.QIcon(":/images/grafity-16.png"))
 
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -834,7 +835,7 @@ class Ui_MainWindow(object):
         return QtGui.QApplication.translate("MainWindow", string, None, QtGui.QApplication.UnicodeUTF8)
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(self.tr("MainWindow"))
+        MainWindow.setWindowTitle(self.tr("Grafity"))
         self.menu_Project.setTitle(self.tr("&Project"))
         self.menu_Edit.setTitle(self.tr("&Edit"))
         self.tabWidget_3.setTabText(self.tabWidget_3.indexOf(self.tab_5), self.tr("Script"))
