@@ -8,8 +8,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>952</width>
-    <height>688</height>
+    <width>793</width>
+    <height>627</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -33,10 +33,17 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>952</width>
+     <width>793</width>
      <height>31</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menu_Edit" >
+    <property name="title" >
+     <string>&amp;Edit</string>
+    </property>
+    <addaction name="act_undo" />
+    <addaction name="act_redo" />
+   </widget>
    <widget class="QMenu" name="menu_Project" >
     <property name="title" >
      <string>&amp;Project</string>
@@ -45,21 +52,31 @@
     <addaction name="action_open" />
     <addaction name="action_save" />
     <addaction name="action_saveas" />
+    <addaction name="separator" />
+    <addaction name="actionE_xit" />
    </widget>
-   <widget class="QMenu" name="menu_Edit" >
+   <widget class="QMenu" name="menu_Help" >
     <property name="title" >
-     <string>&amp;Edit</string>
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="action_About" />
+   </widget>
+   <widget class="QMenu" name="menu_Window" >
+    <property name="title" >
+     <string>&amp;Window</string>
     </property>
    </widget>
    <addaction name="menu_Project" />
    <addaction name="menu_Edit" />
+   <addaction name="menu_Window" />
+   <addaction name="menu_Help" />
   </widget>
   <widget class="QStatusBar" name="statusbar" >
    <property name="geometry" >
     <rect>
      <x>0</x>
-     <y>664</y>
-     <width>952</width>
+     <y>603</y>
+     <width>793</width>
      <height>24</height>
     </rect>
    </property>
@@ -258,17 +275,6 @@
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
-       </property>
-       <property name="font" >
-        <font>
-         <family>Sans Serif</family>
-         <pointsize>9</pointsize>
-         <weight>50</weight>
-         <italic>false</italic>
-         <bold>false</bold>
-         <underline>false</underline>
-         <strikeout>false</strikeout>
-        </font>
        </property>
        <property name="tabPosition" >
         <enum>QTabWidget::East</enum>
@@ -1347,6 +1353,9 @@
    <addaction name="actionNew_Worksheet" />
    <addaction name="actionNew_Graph" />
    <addaction name="actionNew_Folder" />
+   <addaction name="separator" />
+   <addaction name="act_undo" />
+   <addaction name="act_redo" />
   </widget>
   <action name="action_new" >
    <property name="icon" >
@@ -1402,6 +1411,55 @@
    </property>
    <property name="text" >
     <string>New &amp;Folder</string>
+   </property>
+  </action>
+  <action name="action_About" >
+   <property name="text" >
+    <string>&amp;About...</string>
+   </property>
+  </action>
+  <action name="act_closeall" >
+   <property name="text" >
+    <string>Close &amp;All</string>
+   </property>
+  </action>
+  <action name="act_undo" >
+   <property name="icon" >
+    <iconset resource="grafity.qrc" >:/images/general/undo.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Undo</string>
+   </property>
+  </action>
+  <action name="act_redo" >
+   <property name="icon" >
+    <iconset resource="grafity.qrc" >:/images/general/redo.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Redo</string>
+   </property>
+  </action>
+  <action name="actionE_xit" >
+   <property name="icon" >
+    <iconset resource="grafity.qrc" >:/images/general/exit.png</iconset>
+   </property>
+   <property name="text" >
+    <string>E&amp;xit</string>
+   </property>
+  </action>
+  <action name="act_cascade" >
+   <property name="text" >
+    <string>Cascade</string>
+   </property>
+  </action>
+  <action name="act_tile" >
+   <property name="text" >
+    <string>Tile</string>
+   </property>
+  </action>
+  <action name="act_close" >
+   <property name="text" >
+    <string>Close</string>
    </property>
   </action>
  </widget>

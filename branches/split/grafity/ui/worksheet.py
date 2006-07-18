@@ -19,7 +19,7 @@ class WorksheetView(QWidget, Ui_form):
 #        self.table.verticalHeader().resizeSection(0, 10)
 #        self.table.setRowHeight(8, 20)
 
-        self.actions = [self.act_new_column, self.act_del_column, self.act_move_left]
+        self.toolbar_actions = [self.act_new_column, self.act_del_column, self.act_move_left]
 
     @pyqtSignature("")
     def on_act_new_column_activated(self):

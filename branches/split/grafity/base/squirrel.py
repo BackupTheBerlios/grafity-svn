@@ -47,7 +47,7 @@ class Storage(object):
         r = long(random.random()*100000000000000000L)
         return md5.md5(str(t)+' '+str(r)).hexdigest()
 
-    def save(self, filename):
+    def saveas(self, filename):
         self.db.save(open(filename, 'w'))
 
     def close(self):
@@ -172,10 +172,12 @@ class Storage(object):
     def commit(self):
         uview = self.undodb.getas("undolist[name:S,ops:B]")
         uview.append(name=self.action_name, ops=marshal.dumps(self.oplist))
+        self.action_name = None
+
+    def save(self):
         if self.filename is not None:
             self.undodb.commit()
             self.db.commit()
-        self.action_name = None
 
     def undo(self, _redo=False):
         uview = self.undodb.getas("undolist[name:S,ops:B]")

@@ -1,6 +1,15 @@
 grafity.core.storage
 ====================
 
+# defining a database
+# data types
+# reading/writing stuff
+# saving/loading
+# undo/redo
+# notification and validation
+# defining new data types
+
+
 Using ``factorial``
 -------------------
 

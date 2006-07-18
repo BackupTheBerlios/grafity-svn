@@ -5,7 +5,7 @@ from grafity.ui.forms import qtresources
 
 def main():
     app = QApplication(sys.argv)
-    pm = QPixmap(":/images/splash02.jpg")
+    pm = QPixmap(":/images/splash01.jpg")
     splash = QSplashScreen(pm)
     splash.show()
 

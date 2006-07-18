@@ -15,6 +15,9 @@
   <property name="windowTitle" >
    <string>Form</string>
   </property>
+  <property name="windowIcon" >
+   <iconset resource="grafity.qrc" >:/images/general/worksheet.png</iconset>
+  </property>
   <layout class="QHBoxLayout" >
    <property name="margin" >
     <number>0</number>

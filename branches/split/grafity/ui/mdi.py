@@ -1,10 +1,10 @@
 import sys
 
-
 from PyQt4.Qt import *
 from dispatch import dispatcher
 
-dispatcher.send('splash-message', msg='Loading modules..,')
+dispatcher.send('splash-message', msg='Loading modules...')
+
 from pkg_resources import resource_stream
 from grafity.base.items import Folder
 from grafity.base.graph import Graph
@@ -122,19 +122,97 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 #        self.console = Console(self)
 #        self.properties = Properties(self)
 
+        self.window_action_group = QActionGroup(self)
+        self.on_action_new_activated()
+
+
+    def on_project_open(self):
+        """File/Open"""
+        try:
+            self.ask_save()
+        except Cancel:
+            return
+
+        filesel = QFileDialog(self)
+        if filesel.exec_loop() != 1:
+            return
+
+        filename = unicode(filesel.selectedFile())
+
+        if filename in self.recent:
+            self.recent.remove(filename)
+        self.recent = ([filename]+self.recent)[:5]
+
+        self.close_project()
+        self.open_project(grafity.Project(filename))
+
+    def on_project_save(self):
+        if self.project.filename is not None:
+            self.project.commit()
+        else:
+            self.on_project_saveas()
+
+    def on_project_saveas(self):
+        filesel = QFileDialog(self)
+        filesel.setMode(QFileDialog.AnyFile)
+        if filesel.exec_loop() != 1:
+            return
+        self.project.saveto(str(filesel.selectedFile()))
+        self.close_project()
+        self.open_project(grafity.Project(str(filesel.selectedFile())))
+
+    def on_project_new(self):
+        try:
+            self.ask_save()
+        except Cancel:
+            return
+        self.close_project()
+        self.open_project(grafity.Project())
+
+
+
+    def on_menu_Window_aboutToShow(self):
+        self.menu_Window.clear()
+        self.menu_Window.addAction(self.act_tile)
+        self.menu_Window.addAction(self.act_cascade)
+        self.menu_Window.addSeparator()
+        self.menu_Window.addAction(self.act_close)
+        self.menu_Window.addAction(self.act_closeall)
+        self.menu_Window.addSeparator()
+        for w in self.workspace.windowList():
+            if not hasattr(w, "act_set_active"):
+                w.act_set_active = QAction(w.windowTitle(), w)
+                w.act_set_active.setActionGroup(self.window_action_group)
+                w.act_set_active.setCheckable(True)
+                self.connect(w.act_set_active, SIGNAL('toggled(bool)'), self.on_window_activate)
+                w.act_set_active.setChecked(w == self.workspace.activeWindow())
+            self.menu_Window.addAction(w.act_set_active)
+
+
+
+    def on_window_activate(self, checked):
+        if checked:
+            for window in self.workspace.windowList():
+                if window.act_set_active.isChecked():
+                    self.workspace.setActiveWindow(window)
+                    break
 
     @pyqtSignature("")
     def on_action_new_activated(self):
         project = Project()
-        f1 = project.new_folder('foobar')
-        f2 = project.new_worksheet('bs5', f1)
         self.open_project(project)
 
     @pyqtSignature("")
     def on_action_open_activated(self):
-        filename = QFileDialog.getOpenFileName(self, "Choose a file", "", "Projects (*.grafity);;All files (*)")
+        filename = QFileDialog.getOpenFileName(self, "Choose a file", "", 
+                                               "Projects (*.grafity);;All files (*)")
         if filename is not None:
             self.open_project(Project(str(filename)))
+
+    @pyqtSignature("")
+    def on_action_save_activated(self):
+        print >>sys.stderr, "1"
+
 
     @pyqtSignature("")
     def on_actionE_xit_activated(self):
@@ -189,11 +267,31 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.model = TreeModel(self.project)
         self.tree.setModel(self.model)
 
+
+    def ask_save(self):
+        """Prepare to close the project. Ask the user whether to
+        save changes and save is necessary. Raises Cancel if
+        the user cancels.
+        """
+        if not self.project.modified:
+            return
+        message = "<b>Do you want to save the changes you made to the document?</b>" \
+                  "<p>Your changes will be lost if you don't save them"
+        resp = QMessageBox.information(None, "Grafity", message,
+                                       "&Save",  "&Cancel", "&Don't Save", 0, 1)
+        if resp == 0:
+            self.on_project_save()
+        if resp == 1:
+            raise Cancel
+        elif resp == 2:
+            pass
+
+
     def on_workspace_windowActivated(self, window):
         print >>sys.stderr, window
         self.otoolbar.clear()
-        if hasattr(window, 'actions'):
-            for act in window.actions:
+        if hasattr(window, 'toolbar_actions'):
+            for act in window.toolbar_actions:
                 self.otoolbar.addAction(act)
 
     @pyqtSignature("")

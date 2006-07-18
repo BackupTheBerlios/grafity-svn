@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'unknown'
 #
-# Created: Fri Jul 14 21:15:54 2006
+# Created: Sat Jul 15 17:42:04 2006
 #      by: PyQt4 UI code generator 4.0
 #
 # WARNING! All changes made in this file will be lost!
@@ -14,7 +14,7 @@ from PyQt4 import QtCore, QtGui
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(QtCore.QSize(QtCore.QRect(0,0,952,688).size()).expandedTo(MainWindow.minimumSizeHint()))
+        MainWindow.resize(QtCore.QSize(QtCore.QRect(0,0,793,627).size()).expandedTo(MainWindow.minimumSizeHint()))
         MainWindow.setWindowIcon(QtGui.QIcon(":/images/grafity-16.png"))
 
         self.centralwidget = QtGui.QWidget(MainWindow)
@@ -27,18 +27,24 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0,0,952,31))
+        self.menubar.setGeometry(QtCore.QRect(0,0,793,31))
         self.menubar.setObjectName("menubar")
+
+        self.menu_Edit = QtGui.QMenu(self.menubar)
+        self.menu_Edit.setObjectName("menu_Edit")
 
         self.menu_Project = QtGui.QMenu(self.menubar)
         self.menu_Project.setObjectName("menu_Project")
 
-        self.menu_Edit = QtGui.QMenu(self.menubar)
-        self.menu_Edit.setObjectName("menu_Edit")
+        self.menu_Help = QtGui.QMenu(self.menubar)
+        self.menu_Help.setObjectName("menu_Help")
+
+        self.menu_Window = QtGui.QMenu(self.menubar)
+        self.menu_Window.setObjectName("menu_Window")
         MainWindow.setMenuBar(self.menubar)
 
         self.statusbar = QtGui.QStatusBar(MainWindow)
-        self.statusbar.setGeometry(QtCore.QRect(0,664,952,24))
+        self.statusbar.setGeometry(QtCore.QRect(0,603,793,24))
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
 
@@ -171,16 +177,6 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.tabs.sizePolicy().hasHeightForWidth())
         self.tabs.setSizePolicy(sizePolicy)
-
-        font = QtGui.QFont(self.tabs.font())
-        font.setFamily("Sans Serif")
-        font.setPointSize(9)
-        font.setWeight(50)
-        font.setItalic(False)
-        font.setUnderline(False)
-        font.setStrikeOut(False)
-        font.setBold(False)
-        self.tabs.setFont(font)
         self.tabs.setTabPosition(QtGui.QTabWidget.East)
         self.tabs.setTabShape(QtGui.QTabWidget.Rounded)
         self.tabs.setObjectName("tabs")
@@ -794,12 +790,46 @@ class Ui_MainWindow(object):
         self.actionNew_Folder = QtGui.QAction(MainWindow)
         self.actionNew_Folder.setIcon(QtGui.QIcon(":/images/general/new-folder.png"))
         self.actionNew_Folder.setObjectName("actionNew_Folder")
+
+        self.action_About = QtGui.QAction(MainWindow)
+        self.action_About.setObjectName("action_About")
+
+        self.act_closeall = QtGui.QAction(MainWindow)
+        self.act_closeall.setObjectName("act_closeall")
+
+        self.act_undo = QtGui.QAction(MainWindow)
+        self.act_undo.setIcon(QtGui.QIcon(":/images/general/undo.png"))
+        self.act_undo.setObjectName("act_undo")
+
+        self.act_redo = QtGui.QAction(MainWindow)
+        self.act_redo.setIcon(QtGui.QIcon(":/images/general/redo.png"))
+        self.act_redo.setObjectName("act_redo")
+
+        self.actionE_xit = QtGui.QAction(MainWindow)
+        self.actionE_xit.setIcon(QtGui.QIcon(":/images/general/exit.png"))
+        self.actionE_xit.setObjectName("actionE_xit")
+
+        self.act_cascade = QtGui.QAction(MainWindow)
+        self.act_cascade.setObjectName("act_cascade")
+
+        self.act_tile = QtGui.QAction(MainWindow)
+        self.act_tile.setObjectName("act_tile")
+
+        self.act_close = QtGui.QAction(MainWindow)
+        self.act_close.setObjectName("act_close")
+        self.menu_Edit.addAction(self.act_undo)
+        self.menu_Edit.addAction(self.act_redo)
         self.menu_Project.addAction(self.action_new)
         self.menu_Project.addAction(self.action_open)
         self.menu_Project.addAction(self.action_save)
         self.menu_Project.addAction(self.action_saveas)
+        self.menu_Project.addSeparator()
+        self.menu_Project.addAction(self.actionE_xit)
+        self.menu_Help.addAction(self.action_About)
         self.menubar.addAction(self.menu_Project.menuAction())
         self.menubar.addAction(self.menu_Edit.menuAction())
+        self.menubar.addAction(self.menu_Window.menuAction())
+        self.menubar.addAction(self.menu_Help.menuAction())
         self.toolBar.addAction(self.action_new)
         self.toolBar.addAction(self.action_open)
         self.toolBar.addAction(self.action_save)
@@ -808,6 +838,9 @@ class Ui_MainWindow(object):
         self.toolBar.addAction(self.actionNew_Worksheet)
         self.toolBar.addAction(self.actionNew_Graph)
         self.toolBar.addAction(self.actionNew_Folder)
+        self.toolBar.addSeparator()
+        self.toolBar.addAction(self.act_undo)
+        self.toolBar.addAction(self.act_redo)
         self.label.setBuddy(self.treeView)
         self.label_2.setBuddy(self.listView)
         self.label_3.setBuddy(self.listView_2)
@@ -836,8 +869,10 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(self.tr("Grafity"))
-        self.menu_Project.setTitle(self.tr("&Project"))
         self.menu_Edit.setTitle(self.tr("&Edit"))
+        self.menu_Project.setTitle(self.tr("&Project"))
+        self.menu_Help.setTitle(self.tr("&Help"))
+        self.menu_Window.setTitle(self.tr("&Window"))
         self.tabWidget_3.setTabText(self.tabWidget_3.indexOf(self.tab_5), self.tr("Script"))
         self.tabWidget_3.setTabText(self.tabWidget_3.indexOf(self.tab_6), self.tr("Log"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), self.tr("Project"))
@@ -889,3 +924,11 @@ class Ui_MainWindow(object):
         self.actionNew_Worksheet.setText(self.tr("New &Worksheet"))
         self.actionNew_Graph.setText(self.tr("New &Graph"))
         self.actionNew_Folder.setText(self.tr("New &Folder"))
+        self.action_About.setText(self.tr("&About..."))
+        self.act_closeall.setText(self.tr("Close &All"))
+        self.act_undo.setText(self.tr("&Undo"))
+        self.act_redo.setText(self.tr("&Redo"))
+        self.actionE_xit.setText(self.tr("E&xit"))
+        self.act_cascade.setText(self.tr("Cascade"))
+        self.act_tile.setText(self.tr("Tile"))
+        self.act_close.setText(self.tr("Close"))

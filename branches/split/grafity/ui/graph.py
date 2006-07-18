@@ -4,7 +4,7 @@ import sys
 from PyQt4.Qt import *
 from PyQt4 import Qwt5 as qwt
 
-from grafity.ui.worksheet import Ui_form
+from grafity.ui.forms.graph import Ui_form
 
 from pkg_resources import resource_stream
 
@@ -13,10 +13,12 @@ class GraphView(QWidget, Ui_form):
         QMainWindow.__init__(self, parent)
         self.setupUi(self)
         self.graph = graph
-        self.plot = qwt.QwtPlot(self)
+
 
         self.bg_color = QColor('white')
 
+        self.plot = qwt.QwtPlot(self.frame)
+        self.hboxlayout.addWidget(self.plot)
 
         self.plot.setCanvasBackground(self.bg_color)
 #        self.plot.setPaletteBackgroundColor(self.bg_color)
