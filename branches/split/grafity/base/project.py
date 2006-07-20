@@ -23,6 +23,7 @@ class Project(object):
 #        except:
 #            pass
         self.store = Store(filename)
+        self.modified = False
         dispatcher.connect(self.on_action)
 
         # top folder

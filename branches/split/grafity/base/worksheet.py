@@ -16,9 +16,12 @@ class Column(Item):
     data = MkArray()
 
     def _notify_mod__data(self, value, old, offset):
-        print >>sys.stderr, value, old, offset
+        print >>sys.stderr, "MOD_DATA"
+        dispatcher.send('modified', sender=self.worksheet)
+
     def _notify_set__data(self, value, old):
-        print >>sys.stderr, value, old
+        print >>sys.stderr, "SET_DATA"
+        dispatcher.send('modified', sender=self.worksheet)
     
     def __init__(self, *args):
         Item.__init__(self, *args)
@@ -31,7 +34,6 @@ class Column(Item):
 
     def __setitem__(self, key, value):
         self.data[key] = value
-        dispatcher.send('data-changed', sender=self)
 
     def __getitem__(self, key):
         return self.data[key]

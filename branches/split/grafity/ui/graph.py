@@ -12,7 +12,7 @@ class GraphView(QWidget, Ui_form):
     def __init__(self, parent, graph):
         QMainWindow.__init__(self, parent)
         self.setupUi(self)
-        self.graph = graph
+        self.graph = self.object = graph
 
 
         self.bg_color = QColor('white')

@@ -84,6 +84,9 @@ class TreeModel(QAbstractItemModel):
             return QModelIndex()
         return self.createIndex(list(parent.folder.contents()).index(parent), 0, self._getpos(parent.oid))
 
+class Cancel(Exception):
+    pass
+
 from forms.mdi import Ui_MainWindow
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, *args):
@@ -123,52 +126,55 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 #        self.properties = Properties(self)
 
         self.window_action_group = QActionGroup(self)
+        self.project = None
         self.on_action_new_activated()
+        self.recent = []
 
+    @pyqtSignature("")
+    def on_action_new_activated(self):
+        try:
+            if self.project is not None:
+                self.ask_save()
+        except Cancel:
+            return
+        project = Project()
+        self.open_project(project)
 
-    def on_project_open(self):
-        """File/Open"""
+    @pyqtSignature("")
+    def on_action_open_activated(self):
         try:
             self.ask_save()
         except Cancel:
             return
 
-        filesel = QFileDialog(self)
-        if filesel.exec_loop() != 1:
-            return
-
-        filename = unicode(filesel.selectedFile())
+        filename = QFileDialog.getOpenFileName(self, "Choose a file", "", 
+                                               "Projects (*.grafity);;All files (*)")
 
         if filename in self.recent:
             self.recent.remove(filename)
         self.recent = ([filename]+self.recent)[:5]
 
         self.close_project()
-        self.open_project(grafity.Project(filename))
+        if filename is not None:
+            self.open_project(Project(str(filename)))
 
-    def on_project_save(self):
+
+    @pyqtSignature("")
+    def on_action_save_activated(self):
         if self.project.filename is not None:
             self.project.commit()
         else:
-            self.on_project_saveas()
+            self.on_action_saveas_activated()
 
-    def on_project_saveas(self):
-        filesel = QFileDialog(self)
-        filesel.setMode(QFileDialog.AnyFile)
-        if filesel.exec_loop() != 1:
-            return
-        self.project.saveto(str(filesel.selectedFile()))
+    @pyqtSignature("")
+    def on_action_saveas_activated(self):
+
+        filename = QFileDialog.getSaveFileName(self, "Choose a file", "", 
+                                               "Projects (*.grafity);;All files (*)")
+        self.project.saveto(str(filename))
         self.close_project()
+        print >>sys.stderr, filename
         self.open_project(grafity.Project(str(filesel.selectedFile())))
-
-    def on_project_new(self):
-        try:
-            self.ask_save()
-        except Cancel:
-            return
-        self.close_project()
-        self.open_project(grafity.Project())
-
 
 
     def on_menu_Window_aboutToShow(self):
@@ -197,22 +203,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     self.workspace.setActiveWindow(window)
                     break
 
-    @pyqtSignature("")
-    def on_action_new_activated(self):
-        project = Project()
-        self.open_project(project)
-
-    @pyqtSignature("")
-    def on_action_open_activated(self):
-        filename = QFileDialog.getOpenFileName(self, "Choose a file", "", 
-                                               "Projects (*.grafity);;All files (*)")
-        if filename is not None:
-            self.open_project(Project(str(filename)))
-
-    @pyqtSignature("")
-    def on_action_save_activated(self):
-        print >>sys.stderr, "1"
-
 
     @pyqtSignature("")
     def on_actionE_xit_activated(self):
@@ -239,7 +229,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def on_actionNew_Worksheet_activated(self):
         self.project.store.begin('new worksheet')
         try:
-            sheet = self.project.new_worksheet('sheet1')
+            n = 0
+            while 'sheet'+str(n) in self.project.top:
+                n+=1
+            sheet = self.project.new_worksheet('sheet'+str(n))
             sheet.a = [1,2,3]
             sheet.b = [4,5,6]
         except:
@@ -295,25 +288,30 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.otoolbar.addAction(act)
 
     @pyqtSignature("")
-    def on_action_Undo_activated(self):
+    def on_act_undo_activated(self):
         self.project.store.undo()
 
     @pyqtSignature("")
-    def on_action_Redo_activated(self):
+    def on_act_redo_activated(self):
         self.project.store.redo()
 
     def foo(self, index):
         from worksheet import WorksheetView
         from graph import GraphView
         obj = self.model._fromindex(index) 
-        if isinstance(obj, Worksheet):
-            view = WorksheetView(self.workspace, obj)
-            self.workspace.addWindow(view)
-        elif isinstance(obj, Graph):
-            view = GraphView(self.workspace, obj)
-            self.workspace.addWindow(view)
+        for window in self.workspace.windowList():
+            if window.object == obj:
+                self.workspace.setActiveWindow(window)
+                break
+        else:
+            if isinstance(obj, Worksheet):
+                view = WorksheetView(self.workspace, obj)
+                self.workspace.addWindow(view)
+            elif isinstance(obj, Graph):
+                view = GraphView(self.workspace, obj)
+                self.workspace.addWindow(view)
 #        view = GraphView(self, None)
-        view.show()
+            view.show()
 #        print >>sys.stderr, args
 #        p.new_folder('macaroni', f1)
 

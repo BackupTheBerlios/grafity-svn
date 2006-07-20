@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'unknown'
 #
-# Created: Sat Jul 15 17:42:04 2006
-#      by: PyQt4 UI code generator 4.0
+# Created: Thu Jul 20 15:21:27 2006
+#      by: PyQt4 UI code generator snapshot-20060424
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -433,6 +433,8 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.color_ch.sizePolicy().hasHeightForWidth())
         self.color_ch.setSizePolicy(sizePolicy)
+        self.color_ch.setAutoFillBackground(False)
+        self.color_ch.setTristate(True)
         self.color_ch.setObjectName("color_ch")
         self.gridlayout1.addWidget(self.color_ch,3,0,1,1)
 
@@ -861,7 +863,7 @@ class Ui_MainWindow(object):
         self.textLabel7_2.setBuddy(self.textLabel7_2)
 
         self.retranslateUi(MainWindow)
-        self.tabs.setCurrentIndex(0)
+        self.tabs.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def tr(self, string):
