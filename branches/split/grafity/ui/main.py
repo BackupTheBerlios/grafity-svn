@@ -9,6 +9,10 @@ def main():
     splash = QSplashScreen(pm)
     splash.show()
 
+    QCoreApplication.setOrganizationName("Grafity Labs");
+#    QCoreApplication.setOrganizationDomain("mysoft.com");
+    QCoreApplication.setApplicationName("Grafity");
+
     from dispatch import dispatcher
 
     def messg(msg):

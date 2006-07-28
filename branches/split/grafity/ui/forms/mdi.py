@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'unknown'
 #
-# Created: Thu Jul 20 15:21:27 2006
+# Created: Thu Jul 27 17:18:23 2006
 #      by: PyQt4 UI code generator snapshot-20060424
 #
 # WARNING! All changes made in this file will be lost!
@@ -538,18 +538,18 @@ class Ui_MainWindow(object):
         self.textLabel6.setObjectName("textLabel6")
         self.gridlayout1.addWidget(self.textLabel6,2,1,1,1)
 
-        self.size = QtGui.QSpinBox(self.Style)
+        self.ssize = QtGui.QSpinBox(self.Style)
 
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Policy(3),QtGui.QSizePolicy.Policy(0))
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.size.sizePolicy().hasHeightForWidth())
-        self.size.setSizePolicy(sizePolicy)
-        self.size.setMaximum(60)
-        self.size.setMinimum(1)
-        self.size.setProperty("value",QtCore.QVariant(5))
-        self.size.setObjectName("size")
-        self.gridlayout1.addWidget(self.size,2,2,1,1)
+        sizePolicy.setHeightForWidth(self.ssize.sizePolicy().hasHeightForWidth())
+        self.ssize.setSizePolicy(sizePolicy)
+        self.ssize.setMaximum(60)
+        self.ssize.setMinimum(1)
+        self.ssize.setProperty("value",QtCore.QVariant(5))
+        self.ssize.setObjectName("ssize")
+        self.gridlayout1.addWidget(self.ssize,2,2,1,1)
         self.hboxlayout8.addLayout(self.gridlayout1)
         self.vboxlayout6.addLayout(self.hboxlayout8)
         self.vboxlayout5.addLayout(self.vboxlayout6)
@@ -852,7 +852,7 @@ class Ui_MainWindow(object):
         self.textLabel4.setBuddy(self.shape)
         self.textLabel4_3.setBuddy(self.fill)
         self.textLabel7.setBuddy(self.color)
-        self.textLabel6.setBuddy(self.size)
+        self.textLabel6.setBuddy(self.ssize)
         self.textLabel4_2_2.setBuddy(self.group)
         self.textLabel5.setBuddy(self.xfrom)
         self.textLabel4_5.setBuddy(self.xtitle)

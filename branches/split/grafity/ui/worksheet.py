@@ -15,6 +15,9 @@ class WorksheetView(QWidget, Ui_form):
         self.setupUi(self)
         self.worksheet = self.object = worksheet
 
+        self.headeredit = QLineEdit(self.table.horizontalHeader())
+        self.headeredit.hide()
+
         self.m = WorksheetModel(worksheet)
         self.table.setModel(self.m)
 #        self.table.verticalHeader().resizeSection(0, 10)
@@ -23,9 +26,20 @@ class WorksheetView(QWidget, Ui_form):
         self.toolbar_actions = [self.act_new_column, self.act_del_column, self.act_move_left]
         self.setWindowTitle(self.worksheet.name)
 
+        self.connect(self.table.horizontalHeader(), SIGNAL("sectionDoubleClicked(int)"), self.on_header_clicked)
+
+    def on_header_clicked(self, section):
+        width = self.table.horizontalHeader().sectionSize(section)
+        position = self.table.horizontalHeader().sectionViewportPosition(section)
+        height = self.table.horizontalHeader().height()
+        self.headeredit.move(position, 0)
+        self.headeredit.resize(width, height)
+        self.headeredit.show()
+
     @pyqtSignature("")
     def on_act_new_column_activated(self):
         self.worksheet[self.worksheet.suggest_column_name()] = [1,2,3]
+
 
 class WorksheetModel(QAbstractTableModel):
     def __init__(self, worksheet):
@@ -34,7 +48,6 @@ class WorksheetModel(QAbstractTableModel):
         dispatcher.connect(self.update, sender=self.worksheet, signal='modified')
 
     def update(self):
-        print >>sys.stderr, "layoutchanged"
         self.emit(SIGNAL('layoutChanged()'))
 
     def rowCount(self, parent):

@@ -16,11 +16,9 @@ class Column(Item):
     data = MkArray()
 
     def _notify_mod__data(self, value, old, offset):
-        print >>sys.stderr, "MOD_DATA"
         dispatcher.send('modified', sender=self.worksheet)
 
     def _notify_set__data(self, value, old):
-        print >>sys.stderr, "SET_DATA"
         dispatcher.send('modified', sender=self.worksheet)
     
     def __init__(self, *args):
@@ -45,11 +43,10 @@ class Column(Item):
         return repr(self.data)
 
     def _validate__name(self, name):
-        print >>sys.stderr, name
         return name
 
-    def _after__name(self, name):
-        pass
+    def _notify_set__name(self, name, old):
+        dispatcher.send('modified', sender=self.worksheet)
 
     def _validate__expr(self, expr):
         print >>sys.stderr, self.do_set_expr(expr)

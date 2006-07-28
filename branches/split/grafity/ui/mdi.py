@@ -130,6 +130,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.on_action_new_activated()
         self.recent = []
 
+        settings = QSettings()
+
+        settings.beginGroup("MainWindow")
+        self.resize(settings.value("size", QVariant(QSize(800, 600))).toSize())
+        self.move(settings.value("pos", QVariant(QPoint(100, 100))).toPoint())
+        settings.endGroup()
+                                        
+
     @pyqtSignature("")
     def on_action_new_activated(self):
         try:
@@ -165,6 +173,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.project.commit()
         else:
             self.on_action_saveas_activated()
+
+    def close_project(self):
+        pass
 
     @pyqtSignature("")
     def on_action_saveas_activated(self):
@@ -215,6 +226,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.properties.show()
         else:
             self.properties.show()
+
+    def closeEvent(self, ev):
+        settings = QSettings()
+        settings.beginGroup("MainWindow")
+        settings.setValue("size", QVariant(self.size()))
+        settings.setValue("pos", QVariant(self.pos()))
+        settings.endGroup()
+
+        print >>sys.stderr, 'CLOSE'
+        try:
+            self.ask_save()
+        except Cancel:
+            ev.ignore()
+        else:
+            ev.accept()
 
 
     @pyqtSignature("")
